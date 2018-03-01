@@ -1,11 +1,13 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MetricsComponent } from './metrics/metrics.component';
+import { MetricsRoutingModule } from './metrics.routing';
 
 @NgModule({
   imports: [
-    CommonModule
+    CommonModule,
+    MetricsRoutingModule,
   ],
-  declarations: [MetricsComponent]
+  declarations: [MetricsComponent],
 })
 export class MetricsModule { }

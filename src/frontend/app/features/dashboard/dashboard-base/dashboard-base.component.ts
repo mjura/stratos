@@ -73,6 +73,12 @@ export class DashboardBaseComponent implements OnInit, OnDestroy, AfterContentIn
       endpointType: 'caasp',
     },
     {
+      text: 'Metrics',
+      matIcon: 'equalizer',
+      link: '/metrics',
+      endpointType: 'metrics',
+    },
+    {
       text: 'Endpoints',
       matIcon: 'settings_ethernet',
       link: '/endpoints'

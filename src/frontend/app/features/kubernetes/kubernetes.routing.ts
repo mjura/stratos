@@ -1,6 +1,8 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 import { KubernetesComponent } from './kubernetes/kubernetes.component';
+import { KubernetesTabBaseComponent } from './kubernetes-tab-base/kubernetes-tab-base.component';
+import { KubernetesNodesTabComponent } from './tabs/kubernetes-nodes-tab/kubernetes-nodes-tab.component';
 
 const kubernetes: Routes = [{
   path: '',
@@ -11,7 +13,21 @@ const kubernetes: Routes = [{
   children: [
   {
     path: '',
-    //component: KubernetesSummaryComponent,
+    // Root for Tabs
+    component: KubernetesTabBaseComponent,
+    data: {
+      uiFullView: true
+    },
+    children: [{
+      path: '',
+      redirectTo: 'nodes',
+      pathMatch: 'full'
+    },
+    {
+      path: 'nodes',
+      component: KubernetesNodesTabComponent
+    },
+  ]
   }]
 }];
 

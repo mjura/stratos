@@ -27,7 +27,7 @@ export class KubernetesService {
     );
 
     this.kubeEndpoints$ = this.kubeEndpointsMonitor.currentPage$.pipe(
-      map(endpoints => endpoints.filter(e => e.cnsi_type === 'kubernetes')),
+      map(endpoints => endpoints.filter(e => e.cnsi_type === 'k8s')),
       shareReplay(1)
     );
   }
