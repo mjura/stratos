@@ -86,6 +86,8 @@ import { CfSpacePermissionCellComponent } from './components/list/list-types/cf-
 import { FileInputComponent } from './components/file-input/file-input.component';
 import { RingChartComponent } from './components/ring-chart/ring-chart.component';
 import { NgxChartsModule } from '@swimlane/ngx-charts';
+import { KubernetesNodeCapacityComponent } from './components/list/list-types/kubernetes-nodes/kubernetes-node-capacity/kubernetes-node-capacity.component';
+import { SvgIconComponent } from './components/svg-icon/svg-icon.component';
 /* tslint:enable:max-line-length */
 
 
@@ -161,6 +163,8 @@ import { NgxChartsModule } from '@swimlane/ngx-charts';
     CardCfSpaceUsageComponent,
     CardCfSpaceDetailsComponent,
     RingChartComponent,
+    KubernetesNodeCapacityComponent,
+    SvgIconComponent,
   ],
   exports: [
     FormsModule,
@@ -214,7 +218,8 @@ import { NgxChartsModule } from '@swimlane/ngx-charts';
     CardCfOrgUserDetailsComponent,
     CardCfSpaceUsageComponent,
     CardCfSpaceDetailsComponent,
-    RingChartComponent,    
+    RingChartComponent,  
+    SvgIconComponent,  
   ],
   entryComponents: [
     AppEventDetailDialogComponentComponent,

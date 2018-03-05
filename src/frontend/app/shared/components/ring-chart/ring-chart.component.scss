@@ -21,6 +21,12 @@
     .total-label {
       margin: -8px 0 0 0;
     }
+
+    .legend-items-container .legend-items .legend-item {
+      .item-value, .item-label {
+        margin-top: 0;
+      }
+    }
   }
   
   ngx-charts-advanced-legend .advanced-pie-legend {

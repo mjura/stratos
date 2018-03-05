@@ -54,6 +54,7 @@ import { TableCellSelectComponent } from '../table-cell-select/table-cell-select
 import { TableHeaderSelectComponent } from '../table-header-select/table-header-select.component';
 import { ICellDefinition } from '../table.types';
 import { TableCellCustom } from './table-cell-custom';
+import { KubernetesNodeCapacityComponent } from '../../list-types/kubernetes-nodes/kubernetes-node-capacity/kubernetes-node-capacity.component';
 
 export const listTableCells = [
   TableCellDefaultComponent,
@@ -76,7 +77,8 @@ export const listTableCells = [
   TableCellAppRouteComponent,
   TableCellRadioComponent,
   TableCellCfUserPermissionComponent,
-  CfSpacePermissionCellComponent
+  CfSpacePermissionCellComponent,
+  KubernetesNodeCapacityComponent,
 ];
 @Component({
   selector: 'app-table-cell',

@@ -263,6 +263,7 @@ const testInitialStoreState: AppState = {
         },
       },
       caaspInfo: {},
+      kubernetesInfo: {},
       stack: {},
       space: {},
       organization: {
@@ -642,6 +643,7 @@ const testInitialStoreState: AppState = {
         }
       },
       caaspInfo: {},
+      kubernetesInfo: {},
       domain:{},
       githubBranches:{},
       cloudFoundryInfo: {},
@@ -3821,6 +3823,7 @@ const testInitialStoreState: AppState = {
     },
     requestData: {
       caaspInfo: {},
+      kubernetesInfo: {},
       user: {
         'bcf78136-6225-4515-bf8e-a32243deea0c': {
           entity: {

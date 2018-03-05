@@ -40,11 +40,11 @@ export class DashboardBaseComponent implements OnInit, OnDestroy, AfterContentIn
   @ViewChild('sidenav') public sidenav: MatDrawer;
 
   sideNavTabs: SideNavItem[] = [
-    {
-      text: 'Dashboard',
-      matIcon: 'assessment',
-      link: '/dashboard'
-    },
+    // {
+    //   text: 'Dashboard',
+    //   matIcon: 'assessment',
+    //   link: '/dashboard'
+    // },
     {
       text: 'Applications',
       matIcon: 'apps',
@@ -57,18 +57,18 @@ export class DashboardBaseComponent implements OnInit, OnDestroy, AfterContentIn
     },
     {
       text: 'Cloud Foundry',
-      matIcon: 'cloud',
+      matIcon: 'cloudy',
       link: '/cloud-foundry'
     },
     {
       text: 'Kubernetes',
-      matIcon: 'cloud',
+      matIcon: 'svg:k8s_logo',
       link: '/kubernetes',
       endpointType: 'k8s',
     },
     {
       text: 'CaaSP',
-      matIcon: 'cloud',
+      matIcon: 'svg:caasp_logo',
       link: '/caasp',
       endpointType: 'caasp',
     },

@@ -9,7 +9,9 @@
   <ul class="side-nav__items">
     <li *ngFor="let tab of tabs" class="side-nav__itemContainer" [ngClass]="{'side-nav__itemContainer-hidden': !tab.visible}">
       <a class="side-nav__item" [routerLink]="[tab.link]" [routerLinkActive]="['side-nav__item--active']">
-        <mat-icon>{{ tab.matIcon }}</mat-icon> {{ tab.text }}
+        <mat-icon *ngIf="tab.matIcon.indexOf('svg:') !== 0">{{ tab.matIcon }}</mat-icon>
+        <app-svg-icon *ngIf="tab.matIcon.indexOf('svg:') === 0" icon="{{ tab.matIcon }}"></app-svg-icon> 
+        {{ tab.text }}
       </a>
     </li>
   </ul>

@@ -10,7 +10,7 @@ import { EndpointSchema, GetAllEndpoints } from '../../../store/actions/endpoint
 import { AppState } from '../../../store/app-state';
 import { APIResource, EntityInfo } from '../../../store/types/api.types';
 import { EndpointModel, EndpointUser } from '../../../store/types/endpoint.types';
-import { BaseKube } from '../kubernetes-page.types';
+import { BaseKubeGuid } from '../kubernetes-page.types';
 
 @Injectable()
 export class KubernetesEndpointService {
@@ -23,7 +23,7 @@ export class KubernetesEndpointService {
   kubeGuid: string;
 
   constructor(
-    public baseKube: BaseKube,
+    public baseKube: BaseKubeGuid,
     private store: Store<AppState>,
     private entityServiceFactory: EntityServiceFactory,
     private paginationMonitorFactory: PaginationMonitorFactory

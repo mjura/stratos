@@ -23,6 +23,7 @@ import { GITHUB_REPO_ENTITY_KEY } from '../types/github.types';
 import { UserSchema } from '../types/user.types';
 import { userReducer } from './users.reducer';
 import { CAASP_INFO_ENTITY_KEY } from '../actions/caasp.actions';
+import { KUBE_INFO_ENTITY_KEY } from '../actions/kubernetes.actions';
 /**
  * This module uses the request data reducer and request reducer factories to create
  * the reducers to be used when making http requests
@@ -76,7 +77,8 @@ const entities = [
   AppEnvVarSchema.key,
   AppStatSchema.key,
   AppSummarySchema.key,
-  CAASP_INFO_ENTITY_KEY
+  CAASP_INFO_ENTITY_KEY,
+  KUBE_INFO_ENTITY_KEY
 ];
 const _requestReducer = requestReducerFactory(entities, requestActions);
 

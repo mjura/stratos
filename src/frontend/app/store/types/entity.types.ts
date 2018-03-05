@@ -23,6 +23,7 @@ export interface IRequestDataState extends IRequestTypeState {
   domain: IRequestEntityTypeState<APIResource>;
   user: IRequestEntityTypeState<APIResource>;
   caaspInfo: IRequestEntityTypeState<APIResource>;
+  kubernetesInfo: IRequestEntityTypeState<APIResource>;
 }
 
 export interface IRequestState extends IRequestTypeState {
@@ -39,6 +40,7 @@ export interface IRequestState extends IRequestTypeState {
   domain: IRequestEntityTypeState<RequestInfoState>;
   user: IRequestEntityTypeState<RequestInfoState>;
   caaspInfo: IRequestEntityTypeState<RequestInfoState>;
+  kubernetesInfo: IRequestEntityTypeState<APIResource>;
 }
 
 export const defaultCfEntitiesState = {
@@ -55,5 +57,6 @@ export const defaultCfEntitiesState = {
   [AppEnvVarSchema.key]: {},
   [AppStatSchema.key]: {},
   [AppSummarySchema.key]: {},
-  caaspInfo: {}
+  caaspInfo: {},
+  kubernetesInfo: {},
 };

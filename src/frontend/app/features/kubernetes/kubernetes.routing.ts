@@ -10,15 +10,12 @@ const kubernetes: Routes = [{
 },
 {
   path: ':kubeId',
+  component: KubernetesTabBaseComponent,
+  data: {
+    uiFullView: true
+  },
   children: [
-  {
-    path: '',
-    // Root for Tabs
-    component: KubernetesTabBaseComponent,
-    data: {
-      uiFullView: true
-    },
-    children: [{
+    {
       path: '',
       redirectTo: 'nodes',
       pathMatch: 'full'
@@ -28,7 +25,6 @@ const kubernetes: Routes = [{
       component: KubernetesNodesTabComponent
     },
   ]
-  }]
 }];
 
 @NgModule({

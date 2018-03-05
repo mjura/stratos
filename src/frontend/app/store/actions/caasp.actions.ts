@@ -16,8 +16,6 @@ export const CaaspInfoSchema = new schema.Entity(CAASP_INFO_ENTITY_KEY);
  */
 export class GetCaaspInfo implements PaginatedAction {
   constructor(public caaspGuid) {
-    console.log('HELLO');
-    console.log(this.constructor.name);
     this.paginationKey = getPaginationKey(CaaspInfoSchema.key, caaspGuid);
   }
   type = GET_INFO;
