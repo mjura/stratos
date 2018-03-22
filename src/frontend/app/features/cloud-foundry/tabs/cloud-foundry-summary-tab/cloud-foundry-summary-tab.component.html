@@ -15,3 +15,35 @@
     </app-tile-group>
   </app-tile-grid>
 </div>
+<div>
+  <mat-card>
+      <mat-card-header>
+        <div>
+          <div>Cloud Controller Total memory used</div>
+          <!--
+          <div class="time-controls">
+              <div>2w</div>
+              <div>1w</div>
+              <div>1d</div>
+              <div>12h</div>
+              <div>2h</div>
+              <div>1h</div>
+              <div>15m</div>
+            </div>
+          -->
+        </div>
+        </mat-card-header>
+        <mat-card-content>
+  
+  <ngx-charts-line-chart class="metrics-chart"
+    [results]="metricsData"
+    [gradient]="false"
+    [timeline]="true"
+    [yAxis]="true"
+    [yAxisTickFormatting]="yAxisTickFormatting"
+    [showXAxisLabel]="true" 
+    [autoScale]="true">
+  </ngx-charts-line-chart>
+</mat-card-content>
+    </mat-card>
+</div>

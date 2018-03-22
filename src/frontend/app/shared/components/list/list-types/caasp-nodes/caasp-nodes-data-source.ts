@@ -32,16 +32,12 @@ export class CaaspNodesDataSource extends ListDataSource<CaaspNodeInfo, any> {
       action: new GetCaaspInfo(caaspId),
       schema: CaaspInfoSchema,
       getRowUniqueId: object => object.name,
-    //   getEmptyType: () => ({ name: '', value: '', }),
-      paginationKey: getPaginationKey(CaaspInfoSchema.key, caaspId ),
-      transformEntity: map(variables => {
-        console.log('HERE');
-        console.log(variables);
-        if (!variables || variables.length === 0) {
+      paginationKey: getPaginationKey(CaaspInfoSchema.key, caaspId),
+      transformEntity: map(caaspInfo => {
+        if (!caaspInfo || caaspInfo.length === 0) {
           return [];
         }
-        const rows = [...variables[0].assigned_minions];
-        //const rows = Object.keys(env).map(name => ({ name, value: env[name] }));
+        const rows = [...caaspInfo[0].assigned_minions];
         return rows;
       }),
       isLocal: true,

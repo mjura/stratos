@@ -11,12 +11,18 @@ import { ActivatedRoute } from '@angular/router';
 import { KubernetesNodeInfo, KubernetesNodesDataSource } from './kubernetes-nodes-data-source';
 import { BaseKubeGuid } from '../../../../../features/kubernetes/kubernetes-page.types';
 import { KubernetesNodeCapacityComponent } from './kubernetes-node-capacity/kubernetes-node-capacity.component';
+import { KubernetesNodeStatusComponent } from './kubernetes-node-status/kubernetes-node-status.component';
 
 @Injectable()
 export class KubernetesNodesListConfigService implements IListConfig<KubernetesNodeInfo> {
   nodesDataSource: KubernetesNodesDataSource;
 
   columns: Array<ITableColumn<KubernetesNodeInfo>> = [
+    {
+      columnId: 'status', headerCell: () => 'Status',
+      cellComponent: KubernetesNodeStatusComponent,
+      cellFlex: '0 0 64px',
+    },
     {
       columnId: 'name', headerCell: () => 'ID',
       cellDefinition: {
@@ -25,7 +31,7 @@ export class KubernetesNodesListConfigService implements IListConfig<KubernetesN
       sort: {
         type: 'sort',
         orderKey: 'name',
-        field: 'name'
+        field: 'metadata.name'
       },
       cellFlex: '5',
     },
@@ -34,7 +40,17 @@ export class KubernetesNodesListConfigService implements IListConfig<KubernetesN
       cellComponent: KubernetesNodeCapacityComponent,
       cellFlex: '5',
     },
-  ];
+    {
+      columnId: 'internal_ip', headerCell: () => 'Internal IP',
+      cellDefinition: {
+        getValue: (row) => {
+          const ips = row.status.addresses.filter(item => item.type === 'InternalIP');
+          return ips.length === 1 ? ips[0].address : '-';
+        }
+      },
+      cellFlex: '2',
+    },
+  ];  
 
   pageSizeOptions = [9, 45, 90];
   viewType = ListViewTypes.TABLE_ONLY;

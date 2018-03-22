@@ -18,7 +18,7 @@ import { EndpointsDataSource } from '../../../../shared/components/list/list-typ
 import { denormalize } from 'normalizr';
 import { EndpointSchema, GetAllEndpoints, RegisterEndpoint } from '../../../../store/actions/endpoint.actions';
 import { EndpointsEffect } from '../../../../store/effects/endpoint.effects';
-import { getFullEndpointApiUrl } from '../../endpoint-helpers';
+import { getFullEndpointApiUrl, getEndpointTypes } from '../../endpoint-helpers';
 
 @Component({
   selector: 'app-create-endpoint-cf-step-1',
@@ -40,24 +40,7 @@ export class CreateEndpointCfStep1Component implements OnInit, IStepperStep, Aft
   @ViewChild('urlField') urlField: NgModel;
   @ViewChild('skipSllField') skipSllField: NgModel;
 
-  endpointTypes = [
-    {
-      value: 'cf',
-      label: 'Cloud Foundry'
-    },
-    {
-      value: 'k8s',
-      label: 'Kubernetes'
-    },
-    {
-      value: 'metrics',
-      label: 'Metrics'
-    },
-    {
-      value: 'caasp',
-      label: 'SUSE CaaSP'
-    },
-  ];
+  endpointTypes = getEndpointTypes();
 
   constructor(private store: Store<AppState>, public utilsService: UtilsService) {
 
@@ -85,8 +68,6 @@ export class CreateEndpointCfStep1Component implements OnInit, IStepperStep, Aft
       this.urlField.value,
       !!this.skipSllField.value
     );
-
-    console.log(this.typeField.value);
 
     this.store.dispatch(action);
 

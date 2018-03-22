@@ -19,14 +19,15 @@ export class RingChartComponent implements OnInit {
 
   domain: any[];
   colors: ColorHelper;
-  roundedTotal: number;
 
   constructor() { }
 
   ngOnInit() {
+    if (!this.data) {
+      this.data = [];
+    }
     this.domain = this.getDomain();
     this.setColors();
-    this.roundedTotal = this.getTotal();
   }
 
   setColors(): void {

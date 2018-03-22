@@ -23,7 +23,7 @@
     <mat-error *ngIf="nameField.errors && nameField.errors.appUnique">Name is not unique</mat-error>
   </mat-form-field>
   <mat-form-field novalidate>
-    <input matInput id="url" name="url" [(ngModel)]="urlValue" #urlField="ngModel" type="url" required placeholder="Cloud Foundry API Endpoint" pattern="{{utilsService.urlValidationExpression}}" [appUnique]="(existingEndpoints | async)?.urls">
+    <input matInput id="url" name="url" [(ngModel)]="urlValue" #urlField="ngModel" type="url" required placeholder="Endpoint Address" pattern="{{utilsService.urlValidationExpression}}" [appUnique]="(existingEndpoints | async)?.urls">
     <mat-error *ngIf="urlField.errors && urlField.errors.required">URL is required</mat-error>
     <mat-error *ngIf="urlField.errors && urlField.errors.pattern">Invalid API URL</mat-error>
     <mat-error *ngIf="urlField.errors && urlField.errors.appUnique">URL is not unique</mat-error>

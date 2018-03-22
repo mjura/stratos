@@ -12,10 +12,6 @@ import { GetSystemInfo } from './../../../store/actions/system.actions';
 import { endpointStatusSelector, endpointEntitiesSelector } from '../../../store/selectors/endpoint.selectors';
 import { Http, Headers } from '@angular/http';
 
-function getEndpointTypeString(endpoint: EndpointModel): string {
-  return endpoint.cnsi_type === 'cf' ? 'Cloud Foundry' : endpoint.cnsi_type;
-}
-
 @Component({
   selector: 'app-endpoints-page',
   templateUrl: './endpoints-page.component.html',

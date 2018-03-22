@@ -88,8 +88,9 @@ import { RingChartComponent } from './components/ring-chart/ring-chart.component
 import { NgxChartsModule } from '@swimlane/ngx-charts';
 import { KubernetesNodeCapacityComponent } from './components/list/list-types/kubernetes-nodes/kubernetes-node-capacity/kubernetes-node-capacity.component';
 import { SvgIconComponent } from './components/svg-icon/svg-icon.component';
+import { KubernetesNodeStatusComponent } from './components/list/list-types/kubernetes-nodes/kubernetes-node-status/kubernetes-node-status.component';
+import { BooleanIndicatorComponent } from './components/boolean-indicator/boolean-indicator.component';
 /* tslint:enable:max-line-length */
-
 
 @NgModule({
   imports: [
@@ -165,6 +166,8 @@ import { SvgIconComponent } from './components/svg-icon/svg-icon.component';
     RingChartComponent,
     KubernetesNodeCapacityComponent,
     SvgIconComponent,
+    KubernetesNodeStatusComponent,
+    BooleanIndicatorComponent,
   ],
   exports: [
     FormsModule,
@@ -219,7 +222,8 @@ import { SvgIconComponent } from './components/svg-icon/svg-icon.component';
     CardCfSpaceUsageComponent,
     CardCfSpaceDetailsComponent,
     RingChartComponent,  
-    SvgIconComponent,  
+    SvgIconComponent,
+    BooleanIndicatorComponent,
   ],
   entryComponents: [
     AppEventDetailDialogComponentComponent,

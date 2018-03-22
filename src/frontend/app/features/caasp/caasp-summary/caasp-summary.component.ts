@@ -6,8 +6,11 @@ import { AppState } from '../../../store/app-state';
 import { Http } from '@angular/http';
 import { tap } from 'rxjs/operators';
 import { ListConfig } from '../../../shared/components/list/list.component.types';
-import { GetCaaspInfo } from '../../../store/actions/caasp.actions';
+import { GetCaaspInfo, CaaspInfoSchema } from '../../../store/actions/caasp.actions';
 import { CaaspNodesListConfigService } from '../../../shared/components/list/list-types/caasp-nodes/caasp-nodes-list-config.service';
+import { getPaginationObservables } from '../../../store/reducers/pagination-reducer/pagination-reducer.helper';
+import { PaginationMonitorFactory } from '../../../shared/monitors/pagination-monitor.factory';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-caasp-summary',
@@ -20,6 +23,7 @@ import { CaaspNodesListConfigService } from '../../../shared/components/list/lis
 })
 export class CaaspSummaryComponent implements OnInit {
 
+  [x: string]: any;
   metadata: any;
   // stats: {
   //   total: 0,
@@ -28,12 +32,23 @@ export class CaaspSummaryComponent implements OnInit {
   // };
   stats: any;
 
-  constructor(private http: Http, private store: Store<AppState>, private activatedRoute: ActivatedRoute) {}
+
+  constructor(
+    private http: Http,
+    private store: Store<AppState>,
+    private activatedRoute: ActivatedRoute,
+    private paginationMonitorFactory: PaginationMonitorFactory,
+  ) {}
 
   colorScheme: any;
   chartData: any;
 
+  sub: Subscription;
+
+  chartData$: any;
+
   ngOnInit() {
+    
     //this.fetch();
 
     const { caaspId } = this.activatedRoute.snapshot.params;
@@ -47,38 +62,31 @@ export class CaaspSummaryComponent implements OnInit {
     this.chartData = [
       {
         "name": "Master",
-        "value": 1
+        "value": 0
       },
       {
         "name": "Worker",
-        "value": 2
+        "value": 0
       }
-    ]
+    ];
 
+    const action = new GetCaaspInfo(caaspId);
+    const observe = getPaginationObservables<any>({
+      store: this.store,
+      action,
+      paginationMonitor: this.paginationMonitorFactory.create(
+        action.paginationKey,
+        CaaspInfoSchema
+      )
+    }, true);
+
+    this.chartData$ = observe.entities$.map(data => {
+      const minions = data[0].assigned_minions || [];
+      this.chartData[0].value = minions.filter(m => m.role === 'master').length;
+      this.chartData[1].value = minions.filter(m => m.role === 'worker').length;
+      return this.chartData;
+    });
   }
-
-  // fetch() {
-  //   const { caaspId } = this.activatedRoute.snapshot.params;
-
-  //   // Fetch metadata and store
-  //   const info$ = this.http.get('/pp/v1/caasp/' + caaspId + '/info');
-  //   info$.pipe(
-  //     tap(p => {
-  //       if (p.ok) {
-  //         this.metadata = p.json();
-  //       } else {
-  //         this.metadata = {};
-  //       }
-  //       console.log(this.metadata);
-
-  //       const nodes = this.metadata.assigned_minions ? this.metadata.assigned_minions : [];
-  //       this.stats = {};
-  //       this.stats.total = nodes.length;
-  //       this.stats.masters = nodes.filter(item => item.role === 'master').length;
-  //       this.stats.workers = nodes.filter(item => item.role === 'worker').length;
-  //     })
-  //   ).subscribe()
-  // }
 
   downloadKubeConfig() {
     const { caaspId } = this.activatedRoute.snapshot.params;

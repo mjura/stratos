@@ -10,6 +10,7 @@ import { switchMap, shareReplay, tap, filter, map } from 'rxjs/operators';
 import { PaginationMonitorFactory } from '../../../shared/monitors/pagination-monitor.factory';
 import { PaginationMonitor } from '../../../shared/monitors/pagination-monitor';
 import { EndpointModel } from '../../../store/types/endpoint.types';
+import { GetCaaspInfo } from '../../../store/actions/caasp.actions';
 
 @Injectable()
 export class CaaspService {

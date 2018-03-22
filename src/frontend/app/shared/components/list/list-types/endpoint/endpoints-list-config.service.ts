@@ -16,14 +16,14 @@ import { ITableColumn } from '../../list-table/table.types';
 import { IListAction, IListConfig, IMultiListAction, ListViewTypes } from '../../list.component.types';
 import { EndpointsDataSource } from './endpoints-data-source';
 import { TableCellEndpointStatusComponent } from './table-cell-endpoint-status/table-cell-endpoint-status.component';
-import { getFullEndpointApiUrl } from '../../../../../features/endpoints/endpoint-helpers';
+import { getFullEndpointApiUrl, getNameForEndpointType } from '../../../../../features/endpoints/endpoint-helpers';
 import { TableRowStateManager } from '../../list-table/table-row/table-row-state-manager';
 import { PaginationMonitorFactory } from '../../../../monitors/pagination-monitor.factory';
 import { EntityMonitorFactory } from '../../../../monitors/entity-monitor.factory.service';
 
 
 function getEndpointTypeString(endpoint: EndpointModel): string {
-  return endpoint.cnsi_type === 'cf' ? 'Cloud Foundry' : endpoint.cnsi_type;
+  return getNameForEndpointType(endpoint.cnsi_type);
 }
 
 export const endpointColumns: ITableColumn<EndpointModel>[] = [

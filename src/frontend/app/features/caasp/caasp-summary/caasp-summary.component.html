@@ -6,7 +6,7 @@
     <app-tile-group>
       <app-tile>
         <mat-card class="full-card">
-          <app-ring-chart [data]="chartData" label="Nodes"></app-ring-chart>
+          <app-ring-chart [data]="chartData$ | async" label="Nodes"></app-ring-chart>
         </mat-card>
     </app-tile>
       <app-tile size="1of3">
