@@ -14,6 +14,7 @@ import { DashboardState } from './../../../store/reducers/dashboard-reducer';
 import { SideNavItem } from './../side-nav/side-nav.component';
 import { isFulfilled } from 'q';
 import { Subscription } from 'rxjs/Subscription';
+import { environment } from '../../../../environments/environment';
 
 @Component({
   selector: 'app-dashboard-base',
@@ -40,11 +41,13 @@ export class DashboardBaseComponent implements OnInit, OnDestroy, AfterContentIn
   @ViewChild('sidenav') public sidenav: MatDrawer;
 
   sideNavTabs: SideNavItem[] = [
-    // {
-    //   text: 'Dashboard',
-    //   matIcon: 'assessment',
-    //   link: '/dashboard'
-    // },
+    {
+      text: 'Dashboard',
+      matIcon: 'assessment',
+      link: '/dashboard',
+      // Experimental - only show in development
+      hidden: environment.production,
+    },
     {
       text: 'Applications',
       matIcon: 'apps',
@@ -53,7 +56,7 @@ export class DashboardBaseComponent implements OnInit, OnDestroy, AfterContentIn
     {
       text: 'Services',
       matIcon: 'library_books',
-      link: '/service-catalogue'
+      link: '/service-catalog'
     },
     {
       text: 'Cloud Foundry',
@@ -90,10 +93,10 @@ export class DashboardBaseComponent implements OnInit, OnDestroy, AfterContentIn
   ngOnInit() {
     this.fullView = this.isFullView(this.activatedRoute.snapshot);
     this.routeChangeSubscription = this.router.events
-    .filter((event) => event instanceof NavigationEnd)
-    .subscribe((event) => {
-      this.fullView = this.isFullView(this.activatedRoute.snapshot);
-    });
+      .filter((event) => event instanceof NavigationEnd)
+      .subscribe((event) => {
+        this.fullView = this.isFullView(this.activatedRoute.snapshot);
+      });
   }
 
   ngOnDestroy() {
@@ -115,13 +118,13 @@ export class DashboardBaseComponent implements OnInit, OnDestroy, AfterContentIn
       Breakpoints.Handset
     ]).pipe(
       debounceTime(250)
-      ).subscribe(result => {
-        if (result.matches) {
-          this.store.dispatch(new ChangeSideNavMode('over'));
-        } else {
-          this.store.dispatch(new ChangeSideNavMode('side'));
-        }
-      });
+    ).subscribe(result => {
+      if (result.matches) {
+        this.store.dispatch(new ChangeSideNavMode('over'));
+      } else {
+        this.store.dispatch(new ChangeSideNavMode('side'));
+      }
+    });
 
     this.sidenav.onClose.subscribe(() => {
       this.store.dispatch(new CloseSideNav());
