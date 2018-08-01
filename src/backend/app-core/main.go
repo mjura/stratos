@@ -473,6 +473,9 @@ func newPortalProxy(pc interfaces.PortalConfig, dcp *sql.DB, ss HttpSessionStore
 		EmptyCookieMatcher:     regexp.MustCompile(cookieName + "=(?:;[ ]*|$)"),
 	}
 
+	// Get Diagnostics and store them once
+	pp.StoreDiagnostics()
+
 	return pp
 }
 
@@ -726,6 +729,8 @@ func (p *portalProxy) registerRoutes(e *echo.Echo, addSetupMiddleware *setupMidd
 
 	// Serve up static resources
 	if err == nil {
+		log.Debug("Add URL Check Middleware")
+		e.Use(p.urlCheckMiddleware)
 		e.Static("/", staticDir)
 		e.SetHTTPErrorHandler(getUICustomHTTPErrorHandler(staticDir, e.DefaultHTTPErrorHandler))
 		log.Info("Serving static UI resources")
