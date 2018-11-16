@@ -1,7 +1,7 @@
 
-import {of as observableOf,  BehaviorSubject ,  Observable } from 'rxjs';
+import { of as observableOf, BehaviorSubject, Observable } from 'rxjs';
 
-import {map, first} from 'rxjs/operators';
+import { map, first } from 'rxjs/operators';
 import { Injectable } from '@angular/core';
 import { Store } from '@ngrx/store';
 
@@ -32,7 +32,8 @@ export class CfServicesListConfigService implements IListConfig<APIResource> {
   text = {
     title: null,
     filter: 'Search by name',
-    noEntries: 'There are no services'
+    noEntries: 'There are no services',
+    error: 'Failed to display services'
   };
   columns: ITableColumn<APIResource>[] = [{
     columnId: 'label',
@@ -69,11 +70,11 @@ export class CfServicesListConfigService implements IListConfig<APIResource> {
     this.cf = {
       list$: this.store
         .select(endpointsRegisteredEntitiesSelector).pipe(
-        first(),
-        map(endpoints => {
-          return Object.values(endpoints)
-            .filter((endpoint: EndpointModel) => endpoint.connectionStatus === 'connected' && endpoint.cnsi_type === 'cf');
-        }), ),
+          first(),
+          map(endpoints => {
+            return Object.values(endpoints)
+              .filter((endpoint: EndpointModel) => endpoint.connectionStatus === 'connected' && endpoint.cnsi_type === 'cf');
+          })),
       loading$: observableOf(false),
       select: new BehaviorSubject(undefined)
     };

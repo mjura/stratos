@@ -19,7 +19,8 @@ export class CfSecurityGroupsListConfigService extends BaseCfListConfig<APIResou
   text = {
     title: null,
     filter: 'Search by name',
-    noEntries: 'There are no security groups'
+    noEntries: 'There are no security groups',
+    error: 'Failed to display security groups'
   };
   columns: ITableColumn<APIResource>[] = [{
     columnId: 'name',

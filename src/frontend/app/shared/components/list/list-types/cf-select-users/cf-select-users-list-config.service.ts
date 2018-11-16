@@ -38,7 +38,8 @@ export class CfSelectUsersListConfigService implements IListConfig<APIResource<C
   text = {
     title: null,
     filter: 'Search by name',
-    noEntries: 'There are no users'
+    noEntries: 'There are no users',
+    error: 'Failed to display users'
   };
   columns: ITableColumn<APIResource<CfUser>>[] = [
     {

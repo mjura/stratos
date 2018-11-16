@@ -58,7 +58,8 @@ export class CfUserListConfigService extends ListConfig<APIResource<CfUser>> {
   text = {
     title: null,
     filter: 'Search by username',
-    noEntries: 'There are no users'
+    noEntries: 'There are no users',
+    error: 'Failed to display users'
   };
   private initialised: Observable<boolean>;
   private canEditOrgSpaceRoles$: Observable<boolean>;

@@ -27,7 +27,8 @@ export class ServiceInstancesWallListConfigService extends CfServiceInstancesLis
   text = {
     title: null,
     filter: 'Search by name',
-    noEntries: 'There are no service instances'
+    noEntries: 'There are no service instances',
+    error: 'Failed to display service instances'
   };
   enableTextFilter = true;
   defaultView = 'cards' as ListView;

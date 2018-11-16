@@ -22,7 +22,8 @@ export class CfFeatureFlagsListConfigService extends BaseCfListConfig<APIResourc
   text = {
     title: null,
     filter: 'Search by name',
-    noEntries: 'There are no feature flags'
+    noEntries: 'There are no feature flags',
+    error: 'Failed to display feature flags'
   };
 
   columns: Array<ITableColumn<APIResource<IFeatureFlag>>> = [

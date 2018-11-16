@@ -124,7 +124,8 @@ export class CfAppInstancesConfigService implements IListConfig<ListAppInstance>
   text = {
     title: null,
     filter: 'Search by state',
-    noEntries: 'There are no application instances'
+    noEntries: 'There are no application instances',
+    error: 'Failed to display application instances'
   };
   private initialised$: Observable<boolean>;
 

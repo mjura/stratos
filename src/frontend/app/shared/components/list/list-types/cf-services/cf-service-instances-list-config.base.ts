@@ -43,7 +43,8 @@ export class CfServiceInstancesListConfigBase implements IListConfig<APIResource
   text = {
     title: null,
     filter: null,
-    noEntries: 'There are no service instances'
+    noEntries: 'There are no service instances',
+    error: 'Failed to display services instances'
   };
 
   private canDetachCache: CanCache = {};

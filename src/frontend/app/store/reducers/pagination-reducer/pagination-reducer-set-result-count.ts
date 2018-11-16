@@ -8,7 +8,6 @@ export function paginationSetResultCount(state: PaginationEntityState, action: S
   }
   return {
     ...state,
-    error: false,
     totalResults: action.count,
     clientPagination: {
       ...spreadClientPagination(state.clientPagination),

@@ -121,7 +121,18 @@
         </mat-card-content>
       </mat-card>
     </ng-template>
+    <ng-template #defaultError>
+      <mat-card class="list-component__default-error">
+        <mat-card-content>
+          <div class="no-rows">{{config.text?.error || 'Failed to display entries.'}}</div>
+        </mat-card-content>
+      </mat-card>
+    </ng-template>
     <div [hidden]="(showProgressBar$ | async) || (hasRows$ | async)" class="list-component__no-entries">
+      <ng-container *ngIf="(errored$ | async)">
+        <ng-container *ngTemplateOutlet="errored ? errored : defaultError">
+        </ng-container>
+      </ng-container>
       <ng-container *ngIf="(noRowsNotFiltering$ | async)">
         <ng-container *ngTemplateOutlet="noEntries ? noEntries : defaultNoEntries">
         </ng-container>

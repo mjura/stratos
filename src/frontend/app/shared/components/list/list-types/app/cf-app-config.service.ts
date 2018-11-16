@@ -107,7 +107,8 @@ export class CfAppConfigService extends ListConfig<APIResource> implements IList
   text = {
     title: '',
     filter: 'Search by name',
-    noEntries: 'There are no applications'
+    noEntries: 'There are no applications',
+    error: 'Failed to display applications'
   };
   enableTextFilter = true;
   cardComponent = CardAppComponent;

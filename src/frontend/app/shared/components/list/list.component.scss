@@ -131,7 +131,8 @@
     justify-content: center;
   }
 
-  &__default-no-entries {
+  &__default-no-entries,
+  &__default-error {
     width: 100%;
 
     mat-card-content {

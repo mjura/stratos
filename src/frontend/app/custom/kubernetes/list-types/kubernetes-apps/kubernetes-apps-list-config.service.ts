@@ -78,7 +78,12 @@ export class KubernetesAppsListConfigService implements IListConfig<KubernetesAp
   pageSizeOptions = [9, 45, 90];
   viewType = ListViewTypes.TABLE_ONLY;
 
-  enableTextFilter = false;
+  enableTextFilter = true;
+  text = {
+    filter: 'Filter by Name',
+    noEntries: 'There are no applications',
+    error: 'Failed to display applications'
+  };
 
   getGlobalActions = () => null;
   getMultiActions = () => [];

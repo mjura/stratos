@@ -24,7 +24,8 @@ export class CfUsersSpaceRolesListConfigService implements IListConfig<APIResour
   text = {
     title: null,
     filter: 'Search by space name',
-    noEntries: 'There are no spaces'
+    noEntries: 'There are no spaces',
+    error: 'Failed to display spaces'
   };
   columns: ITableColumn<APIResource<ISpace>>[] = [{
     columnId: 'name',

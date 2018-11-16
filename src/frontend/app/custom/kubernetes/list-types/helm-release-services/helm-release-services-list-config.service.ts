@@ -1,16 +1,14 @@
 import { Injectable } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
-
 import { Store } from '@ngrx/store';
 
-import { ITableColumn } from '../../../../shared/components/list/list-table/table.types';
+import { ITableColumn, ITableText } from '../../../../shared/components/list/list-table/table.types';
 import { IListConfig, ListViewTypes } from '../../../../shared/components/list/list.component.types';
 import { AppState } from '../../../../store/app-state';
 import { BaseKubeGuid } from '../../kubernetes-page.types';
-import { KubeService } from '../../store/kube.types';
-import { HelmReleaseServicesDataSource } from './helm-release-services-data-source';
 import { HelmReleaseService } from '../../services/helm-release.service';
+import { KubeService } from '../../store/kube.types';
 import { KubernetesPodTagsComponent } from '../kubernetes-pods/kubernetes-pod-tags/kubernetes-pod-tags.component';
+import { HelmReleaseServicesDataSource } from './helm-release-services-data-source';
 
 @Injectable()
 export class HelmReleaseServicesListConfig implements IListConfig<KubeService> {
@@ -44,7 +42,12 @@ export class HelmReleaseServicesListConfig implements IListConfig<KubeService> {
 
   pageSizeOptions = [9, 45, 90];
   viewType = ListViewTypes.TABLE_ONLY;
-  enableTextFilter = false;
+  enableTextFilter = true;
+  text: ITableText = {
+    filter: 'Filter by Name',
+    noEntries: 'There are no services',
+    error: 'Failed to display services'
+  };
 
   getGlobalActions = () => null;
   getMultiActions = () => [];

@@ -26,7 +26,8 @@ export class CfCellsListConfigService extends BaseCfListConfig<IMetricVectorResu
   text = {
     title: null,
     filter: 'Search by id',
-    noEntries: 'There are no cells'
+    noEntries: 'There are no cells',
+    error: 'Failed to display cells'
   };
 
   private boolIndicatorConfig: TableCellBooleanIndicatorComponentConfig<IMetricVectorResult<IMetricCell>> = {

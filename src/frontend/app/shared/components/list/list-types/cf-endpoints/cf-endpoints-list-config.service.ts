@@ -1,5 +1,5 @@
 
-import {pairwise} from 'rxjs/operators';
+import { pairwise } from 'rxjs/operators';
 import { Injectable } from '@angular/core';
 import { MatDialog } from '@angular/material';
 import { Store } from '@ngrx/store';
@@ -24,7 +24,8 @@ export class CFEndpointsListConfigService implements IListConfig<EndpointModel> 
   text = {
     title: '',
     filter: 'Filter Endpoints',
-    noEntries: 'There are no endpoints'
+    noEntries: 'There are no endpoints',
+    error: 'Failed to display endpoints'
   };
   enableTextFilter = true;
   tableFixedRowHeight = true;

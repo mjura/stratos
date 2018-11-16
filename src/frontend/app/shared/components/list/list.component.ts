@@ -93,6 +93,8 @@ export class ListComponent<T> implements OnInit, OnChanges, OnDestroy, AfterView
 
   @Input() noEntriesForCurrentFilter: TemplateRef<any>;
 
+  @Input() errored: TemplateRef<any>;
+
   // List config when supplied as an attribute rather than a dependency
   @Input() list: ListConfig<T>;
 
@@ -181,6 +183,7 @@ export class ListComponent<T> implements OnInit, OnChanges, OnDestroy, AfterView
   noRowsNotFiltering$: Observable<boolean>;
   showProgressBar$: Observable<boolean>;
   isRefreshing$: Observable<boolean>;
+  errored$: Observable<boolean>;
 
   // Observable which allows you to determine if the paginator control should be hidden
   hidePaginator$: Observable<boolean>;
@@ -204,7 +207,7 @@ export class ListComponent<T> implements OnInit, OnChanges, OnDestroy, AfterView
     @Optional() public config: ListConfig<T>
   ) { }
 
-ngOnInit() {
+  ngOnInit() {
     // null list means we have list bound but no value available yet
     if (this.list === null) {
       // We will watch for changes to the list value
@@ -385,14 +388,22 @@ ngOnInit() {
       })
     );
 
-    this.noRowsHaveFilter$ = observableCombineLatest(this.hasRows$, this.isFiltering$).pipe(
-      map(([hasRows, isFiltering]) => {
-        return !hasRows && isFiltering;
+    this.errored$ = this.dataSource.pagination$.pipe(
+      map(pagination =>
+        !!pagination.currentPage &&
+        pagination.pageRequests[pagination.currentPage] &&
+        pagination.pageRequests[pagination.currentPage].error
+      )
+    );
+
+    this.noRowsHaveFilter$ = observableCombineLatest(this.hasRows$, this.isFiltering$, this.errored$).pipe(
+      map(([hasRows, isFiltering, errored]) => {
+        return !errored && !hasRows && isFiltering;
       })
     );
-    this.noRowsNotFiltering$ = observableCombineLatest(this.hasRows$, this.isFiltering$).pipe(
-      map(([hasRows, isFiltering]) => {
-        return !hasRows && !isFiltering;
+    this.noRowsNotFiltering$ = observableCombineLatest(this.hasRows$, this.isFiltering$, this.errored$).pipe(
+      map(([hasRows, isFiltering, errored]) => {
+        return !errored && !hasRows && !isFiltering;
       })
     );
 

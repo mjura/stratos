@@ -22,7 +22,8 @@ export class CfSpaceAppsListConfigService implements IListConfig<APIResource> {
   defaultView = 'table' as ListView;
   text = {
     title: null,
-    noEntries: 'There are no applications'
+    noEntries: 'There are no applications',
+    error: 'Failed to display applications'
   };
   pageSizeOptions = defaultPaginationPageSizeOptionsTable;
 

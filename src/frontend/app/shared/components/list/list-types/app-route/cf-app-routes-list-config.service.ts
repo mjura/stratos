@@ -136,7 +136,8 @@ export class CfAppRoutesListConfigService extends ListConfig<APIResource> {
   viewType = ListViewTypes.TABLE_ONLY;
   text = {
     title: null,
-    noEntries: 'There are no routes'
+    noEntries: 'There are no routes',
+    error: 'Failed to display routes'
   };
   isLocal = true;
 

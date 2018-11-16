@@ -28,7 +28,8 @@ export class CfCellHealthListConfigService extends BaseCfListConfig<CfCellHealth
   enableTextFilter = false;
   text = {
     title: 'Cell Health History',
-    noEntries: 'Cell has no health history'
+    noEntries: 'Cell has no health history',
+    error: 'Failed to display health history'
   };
 
   private boolIndicatorConfig: TableCellBooleanIndicatorComponentConfig<CfCellHealthEntry> = {

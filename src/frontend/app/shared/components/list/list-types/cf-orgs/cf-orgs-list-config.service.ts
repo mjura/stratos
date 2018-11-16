@@ -21,7 +21,8 @@ export class CfOrgsListConfigService extends BaseCfListConfig<APIResource<IOrgan
   text = {
     title: null,
     filter: 'Search by name',
-    noEntries: 'There are no organizations'
+    noEntries: 'There are no organizations',
+    error: 'Failed to display organizations'
   };
   columns: ITableColumn<APIResource<IOrganization>>[] = [{
     columnId: 'name',

@@ -122,7 +122,8 @@ export class CfSpaceRoutesListConfigService implements IListConfig<APIResource> 
   isLocal = false;
   text = {
     title: null,
-    noEntries: 'There are no routes'
+    noEntries: 'There are no routes',
+    error: 'Failed to display routes'
   };
 
   dispatchDeleteAction(route) {

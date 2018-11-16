@@ -6,7 +6,6 @@ export function paginationSetClientFilter(state: PaginationEntityState, action: 
   const clientPagination = spreadClientPagination(state.clientPagination);
   return {
     ...state,
-    error: false,
     clientPagination: {
       ...clientPagination,
       filter: {

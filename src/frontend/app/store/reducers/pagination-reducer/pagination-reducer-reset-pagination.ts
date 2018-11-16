@@ -14,7 +14,6 @@ export function paginationResetPagination(state: PaginationState, action) {
       pageCount: 0,
       currentPage: 1,
       totalResults: 0,
-      error: false,
       message: ''
     }
   };

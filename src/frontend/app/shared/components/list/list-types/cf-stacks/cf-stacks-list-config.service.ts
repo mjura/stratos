@@ -18,7 +18,8 @@ export class CfStacksListConfigService extends BaseCfListConfig<APIResource> {
   text = {
     title: null,
     filter: 'Search by name',
-    noEntries: 'There are no stacks'
+    noEntries: 'There are no stacks',
+    error: 'Failed to display stacks'
   };
   columns: ITableColumn<APIResource>[] = [{
     columnId: 'name',

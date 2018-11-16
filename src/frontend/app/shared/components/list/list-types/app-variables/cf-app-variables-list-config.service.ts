@@ -1,5 +1,5 @@
 
-import {of as observableOf,  Observable } from 'rxjs';
+import { of as observableOf, Observable } from 'rxjs';
 import { Injectable } from '@angular/core';
 import { Store } from '@ngrx/store';
 
@@ -63,7 +63,10 @@ export class CfAppVariablesListConfigService implements IListConfig<ListAppEnvVa
 
   viewType = ListViewTypes.TABLE_ONLY;
   text = {
-    title: 'Environment Variables', filter: 'Search by name', noEntries: 'There are no variables'
+    title: 'Environment Variables',
+    filter: 'Search by name',
+    noEntries: 'There are no variables',
+    error: 'Failed to display variables'
   };
   enableTextFilter = true;
 

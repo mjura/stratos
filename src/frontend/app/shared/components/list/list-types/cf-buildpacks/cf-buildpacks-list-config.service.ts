@@ -19,7 +19,8 @@ export class CfBuildpacksListConfigService extends BaseCfListConfig<APIResource<
   text = {
     title: null,
     filter: 'Search by name',
-    noEntries: 'There are no buildpacks'
+    noEntries: 'There are no buildpacks',
+    error: 'Failed to display buildpacks'
   };
   columns: ITableColumn<APIResource>[] = [{
     columnId: 'position',

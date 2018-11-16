@@ -71,7 +71,12 @@ export class KubernetesNodesListConfigService implements IListConfig<KubernetesN
   pageSizeOptions = [9, 45, 90];
   viewType = ListViewTypes.TABLE_ONLY;
 
-  enableTextFilter = false;
+  enableTextFilter = true;
+  text = {
+    filter: 'Filter by Name',
+    noEntries: 'There are no nodes',
+    error: 'Failed to display nodes'
+  };
 
   getGlobalActions = () => null;
   getMultiActions = () => [];

@@ -21,7 +21,8 @@ export class KubernetesEndpointsListConfigService implements IListConfig<Endpoin
   text = {
     title: '',
     filter: 'Filter Endpoints',
-    noEntries: 'There are no endpoints'
+    noEntries: 'There are no endpoints',
+    error: 'Failed to display endpoints'
   };
   enableTextFilter = true;
   tableFixedRowHeight = true;

@@ -87,7 +87,12 @@ export class KubernetesPodsListConfigService implements IListConfig<KubernetesPo
 
   pageSizeOptions = [9, 45, 90];
   viewType = ListViewTypes.TABLE_ONLY;
-  enableTextFilter = false;
+  enableTextFilter = true;
+  text = {
+    filter: 'Filter by Name',
+    noEntries: 'There are no pods',
+    error: 'Failed to display pods'
+  };
 
   getGlobalActions = () => null;
   getMultiActions = () => [];

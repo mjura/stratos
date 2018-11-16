@@ -21,7 +21,8 @@ export class CfCellAppsListConfigService extends BaseCfListConfig<CfCellApp> {
   enableTextFilter = false;
   text = {
     title: null,
-    noEntries: 'There are no applications'
+    noEntries: 'There are no applications',
+    error: 'Failed to display applications'
   };
 
   constructor(store: Store<AppState>, private activeRouteCfCell: ActiveRouteCfCell, entityServiceFactory: EntityServiceFactory) {

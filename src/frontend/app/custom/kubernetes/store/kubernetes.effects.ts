@@ -289,6 +289,9 @@ export class KubernetesEffects {
     })
   );
 
+  private createKubeHeaders(kubeId: string): HttpHeaders {
+    return new HttpHeaders({ 'x-cap-cnsi-list': kubeId, 'x-cap-passthrough': 'true' });
+  }
 
   private processNodeAction(action: GetKubernetesReleasePods | GetKubernetesNodes) {
     const getUid: GetID<KubernetesNode> = (p) => p.metadata.uid;
@@ -305,7 +308,7 @@ export class KubernetesEffects {
     getId: GetID<T>,
     filterResults?: Filter<T>) {
     this.store.dispatch(new StartRequestAction(action));
-    const headers = new HttpHeaders({ 'x-cap-cnsi-list': action.kubeGuid });
+    const headers = this.createKubeHeaders(action.kubeGuid);
     const requestArgs = {
       headers: headers,
       params: null
@@ -323,7 +326,7 @@ export class KubernetesEffects {
           entities: { [schemaKey]: {} },
           result: []
         } as NormalizedResponse;
-        const items = response[action.kubeGuid].items as Array<any>;
+        const items = response['items'] as Array<any>;
         const processesData = items.filter((res) => !!filterResults ? filterResults(res) : true)
           .reduce((res, data) => {
             const id = getId(data);
@@ -347,7 +350,7 @@ export class KubernetesEffects {
 
   private processSingleItemAction<T>(action: KubeAction, url: string, schemaKey: string, getId: GetID<T>) {
     this.store.dispatch(new StartRequestAction(action));
-    const headers = new HttpHeaders({ 'x-cap-cnsi-list': action.kubeGuid });
+    const headers = this.createKubeHeaders(action.kubeGuid);
     const requestArgs = {
       headers: headers
     };
@@ -358,8 +361,8 @@ export class KubernetesEffects {
           entities: { [schemaKey]: {} },
           result: []
         } as NormalizedResponse;
-        const items = [response[action.kubeGuid]];
-        const processesData = items.reduce((res, data) => {
+        const items: T[] = [response as T];
+        const processesData = items.reduce((res: NormalizedResponse, data) => {
           const id = getId(data);
           res.entities[schemaKey][id] = data;
           res.result.push(id);

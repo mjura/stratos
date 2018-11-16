@@ -17,7 +17,8 @@ export abstract class GithubCommitsListConfigServiceBase implements IListConfig<
   viewType = ListViewTypes.TABLE_ONLY;
   text = {
     title: 'Commits',
-    noEntries: 'There are no commits'
+    noEntries: 'There are no commits',
+    error: 'Failed to display commits'
   };
 
   protected columns: ITableColumn<APIResource<GithubCommit>>[] = [

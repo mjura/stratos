@@ -20,7 +20,8 @@ export class DetachAppsListConfigService implements IListConfig<APIResource> {
   text = {
     title: null,
     filter: null,
-    noEntries: 'There are no service bindings'
+    noEntries: 'There are no service bindings',
+    error: 'Failed to display service bindings'
   };
   columns: ITableColumn<APIResource<IServiceBinding>>[] = [{
     columnId: 'appName',
