@@ -29,7 +29,6 @@ import { UserProfileEffect } from './effects/user-profile.effects';
 import { UsersRolesEffects } from './effects/users-roles.effects';
 import { UsersEffects } from './effects/users.effects';
 import { AppReducersModule } from './reducers.module';
-import { KubernetesEffects } from '../custom/kubernetes/store/kubernetes.effects';
 import { EndpointApiError } from './effects/endpoint-api-errors.effects';
 
 @NgModule({
@@ -65,7 +64,6 @@ import { EndpointApiError } from './effects/endpoint-api-errors.effects';
       RecursiveDeleteEffect,
       AppEffects,
       RouteEffect,
-      KubernetesEffects
     ])
   ]
 })
