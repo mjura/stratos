@@ -6,6 +6,7 @@ import { Customizations, CustomizationsMetadata } from '../core/customizations.t
 import { MDAppModule } from '../core/md.module';
 import { SharedModule } from '../shared/shared.module';
 import { KubernetesSetupModule } from './kubernetes/kubernetes.setup.module';
+import { CaaspSetupModule } from './caasp/caasp.setup.module';
 import { SuseLoginComponent } from './suse-login/suse-login.component';
 import { EndpointsService } from '../core/endpoints.service';
 import { Store } from '@ngrx/store';
@@ -23,7 +24,8 @@ const SuseCustomizations: CustomizationsMetadata = {
     CoreModule,
     SharedModule,
     MDAppModule,
-    KubernetesSetupModule
+    KubernetesSetupModule,
+    CaaspSetupModule,
   ],
   declarations: [
     SuseLoginComponent

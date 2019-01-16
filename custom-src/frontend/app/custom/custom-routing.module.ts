@@ -12,6 +12,19 @@ const kubernetes: Routes = [{
       position: 60,
       requiresEndpointType: 'k8s'
     }
+  },
+},
+{
+  path: 'caasp',
+  loadChildren: 'app/custom/caasp/caasp.module#CaaspModule',
+  data: {
+    stratosNavigation: {
+      text: 'SUSE CaaSP',
+      matIcon: 'caasp',
+      matIconFont: 'stratos-icons',
+      position: 60,
+      requiresEndpointType: 'caasp'
+    }
   }
 }];
 
