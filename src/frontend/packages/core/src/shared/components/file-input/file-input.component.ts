@@ -30,6 +30,8 @@ export class FileInputComponent implements OnInit {
 
   private formGroupControl: FormGroupName;
 
+  public errorMessage = '';
+
   constructor(
     @Optional() @Host() @SkipSelf() private parent: ControlContainer,
   ) { }
@@ -66,9 +68,12 @@ export class FileInputComponent implements OnInit {
   handleFormControl(file) {
     const reader = new FileReader();
     reader.onload = () => {
+      this.errorMessage = '';
       this.updateFileState(reader.result);
     };
-    reader.onerror = () => {
+    reader.onerror = (e) => {
+      this.errorMessage = `Could not read file - please check file permissions`;
+
       // Clear the form and thus make it invalid on error
       this.updateFileState(null);
     };
