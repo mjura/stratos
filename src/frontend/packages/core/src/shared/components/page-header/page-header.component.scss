@@ -96,6 +96,12 @@ $bottom-index: $top-index - 1;
   &__favorite {
     margin-left: 10px;
   }
+  &__sub-nav {
+    align-content: center;
+    display: flex;
+    flex-direction: row;
+    padding: 10px 20px;
+  }
 }
 
 .mat-toolbar-row,
