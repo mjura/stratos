@@ -1,5 +1,5 @@
 <app-page-header>
-  <h1>Edit Application: {{ (applicationService.application$ | async)?.app.entity.name }} </h1>
+  <app-page-header-title>Edit Application: {{ (applicationService.application$ | async)?.app.entity.name }} </app-page-header-title>
   <div class="page-header-right">
     <button mat-icon-button mat-button routerLink="/applications/{{applicationService.cfGuid}}/{{applicationService.appGuid}}">
       <mat-icon>clear</mat-icon>

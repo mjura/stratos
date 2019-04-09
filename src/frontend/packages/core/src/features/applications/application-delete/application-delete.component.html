@@ -1,6 +1,6 @@
 <app-loading-page [isLoading]="fetchingApplicationData$" [text]="'Gathering application information'">
   <app-page-header>
-    <h1>Delete application</h1>
+    <app-page-header-title>Delete application</app-page-header-title>
   </app-page-header>
   <ng-container *ngIf="relatedEntities$ | async as entities">
     <app-steppers [cancel]="cancelUrl" [nextButtonProgress]="false">

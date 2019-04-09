@@ -8,19 +8,19 @@
       <app-chart-details-versions [versions]=versions [currentVersion]=currentVersion></app-chart-details-versions>
     </div>
     <div class="chartInfo__home" *ngIf="chart.attributes.home">
-      <h1>Home</h1>
+      <app-page-header-title>Home</app-page-header-title>
       <div>
         <a href="{{ chart.attributes.home }}" target="_blank">{{chart.attributes.home}}</a>
       </div>
     </div>
     <div class="chartInfo__maintainers">
-      <h1>Maintainers</h1>
+      <app-page-header-title>Maintainers</app-page-header-title>
       <div *ngFor="let maintainer of maintainers">
         <a href="{{ maintainerUrl(maintainer) }}" target="_blank">{{ maintainer.name }}</a>
       </div>
     </div>
     <div class="chartInfo__related" *ngIf="sources.length">
-      <h1>Related</h1>
+      <app-page-header-title>Related</app-page-header-title>
       <div *ngFor="let source of sources">
         <a href="{{ source }}" target="_blank">{{ source }}</a>
       </div>

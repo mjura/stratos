@@ -1,5 +1,5 @@
 <app-page-header [breadcrumbs]="breadcrumbs$ | async">
-  <h1>CLI Info</h1>
+  <app-page-header-title>CLI Info</app-page-header-title>
 </app-page-header>
 
 <app-cli-info *ngIf="context$ | async as context" [context]="context">

@@ -165,6 +165,7 @@ import { CloudFoundryUserProvidedServicesService } from './services/cloud-foundr
 import { MetricsRangeSelectorService } from './services/metrics-range-selector.service';
 import { UserPermissionDirective } from './user-permission.directive';
 import { EntitySummaryTitleComponent } from './components/entity-summary-title/entity-summary-title.component';
+import { PageHeaderTitleComponent } from './components/page-header-title/page-header-title.component';
 
 /* tslint:disable:max-line-length */
 
@@ -294,7 +295,8 @@ import { EntitySummaryTitleComponent } from './components/entity-summary-title/e
     PageSubNavComponent,
     BreadcrumbsComponent,
     PageSubNavSectionComponent,
-    EntitySummaryTitleComponent
+    EntitySummaryTitleComponent,
+    PageHeaderTitleComponent
   ],
   exports: [
     FormsModule,
@@ -403,7 +405,8 @@ import { EntitySummaryTitleComponent } from './components/entity-summary-title/e
     MarkdownContentObserverDirective,
     AppNameUniqueDirective,
     SimpleUsageChartComponent,
-    EntitySummaryTitleComponent
+    EntitySummaryTitleComponent,
+    PageHeaderTitleComponent
   ],
   entryComponents: [
     DialogConfirmComponent,

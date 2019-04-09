@@ -1,5 +1,5 @@
 <app-page-header [endpointIds$]="cfIds$">
-  <h1>Services</h1>
+  <app-page-header-title>Services</app-page-header-title>
   <div class="page-header-right">
     <ng-container *ngIf="(haveConnectedCf$ | async)">
       <ng-container *appUserPermission="canCreateServiceInstance">

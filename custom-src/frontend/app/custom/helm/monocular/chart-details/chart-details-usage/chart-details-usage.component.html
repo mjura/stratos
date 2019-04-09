@@ -1,5 +1,5 @@
 <mat-card class="chart-details-usage">
-  <h1>Install</h1>
+  <app-page-header-title>Install</app-page-header-title>
   <mat-tab-group>
     <mat-tab label="UI" *ngIf="endpointsService.hasConnectedEndpointType('k8s') | async">
       <p>You can install this Helm Chart from here.</p>

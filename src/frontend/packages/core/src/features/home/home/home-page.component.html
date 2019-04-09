@@ -1,5 +1,5 @@
 <app-page-header [showHistory]="false" [endpointIds$]="allEndpointIds$">
-  <h1>Home</h1>
+  <app-page-header-title>Home</app-page-header-title>
 </app-page-header>
 <div class="home-page" *ngIf="haveRegistered$ | async ; else noEndpoints">
   <div class="favorites-list">

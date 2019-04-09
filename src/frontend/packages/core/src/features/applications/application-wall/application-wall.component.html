@@ -1,5 +1,5 @@
 <app-page-header [endpointIds$]="cfIds$">
-  <h1>Applications</h1>
+  <app-page-header-title>Applications</app-page-header-title>
   <div *ngIf="haveConnectedCf$ | async" class="page-header-right">
     <ng-container *appUserPermission="canCreateApplication">
       <button id="appwall-create-application" mat-icon-button [routerLink]="'/applications/new/'">

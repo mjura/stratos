@@ -1,9 +1,9 @@
-import { Component, Input, ViewChild, TemplateRef, OnInit, OnDestroy, AfterViewInit, SimpleChanges } from '@angular/core';
+import { TemplatePortal } from '@angular/cdk/portal';
+import { AfterViewInit, Component, Input, OnDestroy, TemplateRef, ViewChild } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Store } from '@ngrx/store';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
-
 import { Logout } from '../../../../../store/src/actions/auth.actions';
 import { ToggleSideNav } from '../../../../../store/src/actions/dashboard-actions';
 import { AddRecentlyVisitedEntityAction } from '../../../../../store/src/actions/recently-visited.actions';
@@ -11,11 +11,11 @@ import { AppState } from '../../../../../store/src/app-state';
 import { AuthState } from '../../../../../store/src/reducers/auth.reducer';
 import { InternalEventSeverity } from '../../../../../store/src/types/internal-events.types';
 import { IFavoriteMetadata, UserFavorite } from '../../../../../store/src/types/user-favorites.types';
+import { TabNavService } from '../../../../tab-nav.service';
 import { favoritesConfigMapper } from '../favorites-meta-card/favorite-config-mapper';
 import { ISubHeaderTabs } from '../page-subheader/page-subheader.types';
 import { BREADCRUMB_URL_PARAM, IHeaderBreadcrumb, IHeaderBreadcrumbLink } from './page-header.types';
-import { TabNavService } from '../../../../tab-nav.service';
-import { TemplatePortal } from '@angular/cdk/portal';
+
 
 @Component({
   selector: 'app-page-header',

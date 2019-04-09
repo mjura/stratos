@@ -1,6 +1,6 @@
 <div class="markdown-preview">
   <div class="markdown-preview__header">
-    <h1>{{ title }}</h1>
+    <app-page-header-title>{{ title }}</app-page-header-title>
   </div>
   <div #markdown class="markdown-preview__content" [innerHtml]="markdownHtml" appMarkdownContentObserver (innerHtmlRendered)="markdownRendered()"></div>
 </div>
