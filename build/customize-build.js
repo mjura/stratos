@@ -250,8 +250,12 @@
 
     if (fs.existsSync(GIT_METADATA)) {
       gitMetadata = JSON.parse(fs.readFileSync(GIT_METADATA));
-      console.log("  + Project Metadata: " + JSON.stringify(gitMetadata));
+      console.log('  + Project Metadata file read OK');
+    } else {
+      console.log('  + Project Metadata file does not exist');
     }
+
+    console.log("  + Project Metadata: " + JSON.stringify(gitMetadata));
 
     // Git Information
     replace.sync({ files: INDEX_HTML, from: '@@stratos_git_project@@', to: gitMetadata.project });
@@ -268,8 +272,11 @@
   function storeGitRepositoryMetadata() {
     // Do we have a git folder?
     if (!fs.existsSync(GIT_FOLDER)) {
+      console.log('  + Unable to store git repository metadata - .git folder not found');
       return;
     }
+    return;
+
     var gitMetadata = {
       project: execGit('git config --get remote.origin.url'),
       branch: execGit('git rev-parse --abbrev-ref HEAD'),
