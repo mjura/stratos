@@ -64,10 +64,6 @@ run:
       { "commit": "${COMMIT_HASH}" }
       EOF
 
-      # Store git metadata
-      ${ROOT}/stratos/build/store-git-metadata.sh
-      cp ${ROOT}/stratos/.stratos-git-metadata.json stratos-git-metadata
-
       echo "Created v2-alpha-tag, v2-version and build-args."
 
       echo "Contents of build-args:"
@@ -80,7 +76,7 @@ run:
       cat v2-alpha-tag
       
       echo "Creating tag file tar..."
-      tar -cf ${FILENAME}.tar v2-alpha-tag v2-version v2-tag v2-commit build-args ui-build-args image-labels stratos-git-metadata
+      tar -cf ${FILENAME}.tar v2-alpha-tag v2-version v2-tag v2-commit build-args ui-build-args image-labels
 
       echo "Created tag file tar as ${FILENAME}.tar"
       echo "Generate tag files complete!"
