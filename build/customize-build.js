@@ -275,7 +275,6 @@
       console.log('  + Unable to store git repository metadata - .git folder not found');
       return;
     }
-    return;
 
     var gitMetadata = {
       project: execGit('git config --get remote.origin.url'),
