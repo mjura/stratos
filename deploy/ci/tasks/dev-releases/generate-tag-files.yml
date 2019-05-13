@@ -62,7 +62,7 @@ run:
       { "stratos_version": "${LATEST_TAG}" }
       EOF
       cat > image-labels << EOF
-      { "commit": "${COMMIT_HASH}" }
+      { "com.stratos.commit": "${COMMIT_HASH}" }
       EOF
 
       # Use uppercase values
