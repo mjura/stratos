@@ -9,8 +9,7 @@ COPY --chown=stratos:users deploy/all-in-one/config.all-in-one.properties config
 RUN npm install \
     && npm run build \
     && npm run build-backend \
-    && cp src/jetstream/jetstream . \
-    && mv dist ui
+    && cp src/jetstream/jetstream .
 
 # Generate dev-certs
 RUN CERTS_PATH=/home/stratos/dev-certs ./generate_cert.sh \
@@ -21,7 +20,7 @@ FROM splatform/stratos-bk-base:opensuse
 ARG CANARY_BUILD
 COPY --from=builder /home/stratos/deploy/db /src/deploy/db
 COPY --from=builder /home/stratos/dev-certs /srv/dev-certs
-COPY --from=builder /home/stratos/ui /srv/ui
+COPY --from=builder /home/stratos/dist /srv/ui
 COPY --from=builder /home/stratos/jetstream /srv/jetstream
 COPY --from=builder /home/stratos/config.properties /srv/config.properties
 
