@@ -26,7 +26,7 @@ COPY --from=builder /home/stratos/jetstream /srv/jetstream
 COPY --from=builder /home/stratos/config.properties /srv/config.properties
 
 # Enable persistence features if canary build flag is set
-RUN if [ "x$CANARY_BUILD" != "x" ] ; then echo "FORCE_ENABLE_PERSISTENCE_FEATURES=true >> srv/config.properties fi
+RUN if [ "x$CANARY_BUILD" != "x" ] ; then echo "FORCE_ENABLE_PERSISTENCE_FEATURES=true" >> srv/config.properties fi
 
 #EXPOSE 443
 
