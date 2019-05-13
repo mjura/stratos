@@ -18,13 +18,17 @@ RUN CERTS_PATH=/home/stratos/dev-certs ./generate_cert.sh \
 
 # use --target=aio to build All-in-one image
 FROM splatform/stratos-bk-base:opensuse
+ARG CANARY_BUILD
 COPY --from=builder /home/stratos/deploy/db /src/deploy/db
 COPY --from=builder /home/stratos/dev-certs /srv/dev-certs
 COPY --from=builder /home/stratos/ui /srv/ui
 COPY --from=builder /home/stratos/jetstream /srv/jetstream
 COPY --from=builder /home/stratos/config.properties /srv/config.properties
 
-EXPOSE 443
+# Enable persistence features if canary build flag is set
+RUN if [ "x$CANARY_BUILD" != "x" ] ; then echo "FORCE_ENABLE_PERSISTENCE_FEATURES=true >> srv/config.properties fi
+
+#EXPOSE 443
 
 # Need to be root to bind to port 443
 USER root
