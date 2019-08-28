@@ -20,7 +20,8 @@ import { HelmSetupModule } from './helm/helm.setup.module';
 const SuseCustomizations: CustomizationsMetadata = {
   copyright: '&copy; 2019 SUSE',
   hasEula: true,
-  aboutInfoComponent: SuseAboutInfoComponent
+  aboutInfoComponent: SuseAboutInfoComponent,
+  alwaysShowNavForEndpointTypes: (typ) => false,
 };
 
 @NgModule({

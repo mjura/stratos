@@ -599,7 +599,7 @@ func newPortalProxy(pc interfaces.PortalConfig, dcp *sql.DB, ss HttpSessionStore
 
 	// OIDC
 	pp.AddAuthProvider(interfaces.AuthTypeOIDC, interfaces.AuthProvider{
-		Handler: pp.doOidcFlowRequest,
+		Handler: pp.DoOidcFlowRequest,
 	})
 
 	return pp
@@ -664,9 +664,8 @@ func start(config interfaces.PortalConfig, p *portalProxy, needSetupMiddleware b
 		AllowMethods:     []string{echo.GET, echo.PUT, echo.POST, echo.DELETE},
 		AllowCredentials: true,
 	}))
-	// See #151
 	e.Use(middleware.SecureWithConfig(middleware.SecureConfig{
-		XFrameOptions: "DENY",
+		XFrameOptions: "SAMEORIGIN",
 	}))
 
 	if !isUpgrade {
