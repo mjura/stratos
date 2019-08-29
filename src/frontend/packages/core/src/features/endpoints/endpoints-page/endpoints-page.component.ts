@@ -1,4 +1,15 @@
-import { Component, NgZone, OnDestroy, OnInit } from '@angular/core';
+import {
+  Component,
+  ComponentFactory,
+  ComponentFactoryResolver,
+  ComponentRef,
+  Inject,
+  NgZone,
+  OnDestroy,
+  OnInit,
+  ViewChild,
+  ViewContainerRef,
+} from '@angular/core';
 import { Store } from '@ngrx/store';
 import { Subscription } from 'rxjs';
 import { first, map } from 'rxjs/operators';
@@ -7,12 +18,14 @@ import { RouterNav } from '../../../../../store/src/actions/router.actions';
 import { AppState } from '../../../../../store/src/app-state';
 import { selectDashboardState } from '../../../../../store/src/selectors/dashboard.selectors';
 import { CurrentUserPermissions } from '../../../core/current-user-permissions.config';
+import { Customizations, CustomizationsMetadata } from '../../../core/customizations.types';
 import { EndpointsService } from '../../../core/endpoints.service';
 import {
   getActionsFromExtensions,
   StratosActionMetadata,
   StratosActionType,
 } from '../../../core/extension/extension-service';
+import { safeUnsubscribe } from '../../../core/utils.service';
 import { EndpointListHelper } from '../../../shared/components/list/list-types/endpoint/endpoint-list.helpers';
 import {
   EndpointsListConfigService,
@@ -31,7 +44,17 @@ import { ListConfig } from '../../../shared/components/list/list.component.types
 export class EndpointsPageComponent implements OnDestroy, OnInit {
   public canRegisterEndpoint = CurrentUserPermissions.ENDPOINT_REGISTER;
   private healthCheckTimeout: number;
-  constructor(public endpointsService: EndpointsService, public store: Store<AppState>, private ngZone: NgZone) {
+
+  @ViewChild('customNoEndpoints', { read: ViewContainerRef }) customNoEndpointsContainer;
+  customContentComponentRef: ComponentRef<any>;
+
+  constructor(
+    public endpointsService: EndpointsService,
+    public store: Store<AppState>,
+    private ngZone: NgZone,
+    private resolver: ComponentFactoryResolver,
+    @Inject(Customizations) public customizations: CustomizationsMetadata
+  ) {
     // Redirect to /applications if not enabled.
     endpointsService.disablePersistenceFeatures$.pipe(
       map(off => {
@@ -49,7 +72,7 @@ export class EndpointsPageComponent implements OnDestroy, OnInit {
     ).subscribe();
   }
 
-  sub: Subscription;
+  sub: Subscription[] = [];
 
   public extensionActions: StratosActionMetadata[] = getActionsFromExtensions(StratosActionType.Endpoints);
 
@@ -68,6 +91,15 @@ export class EndpointsPageComponent implements OnDestroy, OnInit {
   }
 
   ngOnInit() {
+    this.sub.push(this.endpointsService.haveRegistered$.subscribe(haveRegistered => {
+      // Use custom component if specified
+      this.customNoEndpointsContainer.clear();
+      if (!haveRegistered && this.customizations.noEndpointsComponent) {
+        const factory: ComponentFactory<any> = this.resolver.resolveComponentFactory(this.customizations.noEndpointsComponent);
+        this.customContentComponentRef = this.customNoEndpointsContainer.createComponent(factory);
+      }
+    }));
+
     this.endpointsService.checkAllEndpoints();
     this.store.select(selectDashboardState).pipe(
       first()
@@ -76,32 +108,15 @@ export class EndpointsPageComponent implements OnDestroy, OnInit {
         this.startEndpointHealthCheckPulse();
       }
     });
-    // Doesn't look like this is used (see connect-endpoint-dialog.component for actual handler)
-    // const params = queryParamMap();
-    // if (params.cnsi_guid) {
-    //   const guid = params.cnsi_guid;
-    //   window.history.pushState({}, '', '/endpoints');
-    //   this.sub = this.endpointsService.endpoints$.pipe(
-    //     delay(0),
-    //     filter(ep => !!ep[guid]),
-    //     map(ep => {
-    //       const endpoint = ep[guid];
-    //       if (endpoint.connectionStatus === 'connected') {
-    //         this.store.dispatch(new ShowSnackBar(`Connected endpoint '${endpoint.name}'`));
-    //       } else {
-    //         this.store.dispatch(new ShowSnackBar(`A problem occurred connecting endpoint ${endpoint.name}`));
-    //       }
-    //     }),
-    //     first(),
-    //   ).subscribe();
-    // }
   }
 
   ngOnDestroy() {
     this.stopEndpointHealthCheckPulse();
-    if (this.sub) {
-      this.sub.unsubscribe();
+    safeUnsubscribe(...this.sub);
+    if (this.customContentComponentRef) {
+      this.customContentComponentRef.destroy();
     }
+
   }
 }
 
