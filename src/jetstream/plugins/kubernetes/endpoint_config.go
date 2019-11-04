@@ -118,7 +118,7 @@ func (c *KubernetesSpecification) addAuthInfoForEndpoint(info *clientcmdapi.Auth
 	log.Debug("addAuthInfoForEndpoint")
 	var authProvider = c.GetAuthProvider(tokenRec.AuthType)
 	if authProvider == nil {
-		return errors.New("Unsupported auth type")
+		return fmt.Errorf("Unsupported auth type: %s", tokenRec.AuthType)
 	}
 
 	return authProvider.AddAuthInfo(info, tokenRec)

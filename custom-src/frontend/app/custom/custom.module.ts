@@ -2,6 +2,7 @@ import { NgModule } from '@angular/core';
 import { Router } from '@angular/router';
 import { Store } from '@ngrx/store';
 
+import { GetSystemInfo } from '../../../store/src/actions/system.actions';
 import { AppState } from '../../../store/src/app-state';
 import { EndpointHealthCheck } from '../../endpoints-health-checks';
 import { CoreModule } from '../core/core.module';
@@ -16,11 +17,14 @@ import { SuseAboutInfoComponent } from './suse-about-info/suse-about-info.compon
 import { SuseLoginComponent } from './suse-login/suse-login.component';
 import { HelmModule } from './helm/helm.module';
 import { HelmSetupModule } from './helm/helm.setup.module';
+import { SuseWelcomeComponent } from './suse-welcome/suse-welcome.component';
 
 const SuseCustomizations: CustomizationsMetadata = {
   copyright: '&copy; 2019 SUSE',
   hasEula: true,
-  aboutInfoComponent: SuseAboutInfoComponent
+  aboutInfoComponent: SuseAboutInfoComponent,
+  noEndpointsComponent: SuseWelcomeComponent,
+  alwaysShowNavForEndpointTypes: (typ) => false,
 };
 
 @NgModule({
@@ -35,11 +39,13 @@ const SuseCustomizations: CustomizationsMetadata = {
   declarations: [
     SuseLoginComponent,
     SuseAboutInfoComponent,
+    SuseWelcomeComponent,
     DemoHelperComponent
   ],
   entryComponents: [
     SuseLoginComponent,
     SuseAboutInfoComponent,
+    SuseWelcomeComponent,
     DemoHelperComponent,
   ],
   providers: [
@@ -53,6 +59,13 @@ export class CustomModule {
   constructor(endpointService: EndpointsService, store: Store<AppState>, router: Router) {
     endpointService.registerHealthCheck(
       new EndpointHealthCheck('k8s', (endpoint) => store.dispatch(new KubeHealthCheck(endpoint.guid)))
+    );
+    endpointService.registerHealthCheck(
+      new EndpointHealthCheck('helm', (endpoint) => {
+        if (endpoint.endpoint_metadata && endpoint.endpoint_metadata.status === 'Synchronizing') {
+          store.dispatch(new GetSystemInfo());
+        }
+      })
     );
     // Only update the routes once
     if (!CustomModule.init) {
