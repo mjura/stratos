@@ -2,7 +2,6 @@ package kubernetes
 
 import (
 	"encoding/base64"
-	"errors"
 	"fmt"
 	"regexp"
 
