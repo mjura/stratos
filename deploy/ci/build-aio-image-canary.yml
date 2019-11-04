@@ -75,3 +75,4 @@ jobs:
       tag: "stratos/deploy/ci/tasks/build-images/canary-tag"
       tag_as_latest: false
       build_args_file: image-tag/ui-build-args
+      squash: true
