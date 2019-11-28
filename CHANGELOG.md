@@ -12,7 +12,7 @@ This release contains a few fixes:
 - Generated Ingress certificates during Kubernetes deployment are empty [\#4006](https://github.com/cloudfoundry/stratos/issues/4006)
 - Kubernetes Ingress certificate is incorrectly set [\#4005](https://github.com/cloudfoundry/stratos/issues/4005)
 - Update metric used for cells [\#4009](https://github.com/cloudfoundry/stratos/pull/4009)
-- Fix in
+- Fix incorrect SSO behaviour following 2.4.0 --> 2.6.0 upgrade [\#4015](https://github.com/cloudfoundry/stratos/pull/4015)
 
 ## 2.6.0
 
