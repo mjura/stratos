@@ -19,9 +19,12 @@ import { KubernetesGKEAuthFormComponent } from './auth-forms/kubernetes-gke-auth
 import { KubernetesEndpointPreviewComponent } from './kubernetes-endpoint-preview/kubernetes-endpoint-preview.component';
 import { KUBERNETES_ENDPOINT_TYPE } from './kubernetes-entity-factory';
 import { generateKubernetesEntities } from './kubernetes-entity-generator';
+import { KubernetesNodePreviewComponent } from './kubernetes-node/kubernetes-node-preview/kubernetes-node-preview.component';
 import { BaseKubeGuid } from './kubernetes-page.types';
+import { KubernetesPodPreviewComponent } from './kubernetes-pod-preview/kubernetes-pod-preview.component';
 import { KubernetesStoreModule } from './kubernetes.store.module';
 import { KubernetesEndpointService } from './services/kubernetes-endpoint.service';
+import { KubernetesNodeService } from './services/kubernetes-node.service';
 import { KubeHealthCheck } from './store/kubernetes.actions';
 
 
@@ -39,10 +42,13 @@ import { KubeHealthCheck } from './store/kubernetes.actions';
     KubernetesConfigAuthFormComponent,
     KubernetesGKEAuthFormComponent,
     KubernetesEndpointPreviewComponent,
+    KubernetesNodePreviewComponent,
+    KubernetesPodPreviewComponent,
   ],
   providers: [
     BaseKubeGuid,
     KubernetesEndpointService,
+    KubernetesNodeService,
   ],
   entryComponents: [
     KubernetesCertsAuthFormComponent,
@@ -50,6 +56,8 @@ import { KubeHealthCheck } from './store/kubernetes.actions';
     KubernetesConfigAuthFormComponent,
     KubernetesGKEAuthFormComponent,
     KubernetesEndpointPreviewComponent,
+    KubernetesNodePreviewComponent,
+    KubernetesPodPreviewComponent,
   ]
 })
 export class KubernetesSetupModule {

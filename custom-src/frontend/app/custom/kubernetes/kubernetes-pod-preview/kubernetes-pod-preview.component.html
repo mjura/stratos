@@ -1,0 +1,29 @@
+<app-sidepanel-preview [title]="title">
+  <app-tile-grid fit="true">
+    <app-loading-page [isLoading]="detailsLoading$" text="Retrieving details">
+      <app-tile-group>
+        <app-tile>
+          <div class="cf-space-usage">
+            <mat-card>
+              <mat-card-header>
+                <mat-card-title>Summary</mat-card-title>
+              </mat-card-header>
+              <mat-card-content>
+                <app-tile-group class="app-metadata">
+                  <app-tile class="app-metadata__two-cols">
+                    <app-metadata-item label="Namespace">{{ (podEntity$ | async)?.metadata.namespace }}
+                    </app-metadata-item>
+                  </app-tile>
+                  <app-tile class="app-metadata__two-cols">
+                    <app-metadata-item label="Status">{{ (podEntity$ | async)?.status.phase }}
+                    </app-metadata-item>
+                  </app-tile>
+                </app-tile-group>
+              </mat-card-content>
+            </mat-card>
+          </div>
+        </app-tile>
+      </app-tile-group>
+    </app-loading-page>
+  </app-tile-grid>
+</app-sidepanel-preview>

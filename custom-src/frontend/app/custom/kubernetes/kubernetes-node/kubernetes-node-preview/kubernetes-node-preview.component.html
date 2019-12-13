@@ -1,0 +1,57 @@
+<app-sidepanel-preview [title]="title">
+  <app-tile-grid fit="true">
+    <app-loading-page [isLoading]="detailsLoading$" text="Retrieving details">
+      <app-tile-group>
+        <app-tile>
+          <div class="cf-space-usage">
+            <mat-card>
+              <mat-card-header>
+                <mat-card-title>Summary</mat-card-title>
+              </mat-card-header>
+              <mat-card-content>
+                <app-tile-group class="app-metadata">
+                  <app-tile class="app-metadata__two-cols">
+                    <app-metadata-item label="Operating System">{{ (kubeNodeService.nodeEntity$ | async)?.status.nodeInfo.operatingSystem }}
+                    </app-metadata-item>
+                    <app-metadata-item label="Archtecture">{{ (kubeNodeService.nodeEntity$ | async)?.status.nodeInfo.architecture }}
+                    </app-metadata-item>
+                    <app-metadata-item label="OS Image">{{ (kubeNodeService.nodeEntity$ | async)?.status.nodeInfo.osImage }}
+                    </app-metadata-item>
+                  </app-tile>
+                  <app-tile class="app-metadata__two-cols">
+                    <app-metadata-item label="Kernel Version">
+                      {{ (kubeNodeService.nodeEntity$ | async)?.status.nodeInfo.kernelVersion }}
+                    </app-metadata-item>
+                    <app-metadata-item label="Kubelet Version">
+                      {{ (kubeNodeService.nodeEntity$ | async)?.status.nodeInfo.kubeletVersion }}
+                    </app-metadata-item>
+                    <app-metadata-item label="Kube Proxy Version">
+                      {{ (kubeNodeService.nodeEntity$ | async)?.status.nodeInfo.kubeProxyVersion }}
+                    </app-metadata-item>
+                  </app-tile>
+                </app-tile-group>
+              </mat-card-content>
+            </mat-card>
+          </div>
+        </app-tile>
+      </app-tile-group>
+
+      <app-tile-group>
+        <app-tile>
+          <app-card-number-metric [link]="podsLink" icon="apps" label="Pods" labelSingular="Pod"
+            value="{{ podCount$ | async }}"
+            limit="{{ (kubeNodeService.nodeEntity$ | async)?.status.capacity.pods }}"></app-card-number-metric>
+        </app-tile>
+        <app-tile>
+          <app-card-number-metric icon="apps" label="CPU"
+            value="{{ (kubeNodeService.nodeEntity$ | async)?.status.capacity.cpu }}"></app-card-number-metric>
+        </app-tile>
+        <app-tile>
+          <app-card-number-metric icon="memory" label="Memory Capacity"
+          value="{{ (memoryCapacity$ | async) | bytesToHumanSize }}">
+          </app-card-number-metric>
+        </app-tile>
+      </app-tile-group>
+    </app-loading-page>
+  </app-tile-grid>
+</app-sidepanel-preview>

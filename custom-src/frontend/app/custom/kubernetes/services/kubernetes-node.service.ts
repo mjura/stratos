@@ -37,8 +37,17 @@ export class KubernetesNodeService {
     public entityServiceFactory: EntityServiceFactory,
     public entityMonitorFactory: EntityMonitorFactory
   ) {
-    this.nodeName = getIdFromRoute(activatedRoute, 'nodeName');
-    this.kubeGuid = kubeEndpointService.kubeGuid;
+    const nodeName = getIdFromRoute(activatedRoute, 'nodeName');
+    const kubeGuid = kubeEndpointService.kubeGuid;
+
+    if (nodeName && kubeGuid) {
+      this.initialize(nodeName, kubeGuid);
+    }
+  }
+
+  initialize(nodeName, kubeGuid) {
+    this.nodeName = nodeName;
+    this.kubeGuid = kubeGuid;
 
     const nodeEntityService = this.entityServiceFactory.create<KubernetesNode>(
       this.nodeName,
@@ -55,8 +64,6 @@ export class KubernetesNodeService {
       map(p => p.entity)
     );
   }
-
-
 
   public setupMetricObservable(metric: KubeNodeMetric, metricStatistic: MetricStatistic) {
 
