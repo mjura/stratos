@@ -21,6 +21,7 @@ import { AppStoreModule } from '../../store/src/store.module';
 import { EndpointModel } from '../../store/src/types/endpoint.types';
 import { IFavoriteMetadata, UserFavorite } from '../../store/src/types/user-favorites.types';
 import { TabNavService } from '../tab-nav.service';
+import { XSRFModule } from '../xsrf.module';
 import { AppComponent } from './app.component';
 import { RouteModule } from './app.routing';
 import { STRATOS_ENDPOINT_TYPE } from './base-entity-schemas';
@@ -45,8 +46,8 @@ import { LoggedInService } from './logged-in.service';
 import { CustomReuseStrategy } from './route-reuse-stragegy';
 import { FavoritesConfigMapper } from './shared/components/favorites-meta-card/favorite-config-mapper';
 import { endpointEventKey, GlobalEventData, GlobalEventService } from './shared/global-events.service';
+import { PanelPreviewService } from './shared/services/panel-preview.service';
 import { SharedModule } from './shared/shared.module';
-import { XSRFModule } from '../xsrf.module';
 
 // Create action for router navigation. See
 // - https://github.com/ngrx/platform/issues/68
@@ -110,6 +111,7 @@ export class CustomRouterStateSerializer
     LoggedInService,
     ExtensionService,
     DynamicExtensionRoutes,
+    PanelPreviewService,
     { provide: GITHUB_API_URL, useFactory: getGitHubAPIURL },
     { provide: RouterStateSerializer, useClass: CustomRouterStateSerializer }, // Create action for router navigation
     { provide: RouteReuseStrategy, useClass: CustomReuseStrategy }
