@@ -146,7 +146,10 @@ export class AppModule {
       eventTriggered: (state: GeneralEntityAppState) => {
         const eventState = internalEventStateSelector(state);
         return Object.entries(eventState.types.endpoint).reduce((res, [eventId, value]) => {
-          const backendErrors = value.filter(error => error.eventCode === '500');
+          const backendErrors = value.filter(error => {
+            const eventCode = parseInt(error.eventCode, 10);
+            return eventCode >= 500;
+          });
           if (!backendErrors.length) {
             return res;
           }
@@ -159,7 +162,9 @@ export class AppModule {
         }, []);
       },
       message: data => {
-        return `We've been having trouble communicating with the endpoint ${data.endpoint.name}`;
+        const part1 = data.count > 1 ? `There are ${data.count} errors` : `There is an error`;
+        const part2 = data.endpoint ? ` associated with the endpoint '${data.endpoint.name}'` : ` associated with multiple endpoints`;
+        return part1 + part2;
       },
       key: data => `${endpointEventKey}-${data.endpoint.guid}`,
       link: data => `/errors/${data.endpoint.guid}`,

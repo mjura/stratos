@@ -7,9 +7,11 @@ import {
   HydrateDashboardStateAction,
   OPEN_SIDE_NAV,
   SET_HEADER_EVENT,
+  SET_STRATOS_THEME,
   SetHeaderEvent,
   SetPollingEnabledAction,
   SetSessionTimeoutAction,
+  SetThemeAction,
   TIMEOUT_SESSION,
   TOGGLE_SIDE_NAV,
 } from '../actions/dashboard-actions';
@@ -21,6 +23,7 @@ export interface DashboardState {
   isMobile: boolean;
   isMobileNavOpen: boolean;
   sideNavPinned: boolean;
+  themeKey: string;
   headerEventMinimized: boolean;
 }
 
@@ -31,6 +34,7 @@ export const defaultDashboardState: DashboardState = {
   isMobile: false,
   isMobileNavOpen: false,
   sideNavPinned: true,
+  themeKey: null,
   headerEventMinimized: false,
 };
 
@@ -77,6 +81,12 @@ export function dashboardReducer(state: DashboardState = defaultDashboardState, 
       return {
         ...state,
         ...hydrateDashboardStateAction.dashboardState
+      };
+    case SET_STRATOS_THEME:
+      const setThemeAction = action as SetThemeAction;
+      return {
+        ...state,
+        themeKey: setThemeAction.theme ? setThemeAction.theme.key : null
       };
     default:
       return state;

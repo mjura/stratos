@@ -1,5 +1,6 @@
 import { Action } from '@ngrx/store';
 
+import { StratosTheme } from '../../../core/src/core/theme.service';
 import { DashboardState } from '../reducers/dashboard-reducer';
 
 export const OPEN_SIDE_NAV = '[Dashboard] Open side nav';
@@ -12,6 +13,7 @@ export const DISABLE_SIDE_NAV_MOBILE_MODE = '[Dashboard] Disable mobile nav';
 
 export const TIMEOUT_SESSION = '[Dashboard] Timeout Session';
 export const ENABLE_POLLING = '[Dashboard] Enable Polling';
+export const SET_STRATOS_THEME = '[Dashboard] Set Theme';
 
 export const HYDRATE_DASHBOARD_STATE = '[Dashboard] Hydrate dashboard state';
 
@@ -60,3 +62,7 @@ export class HydrateDashboardStateAction implements Action {
   type = HYDRATE_DASHBOARD_STATE;
 }
 
+export class SetThemeAction implements Action {
+  constructor(public theme: StratosTheme) { }
+  type = SET_STRATOS_THEME;
+}
