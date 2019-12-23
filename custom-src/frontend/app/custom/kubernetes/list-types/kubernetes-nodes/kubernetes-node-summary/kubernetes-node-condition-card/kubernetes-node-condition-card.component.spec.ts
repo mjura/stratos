@@ -1,7 +1,10 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { BaseKubeGuid } from '../../../../kubernetes-page.types';
-import { KubernetesBaseTestModules } from '../../../../kubernetes.testing.module';
+import {
+  KubernetesActivatedRouteMock,
+  KubernetesBaseTestModules,
+  KubernetesGuidMock,
+} from '../../../../kubernetes.testing.module';
 import { KubernetesEndpointService } from '../../../../services/kubernetes-endpoint.service';
 import { KubernetesNodeService } from '../../../../services/kubernetes-node.service';
 import { KubernetesNodeConditionCardComponent } from './kubernetes-node-condition-card.component';
@@ -16,7 +19,11 @@ describe('KubernetesNodeConditionCardComponent', () => {
     TestBed.configureTestingModule({
       declarations: [KubernetesNodeConditionCardComponent, KubernetesNodeConditionComponent],
       imports: KubernetesBaseTestModules,
-      providers: [BaseKubeGuid, KubernetesEndpointService, KubernetesNodeService]
+      providers: [
+        KubernetesEndpointService,
+        KubernetesNodeService,
+        KubernetesActivatedRouteMock,
+        KubernetesGuidMock]
     })
       .compileComponents();
   }));

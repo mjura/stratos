@@ -1,5 +1,7 @@
+import { HttpClientModule } from '@angular/common/http';
 import { NgModule } from '@angular/core';
 import { NoopAnimationsModule } from '@angular/platform-browser/animations';
+import { ActivatedRoute } from '@angular/router';
 import { RouterTestingModule } from '@angular/router/testing';
 
 import { createBasicStoreModule } from '../../../test-framework/store-test-helper';
@@ -9,7 +11,7 @@ import { CATALOGUE_ENTITIES, EntityCatalogueFeatureModule } from '../../core/ent
 import { entityCatalogue, TestEntityCatalogue } from '../../core/entity-catalogue/entity-catalogue.service';
 import { SharedModule } from '../../shared/shared.module';
 import { generateKubernetesEntities } from './kubernetes-entity-generator';
-import { HttpClientModule } from '@angular/common/http';
+import { BaseKubeGuid } from './kubernetes-page.types';
 
 @NgModule({
   imports: [{
@@ -39,3 +41,27 @@ export const KubernetesBaseTestModules = [
   HttpClientModule,
   SharedModule,
 ];
+
+export const KubernetesActivatedRouteMock = {
+  provide: ActivatedRoute,
+  useValue: {
+    snapshot: {
+      queryParams: {},
+      params: {
+        podName: 'podName123',
+        nodeName: 'nodeName123',
+        namespaceName: 'namespaceName123',
+      },
+    }
+  }
+};
+
+export const KubernetesGuidMock = {
+  provide: BaseKubeGuid,
+  useValue: {
+    guid: '5123:4'
+  },
+  deps: [
+    KubernetesActivatedRouteMock,
+  ]
+};

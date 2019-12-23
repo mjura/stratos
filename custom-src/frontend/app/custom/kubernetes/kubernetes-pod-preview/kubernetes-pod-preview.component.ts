@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import { Observable } from 'rxjs';
-import { filter, first, map, shareReplay, tap } from 'rxjs/operators';
+import { filter, first, map, shareReplay } from 'rxjs/operators';
 
 import { EntityServiceFactory } from '../../../../../core/src/core/entity-service-factory.service';
 import { PreviewableComponent } from '../../../../../core/src/shared/previewable-component';
@@ -40,14 +40,12 @@ export class KubernetesPodPreviewComponent implements PreviewableComponent {
     );
 
     this.pod$ = podEntityService.entityObs$.pipe(
-      tap(p => console.log(1, p)),
       filter(p => !!p && !!p.entity),
       first(),
       shareReplay(1),
     );
 
     this.podEntity$ = this.pod$.pipe(
-      tap(p => console.log(2, p)),
       map(p => p.entity)
     );
 

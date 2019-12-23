@@ -1,7 +1,10 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { BaseKubeGuid } from '../../../kubernetes-page.types';
-import { KubernetesBaseTestModules } from '../../../kubernetes.testing.module';
+import {
+  KubernetesActivatedRouteMock,
+  KubernetesBaseTestModules,
+  KubernetesGuidMock,
+} from '../../../kubernetes.testing.module';
 import { KubernetesEndpointService } from '../../../services/kubernetes-endpoint.service';
 import { KubernetesNodeService } from '../../../services/kubernetes-node.service';
 import {
@@ -29,7 +32,12 @@ describe('KubernetesNodeSummaryComponent', () => {
         KubernetesNodeTagsCardComponent,
       ],
       imports: KubernetesBaseTestModules,
-      providers: [BaseKubeGuid, KubernetesEndpointService, KubernetesNodeService]
+      providers: [
+        KubernetesEndpointService,
+        KubernetesNodeService,
+        KubernetesActivatedRouteMock,
+        KubernetesGuidMock
+      ]
     })
       .compileComponents();
   }));

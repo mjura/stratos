@@ -1,7 +1,8 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { TabNavService } from '../../../../tab-nav.service';
-import { KubernetesBaseTestModules } from '../kubernetes.testing.module';
+import { BaseKubeGuid } from '../kubernetes-page.types';
+import { KubernetesBaseTestModules, KubernetesGuidMock } from '../kubernetes.testing.module';
 import { KubernetesTabBaseComponent } from './kubernetes-tab-base.component';
 
 describe('KubernetesTabBaseComponent', () => {
@@ -9,6 +10,7 @@ describe('KubernetesTabBaseComponent', () => {
   let fixture: ComponentFixture<KubernetesTabBaseComponent>;
 
   beforeEach(async(() => {
+    TestBed.overrideProvider(BaseKubeGuid, KubernetesGuidMock);
     TestBed.configureTestingModule({
       declarations: [KubernetesTabBaseComponent],
       imports: KubernetesBaseTestModules,

@@ -1,10 +1,7 @@
-import { HttpClient, HttpClientModule, HttpHandler } from '@angular/common/http';
-import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { CoreTestingModule } from '../../../../test-framework/core-test.modules';
-import { createBasicStoreModule } from '../../../../test-framework/store-test-helper';
-import { LoggerService } from '../../../core/logger.service';
+import { KubernetesActivatedRouteMock, KubernetesBaseTestModules, KubernetesGuidMock } from '../kubernetes.testing.module';
+import { KubernetesEndpointService } from '../services/kubernetes-endpoint.service';
 import { KubernetesEndpointPreviewComponent } from './kubernetes-endpoint-preview.component';
 
 describe('KubernetesEndpointPreviewComponent', () => {
@@ -14,13 +11,12 @@ describe('KubernetesEndpointPreviewComponent', () => {
   beforeEach(async(() => {
     TestBed.configureTestingModule({
       declarations: [KubernetesEndpointPreviewComponent],
-      providers: [LoggerService, HttpClient, HttpHandler],
-      imports: [
-        HttpClientModule,
-        HttpClientTestingModule,
-        CoreTestingModule,
-        createBasicStoreModule()
-      ]
+      providers: [
+        KubernetesEndpointService,
+        KubernetesActivatedRouteMock,
+        KubernetesGuidMock
+      ],
+      imports: [...KubernetesBaseTestModules]
     })
       .compileComponents();
   }));

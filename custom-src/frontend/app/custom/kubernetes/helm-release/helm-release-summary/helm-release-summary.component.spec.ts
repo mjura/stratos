@@ -1,7 +1,6 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { BaseKubeGuid } from '../../kubernetes-page.types';
-import { KubernetesBaseTestModules } from '../../kubernetes.testing.module';
+import { KubernetesBaseTestModules, KubernetesGuidMock } from '../../kubernetes.testing.module';
 import { HelmReleaseService } from '../../services/helm-release.service';
 import { KubernetesEndpointService } from '../../services/kubernetes-endpoint.service';
 import { HelmReleaseSummaryCardComponent } from './helm-release-summary-card/helm-release-summary-card.component';
@@ -18,7 +17,11 @@ describe('HelmReleaseSummaryComponent', () => {
         HelmReleaseSummaryCardComponent
       ],
       imports: KubernetesBaseTestModules,
-      providers: [BaseKubeGuid, HelmReleaseService, KubernetesEndpointService]
+      providers: [
+        KubernetesGuidMock,
+        HelmReleaseService,
+        KubernetesEndpointService
+      ]
     })
       .compileComponents();
   }));

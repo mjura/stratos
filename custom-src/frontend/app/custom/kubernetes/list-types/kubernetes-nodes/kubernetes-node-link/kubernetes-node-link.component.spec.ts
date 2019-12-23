@@ -1,7 +1,7 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { BaseKubeGuid } from '../../../kubernetes-page.types';
-import { KubernetesBaseTestModules } from '../../../kubernetes.testing.module';
+import { PanelPreviewService } from '../../../../../../../core/src/shared/services/panel-preview.service';
+import { KubernetesBaseTestModules, KubernetesGuidMock } from '../../../kubernetes.testing.module';
 import { KubernetesEndpointService } from '../../../services/kubernetes-endpoint.service';
 import { KubernetesNodeLinkComponent } from './kubernetes-node-link.component';
 
@@ -13,7 +13,7 @@ describe('KubernetesNodeLinkComponent', () => {
     TestBed.configureTestingModule({
       declarations: [KubernetesNodeLinkComponent],
       imports: KubernetesBaseTestModules,
-      providers: [KubernetesEndpointService, BaseKubeGuid]
+      providers: [KubernetesEndpointService, KubernetesGuidMock, PanelPreviewService]
     })
       .compileComponents();
   }));
