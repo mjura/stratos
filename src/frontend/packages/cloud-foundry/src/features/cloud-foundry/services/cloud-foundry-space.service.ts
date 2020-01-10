@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { combineLatest, Observable, of } from 'rxjs';
-import { map, publishReplay, refCount, switchMap } from 'rxjs/operators';
+import { filter, map, publishReplay, refCount, switchMap } from 'rxjs/operators';
 
 import { CFAppState } from '../../../../../cloud-foundry/src/cf-app-state';
 import {
@@ -15,14 +15,12 @@ import {
 import { SpaceUserRoleNames } from '../../../../../cloud-foundry/src/store/types/user.types';
 import { IApp, IOrgQuotaDefinition, IRoute, ISpace, ISpaceQuotaDefinition } from '../../../../../core/src/core/cf-api.types';
 import { getStartedAppInstanceCount } from '../../../../../core/src/core/cf.helpers';
-import { entityCatalogue } from '../../../../../core/src/core/entity-catalogue/entity-catalogue.service';
-import { EntityServiceFactory } from '../../../../../core/src/core/entity-service-factory.service';
-import { PaginationMonitorFactory } from '../../../../../core/src/shared/monitors/pagination-monitor.factory';
+import { EntityServiceFactory } from '../../../../../store/src/entity-service-factory.service';
+import { PaginationMonitorFactory } from '../../../../../store/src/monitors/pagination-monitor.factory';
 import {
   CloudFoundryUserProvidedServicesService,
 } from '../../../../../core/src/shared/services/cloud-foundry-user-provided-services.service';
 import { APIResource, EntityInfo } from '../../../../../store/src/types/api.types';
-import { CF_ENDPOINT_TYPE } from '../../../../cf-types';
 import { createEntityRelationKey } from '../../../entity-relations/entity-relations.types';
 import { CfUserService } from '../../../shared/data-services/cf-user.service';
 import { fetchServiceInstancesCount } from '../../service-catalog/services-helper';
@@ -30,6 +28,8 @@ import { ActiveRouteCfOrgSpace } from '../cf-page.types';
 import { getSpaceRolesString } from '../cf.helpers';
 import { CloudFoundryEndpointService } from './cloud-foundry-endpoint.service';
 import { CloudFoundryOrganizationService, createOrgQuotaDefinition } from './cloud-foundry-organization.service';
+import { entityCatalog } from '../../../../../store/src/entity-catalog/entity-catalog.service';
+import { CF_ENDPOINT_TYPE } from '../../../cf-types';
 
 @Injectable()
 export class CloudFoundrySpaceService {
@@ -76,9 +76,11 @@ export class CloudFoundrySpaceService {
     const orgGuid = activeRouteCfOrgSpace.orgGuid;
     const cfGuid = activeRouteCfOrgSpace.cfGuid;
 
-    if (cfGuid && orgGuid && spaceGuid) {
-      this.initialize(cfGuid, orgGuid, spaceGuid);
-    }
+    this.initialiseObservables();
+  }
+
+  public fetchApps() {
+    this.cfEndpointService.fetchApps();
   }
 
   public initialize(cfGuid: string, orgGuid: string, spaceGuid: string) {
@@ -126,14 +128,14 @@ export class CloudFoundrySpaceService {
             createEntityRelationKey(spaceEntityType, SpaceUserRoleNames.AUDITOR),
           );
         }
-        const spaceEntity = entityCatalogue.getEntity(CF_ENDPOINT_TYPE, spaceEntityType);
+        const spaceEntity = entityCatalog.getEntity(CF_ENDPOINT_TYPE, spaceEntityType);
         const actionBuilder = spaceEntity.actionOrchestrator.getActionBuilder('get');
         const getSpaceAction = actionBuilder(this.spaceGuid, this.cfGuid, { includeRelations: relations });
         const spaceEntityService = this.entityServiceFactory.create<APIResource<ISpace>>(
           this.spaceGuid,
           getSpaceAction
         );
-        return spaceEntityService.waitForEntity$;
+        return spaceEntityService.entityObs$.pipe(filter(o => !!o && !!o.entity));
       }),
       publishReplay(1),
       refCount()
