@@ -1,13 +1,12 @@
 package kubernetes
 
 import (
-	//"context"
 	"encoding/json"
 	"errors"
 	"fmt"
+	"io/ioutil"
 	"net"
 	"net/http"
-	"net/http/httputil"
 	"net/url"
 	"strings"
 	"time"
@@ -25,13 +24,7 @@ import (
 	v1 "k8s.io/api/core/v1"
 )
 
-// GET /api/v1/namespaces/{namespace}/pods/{name}/proxy
-
-// http://localhost:8001/api/v1/namespaces/kube-system/services/https:kubernetes-dashboard:/proxy/.
-
-//GET /api/v1/namespaces/{namespace}/services/{name}/proxy
-
-const defaultFlushInterval = 200 * time.Millisecond
+const defaultFlushInterval = 0
 
 type responder struct{}
 
@@ -39,6 +32,12 @@ type dashboardStatusResponse struct {
 	Endpoint  string  `json:"guid"`
 	Installed bool    `json:"installed"`
 	Pod       *v1.Pod `json:"pod"`
+}
+
+type dashboardServiceInfo struct {
+	Namespace   string
+	ServiceName string
+	Scheme      string
 }
 
 func (r *responder) Error(w http.ResponseWriter, req *http.Request, err error) {
@@ -90,8 +89,6 @@ func normalizeLocation(location *url.URL) *url.URL {
 func (k *KubernetesSpecification) kubeDashboardProxy(c echo.Context) error {
 	log.Debug("kubeDashboardTest request")
 
-	//	c.Response().Header().Set("X-FRAME-OPTIONS", "sameorigin")
-
 	cnsiGUID := c.Param("guid")
 	userGUID := c.Get("user_id").(string)
 
@@ -118,19 +115,28 @@ func (k *KubernetesSpecification) kubeDashboardProxy(c echo.Context) error {
 		return errors.New("Could not get token")
 	}
 
-	log.Debug(tokenRec.AuthToken)
-	log.Debug(tokenRec.AuthType)
+	svc, err := k.getKubeDashboardService(c, "app%3Dkubernetes-dashboard")
+	if err != nil {
+		svc, err = k.getKubeDashboardService(c, "k8s-app%3Dkubernetes-dashboard")
+		if err != nil {
+			return errors.New("Can not find Kubernetes Dashboard service")
+		}
+	}
+
+	// log.Debug(tokenRec.AuthToken)
+	// log.Debug(tokenRec.AuthType)
 
 	// Make the info call to the SSH endpoint info
 	// Currently this is not cached, so we must get it each time
 	apiEndpoint := cnsiRecord.APIEndpoint
-	log.Debug(apiEndpoint)
+	// log.Debug(apiEndpoint)
 	// target := fmt.Sprintf("%s/api/v1/namespaces/kube-system/services/https:kubernetes-dashboard:/proxy/", apiEndpoint)
 	//target := fmt.Sprintf("%s/api/v1/namespaces/kube-system/services/http:kubernetes-dashboard:/proxy/", apiEndpoint)
 	// target := http://localhost:8001/api/v1/namespaces/kube-system/services/kubernetes-dashboard/proxy
 
 	// TODO: Need namespace and whether it is https or http
-	target := fmt.Sprintf("%s/api/v1/namespaces/kube-system/services/http:kubernetes-dashboard:/proxy/%s", apiEndpoint, path)
+	//target := fmt.Sprintf("%s/api/v1/namespaces/kube-system/services/http:kubernetes-dashboard:/proxy/%s", apiEndpoint, path)
+	target := fmt.Sprintf("%s/api/v1/namespaces/%s/services/%s:%s:/proxy/%s", apiEndpoint, svc.Namespace, svc.Scheme, svc.ServiceName, path)
 	log.Debug(target)
 	targetURL, _ := url.Parse(target)
 	targetURL = normalizeLocation(targetURL)
@@ -140,12 +146,13 @@ func (k *KubernetesSpecification) kubeDashboardProxy(c echo.Context) error {
 		return errors.New("Could not get config for this auth type")
 	}
 
-	log.Info("Config")
-	log.Info(config.Host)
-	log.Info("Making request")
+	//c.Response().Header().Set("X-FRAME-OPTIONS", "sameorigin")
+	// log.Info("Config")
+	// log.Info(config.Host)
+	// log.Info("Making request")
 	req := c.Request()
 	w := c.Response().Writer
-	log.Infof("%v+", req)
+	// log.Infof("%v+", req)
 
 	// if h.tryUpgrade(w, req) {
 	// 	return
@@ -164,7 +171,8 @@ func (k *KubernetesSpecification) kubeDashboardProxy(c echo.Context) error {
 		loc.Path += "/"
 	}
 
-	log.Info(loc)
+	// log.Info(loc)
+	log.Infof("Proxing to %s", loc.String())
 
 	// From pkg/genericapiserver/endpoints/handlers/proxy.go#ServeHTTP:
 	// Redirect requests with an empty path to a location that ends with a '/'
@@ -191,13 +199,14 @@ func (k *KubernetesSpecification) kubeDashboardProxy(c echo.Context) error {
 		return err
 	}
 
-	log.Info(transport)
+	// log.Info(transport)
 
 	// WithContext creates a shallow clone of the request with the new context.
 	newReq := req.WithContext(req.Context())
 	//newReq := req.WithContext(context.Background())
 	newReq.Header = utilnet.CloneHeader(req.Header)
 	newReq.URL = loc
+	newReq.RequestURI = ""
 
 	// Set auth header so we log in if needed
 	if len(tokenRec.AuthToken) > 0 {
@@ -205,36 +214,39 @@ func (k *KubernetesSpecification) kubeDashboardProxy(c echo.Context) error {
 		log.Info("Setting auth header")
 	}
 
-	proxy := httputil.NewSingleHostReverseProxy(&url.URL{Scheme: loc.Scheme, Host: loc.Host})
-	proxy.Transport = transport
-	proxy.FlushInterval = defaultFlushInterval
-	proxy.ModifyResponse = func(response *http.Response) error {
-		log.Debugf("GOT PROXY RESPONSE: %s", loc.String())
-		log.Debugf("%d", response.StatusCode)
-		log.Debug(response.Header.Get("Content-Type"))
+	hres, err := transport.RoundTrip(newReq)
+	response := c.Response()
+	response.Status = hres.StatusCode
+	copyHeader(response.Header(), hres.Header)
+	response.WriteHeader(hres.StatusCode)
+	data, err := ioutil.ReadAll(hres.Body)
+	w.Write(data)
 
-		log.Debugf("%v+", response.Header)
-		response.Header.Del("X-FRAME-OPTIONS")
-		response.Header.Set("X-FRAME-OPTIONS", "sameorigin")
-		log.Debugf("%v+", response)
-		return nil
-	}
+	// proxy := httputil.NewSingleHostReverseProxy(&url.URL{Scheme: loc.Scheme, Host: loc.Host})
+	// proxy.Transport = transport
+	// proxy.FlushInterval = defaultFlushInterval
+	// proxy.ModifyResponse = func(response *http.Response) error {
+	// 	log.Debugf("GOT PROXY RESPONSE: %s", loc.String())
+	// 	log.Infof("%d", response.StatusCode)
+	// 	log.Debug(response.Header.Get("Content-Type"))
 
-	log.Errorf("Proxy: %s", target)
-
-	// Note that ServeHttp is non blocking and uses a go routine under the hood
-	proxy.ServeHTTP(w, newReq)
-
-	// We need this to be blocking
-
-	// select {
-	// case <-newReq.Context().Done():
-	// 	return newReq.Context().Err()
+	// 	log.Debugf("%v+", response.Header)
+	// 	// response.Header.Del("X-FRAME-OPTIONS")
+	// 	// response.Header.Set("X-FRAME-OPTIONS", "sameorigin")
+	// 	log.Debugf("%v+", response)
+	// 	return nil
 	// }
-
-	log.Errorf("Finished proxying request: %s", target)
+	// proxy.ServeHTTP(w, newReq)
 
 	return nil
+}
+
+func copyHeader(dst, src http.Header) {
+	for k, vv := range src {
+		for _, v := range vv {
+			dst.Add(k, v)
+		}
+	}
 }
 
 // Determine if the specified Kube endpoint has the dashboard installed and ready
@@ -331,4 +343,75 @@ func tryDecodePodList(data []byte) (bool, v1.PodList, error) {
 	}
 
 	return true, pods, err
+}
+
+// Get the service for the kubernetes dashboard
+func (k *KubernetesSpecification) getKubeDashboardService(c echo.Context, labelSelector string) (dashboardServiceInfo, error) {
+	log.Debug("kubeDashboardStatus request")
+
+	cnsiGUID := c.Param("guid")
+	userGUID := c.Get("user_id").(string)
+
+	var p = k.portalProxy
+	response, err := p.DoProxySingleRequest(cnsiGUID, userGUID, "GET", "/api/v1/services?labelSelector="+labelSelector, nil, nil)
+
+	info := dashboardServiceInfo{}
+
+	if err != nil {
+		return info, interfaces.NewHTTPShadowError(
+			http.StatusNotFound,
+			"Could not fetch pod list",
+			"Could not fetch pod list")
+	}
+
+	ok, list, err := tryDecodeServicveList(response.Response)
+	if !ok {
+		return info, interfaces.NewHTTPShadowError(
+			http.StatusNotFound,
+			"Kube dashboard not installed - could not decode service list",
+			"Kube dashboard not installed - could not decode service list")
+	}
+
+	if len(list.Items) == 0 {
+		return info, interfaces.NewHTTPShadowError(
+			http.StatusOK,
+			"Kube dashboard not installed",
+			"Kube dashboard not installed")
+	}
+
+	// Should just be one pod
+	if len(list.Items) != 1 {
+		return info, interfaces.NewHTTPShadowError(
+			http.StatusNotFound,
+			"Kube dashboard not installed - too many pods",
+			"Kube dashboard not installed - too many pods")
+	}
+
+	svc := list.Items[0]
+
+	info.Namespace = svc.Namespace
+	info.ServiceName = svc.Name
+	info.Scheme = "http"
+
+	if len(svc.Spec.Ports) > 0 {
+		port := svc.Spec.Ports[0].Port
+		if port == 443 {
+			info.Scheme = "https"
+		}
+	}
+
+	return info, nil
+}
+
+func tryDecodeServicveList(data []byte) (bool, v1.ServiceList, error) {
+
+	var svcs v1.ServiceList
+	var err error
+
+	err = json.Unmarshal(data, &svcs)
+	if err != nil {
+		return false, svcs, err
+	}
+
+	return true, svcs, err
 }
