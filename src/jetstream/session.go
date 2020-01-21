@@ -88,7 +88,6 @@ func (p *portalProxy) SaveSession(c echo.Context, session *sessions.Session) err
 
 	// If this is the first time we have updated the session, register the session writer hook
 	if c.Get(jetStreamSessionContextUpdatedKey) == nil {
-		log.Warn("Adding session hook")
 		c.Response().Before(p.writeSessionHook(c))
 	}
 
