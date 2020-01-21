@@ -1,4 +1,5 @@
 /* tslint:disable:max-line-length */
+
 import {
   Component,
   ComponentFactoryResolver,
@@ -62,11 +63,11 @@ import {
   TableCellServiceInstanceTagsComponent,
 } from '../../list-types/cf-spaces-service-instances/table-cell-service-instance-tags/table-cell-service-instance-tags.component';
 import {
-  TableCellServiceNameComponent,
-} from '../../list-types/cf-spaces-service-instances/table-cell-service-name/table-cell-service-name.component';
+  TableCellServiceLastOpComponent,
+} from '../../list-types/cf-spaces-service-instances/table-cell-service-last-op/table-cell-service-last-op.component';
 import {
-  TableCellServicePlanComponent,
-} from '../../list-types/cf-spaces-service-instances/table-cell-service-plan/table-cell-service-plan.component';
+  TableCellServiceComponent,
+} from '../../list-types/cf-spaces-service-instances/table-cell-service/table-cell-service.component';
 import {
   TableCellSpaceNameComponent,
 } from '../../list-types/cf-spaces-service-instances/table-cell-space-name/table-cell-space-name.component';
@@ -118,6 +119,7 @@ import { TableHeaderSelectComponent } from '../table-header-select/table-header-
 import { ICellDefinition } from '../table.types';
 import { MultiActionListEntity } from './../../../../monitors/pagination-monitor';
 
+
 /* tslint:enable:max-line-length */
 export const listTableCells = [
   TableCellDefaultComponent,
@@ -144,8 +146,8 @@ export const listTableCells = [
   TableCellRadioComponent,
   TableCellServiceInstanceAppsAttachedComponent,
   TableCellServiceInstanceTagsComponent,
-  TableCellServicePlanComponent,
-  TableCellServiceNameComponent,
+  TableCellServiceComponent,
+  TableCellServiceLastOpComponent,
   TableCellRouteAppsAttachedComponent,
   CfOrgPermissionCellComponent,
   CfSpacePermissionCellComponent,
