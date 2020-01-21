@@ -97,10 +97,6 @@ func (p *portalProxy) SaveSession(c echo.Context, session *sessions.Session) err
 	return nil
 }
 
-func (p *portalProxy) WriteSession(c echo.Context) {
-	p.writeSessionHook(c)()
-}
-
 // Save and write the session cookie if needed
 // This is called only once per request to avoid duplication
 func (p *portalProxy) writeSessionHook(c echo.Context) func() {
@@ -118,10 +114,6 @@ func (p *portalProxy) writeSessionHook(c echo.Context) func() {
 			}
 		}
 	}
-}
-
-func (p *portalProxy) SetSessionValues(c echo.Context, values map[string]interface{}) error {
-	return p.setSessionValues(c, values)
 }
 
 func (p *portalProxy) setSessionValues(c echo.Context, values map[string]interface{}) error {
