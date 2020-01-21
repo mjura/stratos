@@ -168,6 +168,7 @@ import { ValuesPipe } from './pipes/values.pipe';
 import { CloudFoundryUserProvidedServicesService } from './services/cloud-foundry-user-provided-services.service';
 import { MetricsRangeSelectorService } from './services/metrics-range-selector.service';
 import { UserPermissionDirective } from './user-permission.directive';
+import { CardProgressOverlayComponent } from './components/card-progress-overlay/card-progress-overlay.component';
 
 /* tslint:disable:max-line-length */
 
@@ -303,6 +304,7 @@ import { UserPermissionDirective } from './user-permission.directive';
     SnackBarReturnComponent,
     PollingIndicatorComponent,
     UnlimitedInputComponent,
+    CardProgressOverlayComponent,
   ],
   exports: [
     FormsModule,
@@ -419,7 +421,8 @@ import { UserPermissionDirective } from './user-permission.directive';
     RunningInstancesComponent,
     CardAppUsageComponent,
     PollingIndicatorComponent,
-    UnlimitedInputComponent
+    UnlimitedInputComponent,
+    CardProgressOverlayComponent,
   ],
   entryComponents: [
     DialogConfirmComponent,

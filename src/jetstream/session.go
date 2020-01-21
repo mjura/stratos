@@ -88,12 +88,17 @@ func (p *portalProxy) SaveSession(c echo.Context, session *sessions.Session) err
 
 	// If this is the first time we have updated the session, register the session writer hook
 	if c.Get(jetStreamSessionContextUpdatedKey) == nil {
+		log.Warn("Adding session hook")
 		c.Response().Before(p.writeSessionHook(c))
 	}
 
 	c.Set(jetStreamSessionContextKey, session)
 	c.Set(jetStreamSessionContextUpdatedKey, true)
 	return nil
+}
+
+func (p *portalProxy) WriteSession(c echo.Context) {
+	p.writeSessionHook(c)()
 }
 
 // Save and write the session cookie if needed
@@ -105,10 +110,18 @@ func (p *portalProxy) writeSessionHook(c echo.Context) func() {
 		sessionIntf := c.Get(jetStreamSessionContextKey)
 		if sessionModifed != nil && sessionIntf != nil {
 			if session, ok := sessionIntf.(*sessions.Session); ok {
-				p.SessionStore.Save(c.Request(), c.Response().Writer, session)
+				err := p.SessionStore.Save(c.Request(), c.Response().Writer, session)
+				if err != nil {
+					log.Error("Failed to save session")
+					log.Error(err)
+				}
 			}
 		}
 	}
+}
+
+func (p *portalProxy) SetSessionValues(c echo.Context, values map[string]interface{}) error {
+	return p.setSessionValues(c, values)
 }
 
 func (p *portalProxy) setSessionValues(c echo.Context, values map[string]interface{}) error {

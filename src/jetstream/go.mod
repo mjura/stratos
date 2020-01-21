@@ -52,6 +52,8 @@ require (
 	github.com/moby/moby v1.13.1 // indirect
 	github.com/nwaples/rardecode v1.0.0 // indirect
 	github.com/nwmac/sqlitestore v0.0.0-20180824125213-7d2ab221fb3f
+	github.com/onsi/ginkgo v1.11.0 // indirect
+	github.com/onsi/gomega v1.8.1 // indirect
 	github.com/pierrec/lz4 v2.0.5+incompatible // indirect
 	github.com/satori/go.uuid v1.2.0
 	github.com/sirupsen/logrus v1.3.0
@@ -65,7 +67,9 @@ require (
 	google.golang.org/appengine v1.5.0 // indirect
 	gopkg.in/DATA-DOG/go-sqlmock.v1 v1.0.0-00010101000000-000000000000
 	gopkg.in/cheggaaa/pb.v1 v1.0.27 // indirect
-	gopkg.in/yaml.v2 v2.2.2
+	gopkg.in/yaml.v2 v2.2.4
+	k8s.io/cloud-provider v0.17.1 // indirect
+	k8s.io/csi-api v0.0.0-20190313123203-94ac839bf26c // indirect
 )
 
 replace github.com/cloudfoundry-incubator/stratos/src/jetstream/repository/interfaces => ./repository/interfaces

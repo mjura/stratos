@@ -40,6 +40,7 @@ import (
 	"github.com/cloudfoundry-incubator/stratos/src/jetstream/repository/interfaces"
 	"github.com/cloudfoundry-incubator/stratos/src/jetstream/repository/interfaces/config"
 	"github.com/cloudfoundry-incubator/stratos/src/jetstream/repository/localusers"
+	"github.com/cloudfoundry-incubator/stratos/src/jetstream/repository/sessiondata"
 	"github.com/cloudfoundry-incubator/stratos/src/jetstream/repository/tokens"
 )
 
@@ -180,6 +181,7 @@ func main() {
 	tokens.InitRepositoryProvider(dc.DatabaseProvider)
 	console_config.InitRepositoryProvider(dc.DatabaseProvider)
 	localusers.InitRepositoryProvider(dc.DatabaseProvider)
+	sessiondata.InitRepositoryProvider(dc.DatabaseProvider)
 
 	// Establish a Postgresql connection pool
 	var databaseConnectionPool *sql.DB
@@ -234,8 +236,23 @@ func main() {
 	}()
 	log.Info("Session store initialized.")
 
+	// Create session data store
+	sessionDataStore, err := sessiondata.NewPostgresSessionDataRepository(databaseConnectionPool)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	// Session Data Store: Ensure the cleanup tick starts now (this will delete expired session data from the DB)
+	dataQuitCleanup, dataDoneCleanup := sessionDataStore.Cleanup(time.Minute * 3)
+	defer func() {
+		log.Info(`... Cleaning up session data store`)
+		sessionDataStore.StopCleanup(dataQuitCleanup, dataDoneCleanup)
+	}()
+	log.Info("Session data store initialized.")
+
 	// Setup the global interface for the proxy
 	portalProxy := newPortalProxy(portalConfig, databaseConnectionPool, sessionStore, sessionStoreOptions, envLookup)
+	portalProxy.SessionDataStore = sessionDataStore
 	log.Info("Initialization complete.")
 
 	c := make(chan os.Signal, 2)
@@ -300,6 +317,11 @@ func main() {
 // GetDatabaseConnection makes db connection available to plugins
 func (portalProxy *portalProxy) GetDatabaseConnection() *sql.DB {
 	return portalProxy.DatabaseConnectionPool
+}
+
+// GetSessionDataStore returns the store that can be used for extra session data
+func (portalProxy *portalProxy) GetSessionDataStore() interfaces.SessionDataStore {
+	return portalProxy.SessionDataStore
 }
 
 func (portalProxy *portalProxy) GetPlugin(name string) interface{} {

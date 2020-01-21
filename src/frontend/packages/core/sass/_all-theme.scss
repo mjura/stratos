@@ -58,6 +58,7 @@
 @import '../src/shared/components/schema-form/schema-form.component.theme';
 @import '../src/features/cloud-foundry/tabs/cf-admin-add-user-warning/cf-admin-add-user-warning.component.theme';
 @import '../src/shared/components/favorites-global-list/favorites-global-list.component.theme';
+@import '../src/shared/components/card-progress-overlay//card-progress-overlay.component.theme';
 
 // Defaults
 $side-nav-light-text: #fff;
@@ -148,6 +149,7 @@ $side-nav-light-active: #484848;
   @include page-side-nav-theme($theme, $app-theme);
   @include cf-admin-add-user-warning($theme, $app-theme);
   @include entity-summary-title-theme($theme, $app-theme);
+  @include app-card-progerss-overlay-theme($theme, $app-theme);
 }
 
 @function app-generate-nav-theme($theme, $nav-theme: null) {
