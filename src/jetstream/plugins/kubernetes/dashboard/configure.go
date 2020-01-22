@@ -230,16 +230,11 @@ func DeleteDashboard(p interfaces.PortalProxy, endpointGUID, userGUID string) er
 		p.DoProxySingleRequest(endpointGUID, userGUID, "DELETE", svcTarget, nil, nil)
 	}
 
+	// Delete the service account
+	DeleteServiceAccount(p, endpointGUID, userGUID)
+
 	// Delete the namespace 'kubernetes-dashboard'
 	target := "api/v1/namespaces/kubernetes-dashboard?propagationPolicy=Background"
-	_, err = p.DoProxySingleRequest(endpointGUID, userGUID, "DELETE", target, nil, nil)
-	if err != nil {
-		return err
-	}
-
-	// Delete the cluster role binding
-	labelSelector := "stratos-role%3Dkubernetes-dashboard"
-	target = fmt.Sprintf("/apis/rbac.authorization.k8s.io/v1/clusterrolebindings?labelSelector=%s", labelSelector)
 	_, err = p.DoProxySingleRequest(endpointGUID, userGUID, "DELETE", target, nil, nil)
 	if err != nil {
 		return err

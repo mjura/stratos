@@ -83,12 +83,8 @@ export class KubernetesDashboardTabComponent implements OnInit {
 
   iframeLoaded() {
     if (!this.kubeDash) {
-      console.log('Ignoring initial load of empty iframe');
       return;
     }
-
-    console.log('IFrame loaded');
-
     this.loadCheckTries = 20;
     this.checkPageLoad();
     this.hasIframeLoaded = true;
@@ -139,25 +135,13 @@ export class KubernetesDashboardTabComponent implements OnInit {
     this.haveSetupEventLister = true;
     const iframeWindow = this.kubeDash.nativeElement.contentWindow;
     iframeWindow.addEventListener('hashchange', () => {
-      // Object.defineProperty( event, "oldURL", { enumerable: true, configurable: true, value: lastURL } );
-      // Object.defineProperty( event, "newURL", { enumerable: true, configurable: true, value: document.URL } );
-      // lastURL = document.URL;
-      // console.log('iframe hashchange');
-      // console.log(event);
-
-      // console.log(iframeWindow.location);
-
-      // console.log(this.href);
-
       if (this.href) {
         let h2 = decodeURI(this.href);
         h2 = decodeURI(h2);
 
         h2 = h2.replace('%3F', '?');
         h2 = h2.replace('%3D', '=');
-        // console.log(h2);
         h2 = '#!' + h2;
-        // console.log('Changing location hash');
         iframeWindow.location.hash = h2;
         this.href = '';
       }
@@ -189,9 +173,11 @@ export class KubernetesDashboardTabComponent implements OnInit {
       const kdChrome = this.kubeDash.nativeElement.contentDocument.getElementsByTagName('kd-chrome')[0];
       if (kdChrome) {
         const kdToolbar = kdChrome.getElementsByTagName('mat-toolbar')[0];
-        return kdToolbar;
-
-        // TODO: Check for md-toolbar as well?
+        if (kdToolbar) {
+          return kdToolbar;
+        }
+        const mdToolbar = kdChrome.getElementsByTagName('md-toolbar')[0];
+        return mdToolbar;
       }
     }
     return null;

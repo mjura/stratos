@@ -6,8 +6,8 @@ import { KubernetesService } from '../../services/kubernetes.service';
 import { ActivatedRoute } from '@angular/router';
 import { BaseKubeGuid } from '../../kubernetes-page.types';
 import { Component, OnInit, OnDestroy } from '@angular/core';
-import { Observable, BehaviorSubject, combineLatest, Subscription } from 'rxjs';
-import { map, filter, first, tap, withLatestFrom, distinctUntilChanged } from 'rxjs/operators';
+import { Observable, BehaviorSubject, Subscription } from 'rxjs';
+import { map, distinctUntilChanged, tap, filter } from 'rxjs/operators';
 import { KubeDashboardStatus } from '../../store/kubernetes.effects';
 import { ConfirmationDialogConfig } from '../../../../shared/components/confirmation-dialog.config';
 import { HttpClient } from '@angular/common/http';
@@ -85,6 +85,8 @@ export class KubedashConfigurationComponent implements OnInit, OnDestroy {
 
   private sub: Subscription;
 
+  public isAzure$: Observable<boolean>;
+
   constructor(
     public kubeEndpointService: KubernetesEndpointService,
     private httpClient: HttpClient,
@@ -98,6 +100,12 @@ export class KubedashConfigurationComponent implements OnInit, OnDestroy {
         this.isUpdatingStatus = false;
       }
     });
+
+    this.isAzure$ = this.kubeDashboardStatus$.pipe(
+      filter(status => status !== null),
+      filter(status => !!status.version),
+      map(status => status.version.indexOf('azure') !== -1)
+    );
   }
 
   ngOnInit() {
@@ -132,9 +140,7 @@ export class KubedashConfigurationComponent implements OnInit, OnDestroy {
     (status => !!status.serviceAccount),
     (msg) => this.serviceAccountMsg = msg
     );
-
   }
-
 
   public deleteServiceAccount() {
     this.confirmDialog.open(this.deleteServiceAccountConfirmation, () => {
@@ -203,18 +209,18 @@ export class KubedashConfigurationComponent implements OnInit, OnDestroy {
    }
 
    obs.subscribe(() => {
-    this.snackBar.open(okMsg, 'Dismiss', { duration: 3000 });
-    busy.next(false);
-    this.refresh();
-  }, (e) => {
-    let msg = errorMsg;
-    if (e && e.error && e.error.error) {
-      msg = e.error.error;
-    }
-    this.snackBarRef = this.snackBar.open(msg, 'Dismiss');
-    busy.next(false);
-    this.refresh();
-  });
+     this.snackBar.open(okMsg, 'Dismiss', { duration: 3000 });
+     busy.next(false);
+     this.refresh();
+   }, (e) => {
+     let msg = errorMsg;
+     if (e && e.error && e.error.error) {
+       msg = e.error.error;
+     }
+     this.snackBarRef = this.snackBar.open(msg, 'Dismiss');
+     busy.next(false);
+     this.refresh();
+    });
   }
 
   private refresh() {
