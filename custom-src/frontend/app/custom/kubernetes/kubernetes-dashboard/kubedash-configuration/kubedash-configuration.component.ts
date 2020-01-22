@@ -87,6 +87,8 @@ export class KubedashConfigurationComponent implements OnInit, OnDestroy {
 
   public isAzure$: Observable<boolean>;
 
+  public dashboardLink: string;
+
   constructor(
     public kubeEndpointService: KubernetesEndpointService,
     private httpClient: HttpClient,
@@ -95,11 +97,13 @@ export class KubedashConfigurationComponent implements OnInit, OnDestroy {
 ) {
     this.kubeDashboardStatus$ = kubeEndpointService.kubeDashboardStatus$;
     // Clear the updatind status when we get back new dashboard status
-    this.kubeDashboardStatus$.pipe(distinctUntilChanged()).subscribe(status => {
+    this.sub = this.kubeDashboardStatus$.pipe(distinctUntilChanged()).subscribe(status => {
       if (status !== null) {
         this.isUpdatingStatus = false;
       }
     });
+
+    this.dashboardLink = `/kubernetes/${kubeEndpointService.kubeGuid}/dashboard`;
 
     this.isAzure$ = this.kubeDashboardStatus$.pipe(
       filter(status => status !== null),
@@ -137,7 +141,6 @@ export class KubedashConfigurationComponent implements OnInit, OnDestroy {
     'Creating Service Account ...',
     'Service Account created', 'An error occurred creating the Service Account',
     this.serviceAccountBusy$,
-    (status => !!status.serviceAccount),
     (msg) => this.serviceAccountMsg = msg
     );
   }
@@ -153,7 +156,6 @@ export class KubedashConfigurationComponent implements OnInit, OnDestroy {
       'Deleting Service Account ...',
       'Service Account deleted',
       'An error occurred deleting the Service Account', this.serviceAccountBusy$,
-      (status => !status.serviceAccount),
       (msg => this.serviceAccountMsg = msg));
   }
 
@@ -169,7 +171,6 @@ export class KubedashConfigurationComponent implements OnInit, OnDestroy {
     'Installing Kubernetes Dashboard ...',
     'Kubernetes Dashboard installed', 'An error occurred installing the Kubernetes Dashboard',
     this.dashboardUIBusy$,
-    (status => !!status.service),
     (msg) => this.dashboardUIMsg = msg
     );
   }
@@ -186,13 +187,12 @@ export class KubedashConfigurationComponent implements OnInit, OnDestroy {
     'Deleting Kubernetes Dashboard ...',
     'Kubernetes Dashboard deleted', 'An error occurred deleting the Kubernetes Dashboard',
     this.dashboardUIBusy$,
-    (status => !status.service),
     (msg) => this.dashboardUIMsg = msg
     );
   }
 
   private makeRequest(method: string, op: string, busyMsg: string, okMsg: string, errorMsg: string,
-                      busy: BehaviorSubject<boolean>, readyFilter: ReadyFilter, msgUpdater: MessageUpdater) {
+                      busy: BehaviorSubject<boolean>, msgUpdater: MessageUpdater) {
    const guid = this.kubeEndpointService.kubeGuid;
    const url = `/pp/v1/kubedash/${guid}/${op}`;
    let obs;

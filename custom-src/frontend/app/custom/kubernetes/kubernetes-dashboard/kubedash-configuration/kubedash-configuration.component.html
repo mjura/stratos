@@ -16,8 +16,14 @@
 <div *ngIf="(kubeDashboardStatus$ | async) && !isUpdatingStatus">
   <div *ngIf="kubeDashboardStatus$ | async as status">
     <div class="kubedash__ready" *ngIf="status.service && status.serviceAccount">
-      <app-boolean-indicator [showText]="false" [isTrue]="true" type="yes-no"></app-boolean-indicator>
-      <div>Kubernetes Dashboard is installed and a Service Account exists - you can access the dashboard using the 'View Dashboard' button on the Summary view for this cluster</div>
+      <div class="kubedash__access">
+        <app-boolean-indicator [showText]="false" [isTrue]="true" type="yes-no"></app-boolean-indicator>
+        <div>Kubernetes Dashboard is installed and a Service Account exists - you can access the dashboard using the 'View Dashboard' button on the Summary view for this cluster.</div>
+      </div>
+      <button *ngIf="kubeEndpointService.kubeDashboardConfigured$ | async" [routerLink]="dashboardLink" mat-button>
+        <mat-icon>dashboard</mat-icon>
+        <span class="kube-details__button">View Dashboard</span>
+      </button>
     </div>
 
     <mat-card class="kubedash__card">
@@ -83,7 +89,7 @@
           <div class="kubedash__label">kubectl label serviceaccount -n kube-system kubernetes-dashboard stratos-role=kubernetes-dashboard-user</div>
         </div>
         <div *ngIf="!(isAzure$ | async)">
-          <p>Service Account not found - you can create one manually or Stratos can do this for you:</p>
+          <p>Service Account not found - you can create one manually or Stratos can do this for you.</p>
           <h2 class="kubedash__option">Manually create a Service Account</h2>
           <div class="kubedash__option-block">
             <p>Create a Service Account with the appropriate permissions that will be used by the Dashboard to

@@ -17,9 +17,14 @@
     top: 20px;
   }
   &__ready {
+    > div {
+      flex: 1;
+    }
     display: flex;
     margin: 20px 0;
-    
+  }
+  &__access {
+    display: flex;
     > :first-child {
       margin-right: 8px;
     }
