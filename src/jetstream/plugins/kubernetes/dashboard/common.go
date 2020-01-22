@@ -184,7 +184,6 @@ func getKubeDashboardSecretToken(p interfaces.PortalProxy, cnsiGUID, userGUID st
 			}
 			return "", errors.New("Could not find token in the data for the Service Account Secret")
 		}
-
 	}
 
 	return "", errors.New("Could not find token for the Service Account")
@@ -257,7 +256,7 @@ func tryDecodeSecrets(data []byte) (bool, v1.SecretList, error) {
 // Send an error page that will get loaded into the IFRAME and the onload handler will detect
 // it and show a Stratos error message
 func sendErrorPage(c echo.Context, msg string) error {
-	html := fmt.Sprintf("<html><body><stratos-error>%s</stratos-error>", msg)
+	html := fmt.Sprintf("<html><body><stratos-error>%s</stratos-error></body></html>", msg)
 	c.Response().Write([]byte(html))
 	return nil
 }

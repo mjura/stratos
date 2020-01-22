@@ -135,12 +135,3 @@ func KubeDashboardProxy(c echo.Context, p interfaces.PortalProxy, config *rest.C
 
 	return nil
 }
-
-// Check where we can use the responder when proxying
-// type responder struct{}
-
-// func (r *responder) Error(w http.ResponseWriter, req *http.Request, err error) {
-// 	log.Errorf("Error while proxying request: %v", err)
-// 	http.Error(w, err.Error(), http.StatusInternalServerError)
-// }
-

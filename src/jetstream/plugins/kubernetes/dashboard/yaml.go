@@ -2,7 +2,6 @@ package dashboard
 
 import (
 	"encoding/json"
-
 	"strings"
 )
 

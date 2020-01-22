@@ -16,6 +16,7 @@ import (
 
 const dashboardInstallYAMLDownloadURL = "https://raw.githubusercontent.com/kubernetes/dashboard/v2.0.0-rc2/aio/deploy/recommended.yaml"
 
+// Service Account definition - as per kube dashboard docs
 const serviceAccountDefinition = `{
 	"apiVersion": "v1",
 	"kind": "ServiceAccount",
@@ -28,6 +29,7 @@ const serviceAccountDefinition = `{
 	}
 }`
 
+// Cluster Role Binding definition - as per kube dashboard docs
 const clusterRoleBindingDefinition = `{
 	"apiVersion": "rbac.authorization.k8s.io/v1",
 	"kind": "ClusterRoleBinding",
@@ -66,10 +68,7 @@ func CreateServiceAccount(p interfaces.PortalProxy, endpointGUID, userGUID strin
 	}
 
 	namespace := svc.Namespace
-	log.Errorf("namespace: %s", namespace)
-
 	target := fmt.Sprintf("api/v1/namespaces/%s/serviceaccounts", namespace)
-	//target := "api/v1/serviceaccounts"
 	headers := make(http.Header, 0)
 	headers.Set("Content-Type", "application/json")
 
@@ -112,7 +111,6 @@ func DeleteServiceAccount(p interfaces.PortalProxy, endpointGUID, userGUID strin
 	}
 
 	msg := ""
-
 	target := fmt.Sprintf("api/v1/namespaces/%s/serviceaccounts/%s", svcAccount.Namespace, svcAccount.Name)
 	response, err := p.DoProxySingleRequest(endpointGUID, userGUID, "DELETE", target, nil, nil)
 	msg = addErrorMessage(msg, "Unable to delete Service Account", response, err)
@@ -133,7 +131,7 @@ func addErrorMessage(msg, prefix string, response *interfaces.CNSIRequest, err e
 	if err != nil {
 		errMsg = fmt.Sprintf("%s - Error: %v", prefix, err.Error())
 	} else if response.StatusCode != 200 {
-		errMsg = fmt.Sprintf("%s - unexpected response from API: %d", response.StatusCode)
+		errMsg = fmt.Sprintf("%s - unexpected response from API: %d", prefix, response.StatusCode)
 	}
 
 	if len(errMsg) > 0 {
@@ -203,6 +201,7 @@ func InstallDashboard(p interfaces.PortalProxy, endpointGUID, userGUID string) e
 		}
 
 		if response.StatusCode != 201 {
+			// Don't fail if creation of a cluster-level resoures fails beacuse it already exists
 			if !(response.StatusCode == 409 && isClusterAPI(info.Kind)) {
 				return fmt.Errorf("Unable to delete %s - unexpected response from API: %d", info.Kind, response.StatusCode)
 			}
