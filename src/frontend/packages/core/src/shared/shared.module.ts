@@ -171,6 +171,7 @@ import { LongRunningCfOperationsService } from './services/long-running-cf-op.se
 import { LongRunningOperationsService } from './services/long-running-op.service';
 import { MetricsRangeSelectorService } from './services/metrics-range-selector.service';
 import { UserPermissionDirective } from './user-permission.directive';
+import { CardProgressOverlayComponent } from './components/card-progress-overlay/card-progress-overlay.component';
 
 /* tslint:disable:max-line-length */
 
@@ -306,6 +307,7 @@ import { UserPermissionDirective } from './user-permission.directive';
     SnackBarReturnComponent,
     PollingIndicatorComponent,
     UnlimitedInputComponent,
+    CardProgressOverlayComponent,
     ServiceInstanceLastOpComponent
   ],
   exports: [
@@ -423,7 +425,8 @@ import { UserPermissionDirective } from './user-permission.directive';
     RunningInstancesComponent,
     CardAppUsageComponent,
     PollingIndicatorComponent,
-    UnlimitedInputComponent
+    UnlimitedInputComponent,
+    CardProgressOverlayComponent,
   ],
   entryComponents: [
     DialogConfirmComponent,
