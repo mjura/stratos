@@ -66,19 +66,6 @@ var (
 	httpClientMutatingSkipSSL = http.Client{}
 )
 
-func cleanup(dbc *sql.DB, ss HttpSessionStore) {
-	// Print a newline - if you pressed CTRL+C, the alighment will be slightly out, so start a new line first
-	fmt.Println()
-	log.Info("Attempting to shut down gracefully...")
-	log.Info(`... Closing databaseConnectionPool`)
-	dbc.Close()
-	log.Info(`... Closing sessionStore`)
-	ss.Close()
-	log.Info(`.. Stopping sessionStore cleanup`)
-	ss.StopCleanup(ss.Cleanup(time.Minute * 5))
-	log.Info("Graceful shut down complete")
-}
-
 // getEnvironmentLookup return a search path for configuration settings
 func getEnvironmentLookup() *env.VarSet {
 	// Make environment lookup
@@ -259,7 +246,25 @@ func main() {
 	signal.Notify(c, os.Interrupt, syscall.SIGTERM)
 	go func() {
 		<-c
-		cleanup(databaseConnectionPool, sessionStore)
+		// Print a newline - if you pressed CTRL+C, the alighment will be slightly out, so start a new line first
+		fmt.Println()
+		log.Info("Attempting to shut down gracefully...")
+
+		// Database connection pool
+		log.Info(`... Closing database connection pool`)
+		databaseConnectionPool.Close()
+
+		// Session store
+		log.Info(`... Closing session store`)
+		sessionStore.Close()
+		log.Info(`... Stopping sessionStore cleanup`)
+		sessionStore.StopCleanup(quitCleanup, doneCleanup)
+
+		// Session Data Store
+		log.Info(`... Stopping sessiondata store cleanup`)
+		sessionDataStore.StopCleanup(dataQuitCleanup, dataDoneCleanup)
+
+		log.Info("Graceful shut down complete")
 		os.Exit(1)
 	}()
 
