@@ -9,7 +9,6 @@ to the Kubernetes Dashboard integration.
 
 Details:
 
-
 **Fixes:**
 
 - Kubernetes Dashboard integration is hard to configure [\#270](https://github.com/SUSE/stratos/pull/270)
@@ -20,7 +19,7 @@ Details:
 
 - Update branding to "SUSE Stratos Console" [\#271](https://github.com/SUSE/stratos/pull/271)
 - Show last operation and service broker info for service instances [\#4038](https://github.com/cloudfoundry/stratos/pull/4038)
-
+- Disable Volume Migration Job [\#279](https://github.com/SUSE/stratos/issues/279)
 
 ## 2.6.1
 
