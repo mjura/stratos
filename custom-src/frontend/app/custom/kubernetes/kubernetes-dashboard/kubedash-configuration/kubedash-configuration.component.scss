@@ -16,6 +16,14 @@
     right: 20px;
     top: 20px;
   }
+  &__ready {
+    display: flex;
+    margin: 20px 0;
+    
+    > :first-child {
+      margin-right: 8px;
+    }
+  }
   &__loading {
     display: flex;
     margin: 10px 0;

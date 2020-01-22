@@ -120,6 +120,14 @@ func getKubeDashboardService(p interfaces.PortalProxy, cnsiGUID, userGUID string
 	return info, nil
 }
 
+func getKubeDashboardServiceInfo(p interfaces.PortalProxy, endpointGUID, userGUID string) (ServiceInfo, error) {
+	svc, err := getKubeDashboardService(p, endpointGUID, userGUID, "app%3Dkubernetes-dashboard")
+	if err != nil {
+		svc, err = getKubeDashboardService(p, endpointGUID, userGUID, "k8s-app%3Dkubernetes-dashboard")
+	}
+	return svc, err
+}
+
 // Get the service account for the kubernetes dashboard
 func getKubeDashboardServiceAccount(p interfaces.PortalProxy, cnsiGUID, userGUID string, labelSelector string) (*v1.ServiceAccount, error) {
 	log.Debug("getKubeDashboardService request")

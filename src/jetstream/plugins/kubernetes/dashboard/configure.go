@@ -3,6 +3,7 @@ package dashboard
 import (
 	"bytes"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io/ioutil"
 	"net/http"
@@ -20,7 +21,7 @@ const serviceAccountDefinition = `{
 	"kind": "ServiceAccount",
 	"metadata": {
 		"name": "stratos-dashboard-user",
-		"namespace": "kubernetes-dashboard",
+		"namespace": "$NAMESPACE",
 		"labels": {
 			"stratos-role": "kubernetes-dashboard-user"
 		}
@@ -45,7 +46,7 @@ const clusterRoleBindingDefinition = `{
 		{
 			"kind": "ServiceAccount",
 			"name": "stratos-dashboard-user",
-			"namespace": "kubernetes-dashboard"
+			"namespace": "$NAMESPACE"
 		}
 	]
 }`
@@ -59,12 +60,21 @@ type apiVersionAndKind struct {
 func CreateServiceAccount(p interfaces.PortalProxy, endpointGUID, userGUID string) error {
 	log.Debug("CreateServiceAccount")
 
-	target := "api/v1/namespaces/kubernetes-dashboard/serviceaccounts"
+	svc, err := getKubeDashboardServiceInfo(p, endpointGUID, userGUID)
+	if err != nil {
+		return err
+	}
+
+	namespace := svc.Namespace
+	log.Errorf("namespace: %s", namespace)
+
+	target := fmt.Sprintf("api/v1/namespaces/%s/serviceaccounts", namespace)
 	//target := "api/v1/serviceaccounts"
 	headers := make(http.Header, 0)
 	headers.Set("Content-Type", "application/json")
 
-	response, err := p.DoProxySingleRequest(endpointGUID, userGUID, "POST", target, headers, []byte(serviceAccountDefinition))
+	response, err := p.DoProxySingleRequest(endpointGUID, userGUID, "POST", target, headers,
+		replaceNamespace(serviceAccountDefinition, namespace))
 	if err != nil {
 		return err
 	}
@@ -74,7 +84,8 @@ func CreateServiceAccount(p interfaces.PortalProxy, endpointGUID, userGUID strin
 	}
 
 	target = "/apis/rbac.authorization.k8s.io/v1/clusterrolebindings"
-	response, err = p.DoProxySingleRequest(endpointGUID, userGUID, "POST", target, headers, []byte(clusterRoleBindingDefinition))
+	response, err = p.DoProxySingleRequest(endpointGUID, userGUID, "POST", target, headers,
+		replaceNamespace(clusterRoleBindingDefinition, namespace))
 	if err != nil {
 		return err
 	}
@@ -86,6 +97,11 @@ func CreateServiceAccount(p interfaces.PortalProxy, endpointGUID, userGUID strin
 	return err
 }
 
+func replaceNamespace(definition, namespace string) []byte {
+	updated := strings.ReplaceAll(definition, "$NAMESPACE", namespace)
+	return []byte(updated)
+}
+
 // DeleteServiceAccount will delete the service account
 func DeleteServiceAccount(p interfaces.PortalProxy, endpointGUID, userGUID string) error {
 	log.Debug("DeleteServiceAccount")
@@ -95,27 +111,39 @@ func DeleteServiceAccount(p interfaces.PortalProxy, endpointGUID, userGUID strin
 		return err
 	}
 
-	target := fmt.Sprintf("api/v1/namespaces/kubernetes-dashboard/serviceaccounts/%s", svcAccount.Name)
-	response, err := p.DoProxySingleRequest(endpointGUID, userGUID, "DELETE", target, nil, nil)
-	if err != nil {
-		return err
-	}
+	msg := ""
 
-	if response.StatusCode != 200 {
-		return fmt.Errorf("Unable to delete Service Account - unexpected response from API: %d", response.StatusCode)
-	}
+	target := fmt.Sprintf("api/v1/namespaces/%s/serviceaccounts/%s", svcAccount.Namespace, svcAccount.Name)
+	response, err := p.DoProxySingleRequest(endpointGUID, userGUID, "DELETE", target, nil, nil)
+	msg = addErrorMessage(msg, "Unable to delete Service Account", response, err)
 
 	target = fmt.Sprintf("apis/rbac.authorization.k8s.io/v1/clusterrolebindings/%s", svcAccount.Name)
 	response, err = p.DoProxySingleRequest(endpointGUID, userGUID, "DELETE", target, nil, nil)
+	msg = addErrorMessage(msg, "Unable to delete Cluster Role Binding", response, err)
+
+	if len(msg) > 0 {
+		return errors.New(msg)
+	}
+
+	return nil
+}
+
+func addErrorMessage(msg, prefix string, response *interfaces.CNSIRequest, err error) string {
+	errMsg := ""
 	if err != nil {
-		return err
+		errMsg = fmt.Sprintf("%s - Error: %v", prefix, err.Error())
+	} else if response.StatusCode != 200 {
+		errMsg = fmt.Sprintf("%s - unexpected response from API: %d", response.StatusCode)
 	}
 
-	if response.StatusCode != 200 {
-		return fmt.Errorf("Unable to delete Cluster Role Binding - unexpected response from API: %d", response.StatusCode)
+	if len(errMsg) > 0 {
+		if len(msg) > 0 {
+			return fmt.Sprintf("%s. %s", msg, errMsg)
+		}
+		return errMsg
 	}
 
-	return err
+	return msg
 }
 
 // InstallDashboard will install the dashboard into a Kubernetes cluster
@@ -188,14 +216,23 @@ func isClusterAPI(api string) bool {
 	return strings.HasPrefix(api, "Cluster") || api == "Namespace"
 }
 
-
 // DeleteDashboard will delete the dashboard from Kubernetes cluster
 func DeleteDashboard(p interfaces.PortalProxy, endpointGUID, userGUID string) error {
 	log.Debug("DeleteDashboard")
 
+	// Delete the service
+	svc, err := getKubeDashboardServiceInfo(p, endpointGUID, userGUID)
+	if err == nil {
+		svcTarget := fmt.Sprintf("api/v1/namespaces/%s/services/%s", svc.Namespace, svc.ServiceName)
+		// Don't wory if this fails, it will get deleted when the namespace is deleted
+		// We delete it here specifically so we know that it has gone since this is what we use
+		// to determine if the Dashboard is installed
+		p.DoProxySingleRequest(endpointGUID, userGUID, "DELETE", svcTarget, nil, nil)
+	}
+
 	// Delete the namespace 'kubernetes-dashboard'
 	target := "api/v1/namespaces/kubernetes-dashboard?propagationPolicy=Background"
-	_, err := p.DoProxySingleRequest(endpointGUID, userGUID, "DELETE", target, nil, nil)
+	_, err = p.DoProxySingleRequest(endpointGUID, userGUID, "DELETE", target, nil, nil)
 	if err != nil {
 		return err
 	}

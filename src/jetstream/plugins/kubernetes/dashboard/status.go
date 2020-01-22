@@ -33,11 +33,7 @@ func KubeDashboardStatus(p interfaces.PortalProxy, endpointGUID, userGUID string
 		}
 	}
 
-	svc, err := getKubeDashboardService(p, endpointGUID, userGUID, "app%3Dkubernetes-dashboard")
-	if err != nil {
-		svc, err = getKubeDashboardService(p, endpointGUID, userGUID, "k8s-app%3Dkubernetes-dashboard")
-	}
-
+	svc, err := getKubeDashboardServiceInfo(p, endpointGUID, userGUID)
 	if err == nil {
 		status.Service = &svc
 		status.StratosInstalled = svc.StratosInstalled

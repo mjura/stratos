@@ -6,8 +6,8 @@ import { KubernetesService } from '../../services/kubernetes.service';
 import { ActivatedRoute } from '@angular/router';
 import { BaseKubeGuid } from '../../kubernetes-page.types';
 import { Component, OnInit, OnDestroy } from '@angular/core';
-import { Observable, BehaviorSubject } from 'rxjs';
-import { map, filter, first, tap } from 'rxjs/operators';
+import { Observable, BehaviorSubject, combineLatest, Subscription } from 'rxjs';
+import { map, filter, first, tap, withLatestFrom, distinctUntilChanged } from 'rxjs/operators';
 import { KubeDashboardStatus } from '../../store/kubernetes.effects';
 import { ConfirmationDialogConfig } from '../../../../shared/components/confirmation-dialog.config';
 import { HttpClient } from '@angular/common/http';
@@ -77,6 +77,14 @@ export class KubedashConfigurationComponent implements OnInit, OnDestroy {
   public dashboardUIBusy$ = new BehaviorSubject<boolean>(false);
   public dashboardUIMsg = '';
 
+  // Are we busy with an operation - disable buttons if we are
+  public isBusy$ = new BehaviorSubject<boolean>(false);
+
+  // Is the status loading
+  public isUpdatingStatus = false;
+
+  private sub: Subscription;
+
   constructor(
     public kubeEndpointService: KubernetesEndpointService,
     private httpClient: HttpClient,
@@ -84,6 +92,12 @@ export class KubedashConfigurationComponent implements OnInit, OnDestroy {
     private snackBar: MatSnackBar,
 ) {
     this.kubeDashboardStatus$ = kubeEndpointService.kubeDashboardStatus$;
+    // Clear the updatind status when we get back new dashboard status
+    this.kubeDashboardStatus$.pipe(distinctUntilChanged()).subscribe(status => {
+      if (status !== null) {
+        this.isUpdatingStatus = false;
+      }
+    });
   }
 
   ngOnInit() {
@@ -97,6 +111,9 @@ export class KubedashConfigurationComponent implements OnInit, OnDestroy {
   ngOnDestroy() {
     if (this.snackBarRef) {
       this.snackBarRef.dismiss();
+    }
+    if (this.sub) {
+      this.sub.unsubscribe();
     }
   }
 
@@ -115,7 +132,9 @@ export class KubedashConfigurationComponent implements OnInit, OnDestroy {
     (status => !!status.serviceAccount),
     (msg) => this.serviceAccountMsg = msg
     );
+
   }
+
 
   public deleteServiceAccount() {
     this.confirmDialog.open(this.deleteServiceAccountConfirmation, () => {
@@ -161,7 +180,7 @@ export class KubedashConfigurationComponent implements OnInit, OnDestroy {
     'Deleting Kubernetes Dashboard ...',
     'Kubernetes Dashboard deleted', 'An error occurred deleting the Kubernetes Dashboard',
     this.dashboardUIBusy$,
-    (status => !!status.service),
+    (status => !status.service),
     (msg) => this.dashboardUIMsg = msg
     );
   }
@@ -173,6 +192,7 @@ export class KubedashConfigurationComponent implements OnInit, OnDestroy {
    let obs;
    msgUpdater(busyMsg);
    busy.next(true);
+   this.isBusy$.next(true);
    if (method === 'post') {
      obs =  this.httpClient.post(url, {});
    } else if (method === 'delete') {
@@ -183,21 +203,23 @@ export class KubedashConfigurationComponent implements OnInit, OnDestroy {
    }
 
    obs.subscribe(() => {
-    this.kubeEndpointService.refreshKubernetesDashboardStatus();
-    msgUpdater('Updating Dashboard status ...');
-    this.kubeDashboardStatus$.pipe(
-      filter(status => !!status),
-      filter(status => readyFilter(status)),
-      first()
-    ).subscribe(() => busy.next(false), () => busy.next(false));
     this.snackBar.open(okMsg, 'Dismiss', { duration: 3000 });
+    busy.next(false);
+    this.refresh();
   }, (e) => {
     let msg = errorMsg;
     if (e && e.error && e.error.error) {
       msg = e.error.error;
     }
-    busy.next(false);
     this.snackBarRef = this.snackBar.open(msg, 'Dismiss');
+    busy.next(false);
+    this.refresh();
   });
+  }
+
+  private refresh() {
+    this.isUpdatingStatus = true;
+    this.kubeEndpointService.refreshKubernetesDashboardStatus();
+    this.isBusy$.next(false);
   }
 }
