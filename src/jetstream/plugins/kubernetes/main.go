@@ -149,7 +149,6 @@ func (c *KubernetesSpecification) AddSessionGroupRoutes(echoGroup *echo.Group) {
 	echoGroup.DELETE("/helm/releases/:endpoint/:namespace/:name", c.DeleteRelease)
 	echoGroup.GET("/helm/releases/:endpoint/:namespace/:name/status", c.GetReleaseStatus)
 	echoGroup.GET("/helm/releases/:endpoint/:namespace/:name", c.GetRelease)
-	echoGroup.GET("/helm/versions", c.GetHelmVersions)
 	// TODO: RC
 	// echoGroup.DELETE("/helm/releases/:endpoint/:name", c.DeleteRelease)
 	// echoGroup.GET("/helm/releases/:endpoint/:name", c.GetRelease)
