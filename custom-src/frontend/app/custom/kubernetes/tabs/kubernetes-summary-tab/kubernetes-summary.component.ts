@@ -1,20 +1,25 @@
 import { HttpClient } from '@angular/common/http';
 import { Component, NgZone, OnDestroy, OnInit } from '@angular/core';
 import { SafeResourceUrl } from '@angular/platform-browser';
+import { Router } from '@angular/router';
 import { Store } from '@ngrx/store';
 import { combineLatest, interval, Observable, Subscription } from 'rxjs';
 import { map, startWith } from 'rxjs/operators';
 
-import { AppState } from '../../../../../../store/src/app-state';
-import { entityCatalog } from '../../../../../../store/src/entity-catalog/entity-catalog.service';
-import { PaginationMonitorFactory } from '../../../../../../store/src/monitors/pagination-monitor.factory';
-import { getPaginationObservables } from '../../../../../../store/src/reducers/pagination-reducer/pagination-reducer.helper';
-import { PaginatedAction } from '../../../../../../store/src/types/pagination.types';
-import { safeUnsubscribe } from '../../../../core/utils.service';
+import { safeUnsubscribe } from '../../../../../../../src/frontend/packages/core/src/core/utils.service';
 import {
   IChartThresholds,
   ISimpleUsageChartData,
-} from '../../../../shared/components/simple-usage-chart/simple-usage-chart.types';
+} from '../../../../../../../src/frontend/packages/core/src/shared/components/simple-usage-chart/simple-usage-chart.types';
+import { AppState } from '../../../../../../../src/frontend/packages/store/src/app-state';
+import { entityCatalog } from '../../../../../../../src/frontend/packages/store/src/entity-catalog/entity-catalog.service';
+import {
+  PaginationMonitorFactory,
+} from '../../../../../../../src/frontend/packages/store/src/monitors/pagination-monitor.factory';
+import {
+  getPaginationObservables,
+} from '../../../../../../../src/frontend/packages/store/src/reducers/pagination-reducer/pagination-reducer.helper';
+import { PaginatedAction } from '../../../../../../../src/frontend/packages/store/src/types/pagination.types';
 import { KubernetesEndpointService } from '../../services/kubernetes-endpoint.service';
 import { GetKubernetesNamespaces, GetKubernetesNodes, GetKubernetesPods } from '../../store/kubernetes.actions';
 
@@ -99,7 +104,8 @@ export class KubernetesSummaryTabComponent implements OnInit, OnDestroy {
     public httpClient: HttpClient,
     public paginationMonitorFactory: PaginationMonitorFactory,
     private store: Store<AppState>,
-    private ngZone: NgZone
+    private ngZone: NgZone,
+    private router: Router,
   ) {
   }
 

@@ -5,6 +5,9 @@ import { NgxChartsModule } from '@swimlane/ngx-charts';
 
 import { CoreModule } from '../../core/core.module';
 import { SharedModule } from '../../shared/shared.module';
+import {
+  KubedashConfigurationComponent,
+} from './kubernetes-dashboard/kubedash-configuration/kubedash-configuration.component';
 import { KubernetesDashboardTabComponent } from './kubernetes-dashboard/kubernetes-dashboard.component';
 import {
   KubernetesNamespacePodsComponent,
@@ -142,7 +145,11 @@ import { KubernetesSummaryTabComponent } from './tabs/kubernetes-summary-tab/kub
     KubernetesServicePortsComponent,
     KubernetesPodStatusComponent,
     KubernetesPodReadinessComponent,
-    KubeServiceCardComponent
+    KubeServiceCardComponent,
+    KubedashConfigurationComponent,
+  ],
+  exports: [
+    KubernetesServicePortsComponent // TODO: RC
   ],
   providers: [
     KubernetesService,

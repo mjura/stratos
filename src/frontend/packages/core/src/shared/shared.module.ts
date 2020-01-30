@@ -24,6 +24,7 @@ import { ApplicationStateService } from './components/application-state/applicat
 import { BlurDirective } from './components/blur.directive';
 import { BooleanIndicatorComponent } from './components/boolean-indicator/boolean-indicator.component';
 import { BreadcrumbsComponent } from './components/breadcrumbs/breadcrumbs.component';
+import { CardProgressOverlayComponent } from './components/card-progress-overlay/card-progress-overlay.component';
 import { CardBooleanMetricComponent } from './components/cards/card-boolean-metric/card-boolean-metric.component';
 import { CardNumberMetricComponent } from './components/cards/card-number-metric/card-number-metric.component';
 import { CardStatusComponent } from './components/cards/card-status/card-status.component';
@@ -226,7 +227,8 @@ import { UserPermissionDirective } from './user-permission.directive';
     CopyToClipboardComponent,
     SidepanelPreviewComponent,
     TileSelectorTileComponent,
-    SidepanelPreviewComponent
+    SidepanelPreviewComponent,
+    CardProgressOverlayComponent,
   ],
   exports: [
     ApplicationStateIconPipe,
@@ -320,7 +322,8 @@ import { UserPermissionDirective } from './user-permission.directive';
     CopyToClipboardComponent,
     SidepanelPreviewComponent,
     TileSelectorTileComponent,
-    SidepanelPreviewComponent
+    SidepanelPreviewComponent,
+    CardProgressOverlayComponent,
   ],
   entryComponents: [
     DialogConfirmComponent,
