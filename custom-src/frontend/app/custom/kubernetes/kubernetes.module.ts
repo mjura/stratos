@@ -74,9 +74,6 @@ import {
 } from './list-types/kubernetes-nodes/kubernetes-node-summary/kubernetes-node-tags-card/kubernetes-node-tags-card.component';
 import { NodePodCountComponent } from './list-types/kubernetes-nodes/node-pod-count/node-pod-count.component';
 import {
-  KubernetesPodReadinessComponent,
-} from './list-types/kubernetes-pods/kubernetes-pod-readiness/kubernetes-pod-readiness.component';
-import {
   KubernetesPodStatusComponent,
 } from './list-types/kubernetes-pods/kubernetes-pod-status/kubernetes-pod-status.component';
 import { KubernetesPodTagsComponent } from './list-types/kubernetes-pods/kubernetes-pod-tags/kubernetes-pod-tags.component';
@@ -92,8 +89,6 @@ import { KubernetesNamespacesTabComponent } from './tabs/kubernetes-namespaces-t
 import { KubernetesNodesTabComponent } from './tabs/kubernetes-nodes-tab/kubernetes-nodes-tab.component';
 import { KubernetesPodsTabComponent } from './tabs/kubernetes-pods-tab/kubernetes-pods-tab.component';
 import { KubernetesSummaryTabComponent } from './tabs/kubernetes-summary-tab/kubernetes-summary.component';
-
-
 
 
 /* tslint:enable */
@@ -144,7 +139,6 @@ import { KubernetesSummaryTabComponent } from './tabs/kubernetes-summary-tab/kub
     NodePodCountComponent,
     KubernetesServicePortsComponent,
     KubernetesPodStatusComponent,
-    KubernetesPodReadinessComponent,
     KubeServiceCardComponent,
     KubedashConfigurationComponent,
     KubernetesResourceViewerComponent
@@ -169,7 +163,6 @@ import { KubernetesSummaryTabComponent } from './tabs/kubernetes-summary-tab/kub
     NodePodCountComponent,
     KubernetesServicePortsComponent,
     KubernetesPodStatusComponent,
-    KubernetesPodReadinessComponent,
     KubeServiceCardComponent,
     KubernetesResourceViewerComponent
   ],
