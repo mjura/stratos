@@ -60,12 +60,18 @@ import { MetaCardValueComponent } from './components/list/list-cards/meta-card/m
 import {
   TableCellRequestMonitorIconComponent,
 } from './components/list/list-table/table-cell-request-monitor-icon/table-cell-request-monitor-icon.component';
+import {
+  TableCellSidePanelComponent,
+} from './components/list/list-table/table-cell-side-panel/table-cell-side-panel.component';
 import { TableCellStatusDirective } from './components/list/list-table/table-cell-status.directive';
 import { TableComponent } from './components/list/list-table/table.component';
 import { listTableComponents } from './components/list/list-table/table.types';
 import { EndpointCardComponent } from './components/list/list-types/endpoint/endpoint-card/endpoint-card.component';
 import { EndpointListHelper } from './components/list/list-types/endpoint/endpoint-list.helpers';
 import { EndpointsListConfigService } from './components/list/list-types/endpoint/endpoints-list-config.service';
+import {
+  TableCellEndpointNameComponent,
+} from './components/list/list-types/endpoint/table-cell-endpoint-name/table-cell-endpoint-name.component';
 import { ListComponent } from './components/list/list.component';
 import { ListConfig } from './components/list/list.component.types';
 import { ListHostDirective } from './components/list/simple-list/list-host.directive';
@@ -229,6 +235,7 @@ import { UserPermissionDirective } from './user-permission.directive';
     TileSelectorTileComponent,
     SidepanelPreviewComponent,
     CardProgressOverlayComponent,
+    TableCellSidePanelComponent
   ],
   exports: [
     ApplicationStateIconPipe,
@@ -324,6 +331,7 @@ import { UserPermissionDirective } from './user-permission.directive';
     TileSelectorTileComponent,
     SidepanelPreviewComponent,
     CardProgressOverlayComponent,
+    TableCellEndpointNameComponent
   ],
   entryComponents: [
     DialogConfirmComponent,
