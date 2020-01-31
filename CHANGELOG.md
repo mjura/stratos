@@ -13,7 +13,7 @@ Details:
 
 - Kubernetes Dashboard integration is hard to configure [\#270](https://github.com/SUSE/stratos/pull/270)
 - Kubernetes Dashboard integration does not work with CaaSP 4.1 [\#269](https://github.com/SUSE/stratos/pull/269)
-- Fix long running service actions [\#4049] (https://github.com/cloudfoundry/stratos/pull/4049)
+- Fix timeout with long running service actions [\#4049] (https://github.com/cloudfoundry/stratos/pull/4049)
 
 **Improvements:**
 
