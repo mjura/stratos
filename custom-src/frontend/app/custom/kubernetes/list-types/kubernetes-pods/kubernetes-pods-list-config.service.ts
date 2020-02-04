@@ -20,6 +20,7 @@ import {
 import { KubernetesPod } from '../../store/kube.types';
 import { defaultHelmKubeListPageSize } from '../kube-helm-list-types';
 import { createKubeAgeColumn } from '../kube-list.helper';
+import { KubernetesPodContainersComponent } from './kubernetes-pod-containers/kubernetes-pod-containers.component';
 import { KubernetesPodStatusComponent } from './kubernetes-pod-status/kubernetes-pod-status.component';
 import { KubernetesPodsDataSource } from './kubernetes-pods-data-source';
 
@@ -28,6 +29,7 @@ export abstract class BaseKubernetesPodsListConfigService implements IListConfig
   static namespaceColumnId = 'namespace';
   static nodeColumnId = 'node';
   public showNamespaceLink = true;
+
 
   constructor(
     private kubeId: string,
@@ -139,6 +141,8 @@ export abstract class BaseKubernetesPodsListConfigService implements IListConfig
     noEntries: 'There are no pods'
   };
   abstract getDataSource: () => IListDataSource<KubernetesPod>;
+  expandComponent = KubernetesPodContainersComponent;
+  tableFixedRowHeight = true;
 
   getGlobalActions = () => null;
   getMultiActions = () => [];

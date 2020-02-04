@@ -1,9 +1,20 @@
 import { CdkRow } from '@angular/cdk/table';
-import { ChangeDetectionStrategy, Component, Input, OnInit, ViewEncapsulation } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  ComponentFactoryResolver,
+  ComponentRef,
+  Input,
+  OnInit,
+  ViewChild,
+  ViewContainerRef,
+  ViewEncapsulation,
+} from '@angular/core';
 import { Observable } from 'rxjs';
-import { map, tap } from 'rxjs/operators';
+import { map } from 'rxjs/operators';
 
 import { RowState } from '../../data-sources-controllers/list-data-source-types';
+import { CardCell } from '../../list.types';
 
 
 @Component({
@@ -16,8 +27,15 @@ import { RowState } from '../../data-sources-controllers/list-data-source-types'
 })
 export class TableRowComponent extends CdkRow implements OnInit {
 
+  @ViewChild('expandedComponent', { read: ViewContainerRef, static: true })
+  expandedComponent: ViewContainerRef;
+
   @Input()
   rowState: Observable<RowState>;
+  @Input() expandComponent: any; // TODO: RC Typeing
+  @Input() row;
+  @Input() height: boolean;
+  @Input() inExpandedRow: boolean;
 
   public inErrorState$: Observable<boolean>;
   public inWarningState$: Observable<boolean>;
@@ -25,6 +43,12 @@ export class TableRowComponent extends CdkRow implements OnInit {
   public isBlocked$: Observable<boolean>;
   public isHighlighted$: Observable<boolean>;
   public isDeleting$: Observable<boolean>;
+
+  private expandedComponentRef: ComponentRef<any>;
+
+  constructor(private componentFactoryResolver: ComponentFactoryResolver) {
+    super();
+  }
 
   ngOnInit() {
     if (this.rowState) {
@@ -47,6 +71,26 @@ export class TableRowComponent extends CdkRow implements OnInit {
         map(state => state.deleting)
       );
     }
+  }
+
+  private getComponent() {
+    return this.componentFactoryResolver.resolveComponentFactory(
+      this.expandComponent
+    );
+  }
+
+  private createComponent() {
+    const component = this.getComponent();
+    return !!component ? this.expandedComponent.createComponent(component) : null;
+  }
+
+  public createExpandedComponent() {
+    if (this.expandedComponentRef) {
+      return;
+    }
+    this.expandedComponentRef = this.createComponent();
+    const instance: CardCell<any> = this.expandedComponentRef.instance;
+    instance.row = this.row;
   }
 
 }

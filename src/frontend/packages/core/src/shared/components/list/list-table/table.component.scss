@@ -37,6 +37,12 @@ mat-header-cell {
     &--fixed-row-height {
       height: $row-height;
     }
+
+    &--has-expanded-columns {
+      & > mat-header-cell:first-of-type {
+        padding-left: 75px;
+      }
+    }
   }
 
   &__row,

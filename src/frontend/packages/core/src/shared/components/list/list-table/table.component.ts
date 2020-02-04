@@ -43,6 +43,8 @@ export class TableComponent<T> implements OnInit, OnDestroy {
   @Input() hideTable = false;
   @Input() addSelect = false;
   @Input() addActions = false;
+  @Input() expandComponent: any; // TODO: RC Typeing
+  @Input() inExpandedRow = false;
   @Input() dataSource: ITableListDataSource<T>;
   @Input() paginationController = null as IListPaginationController<T>;
   @Input() columns: ITableColumn<T>[];

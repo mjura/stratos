@@ -7,6 +7,7 @@
     <mat-card-content class="app-table__content">
       <mat-table class="app-table__inner" #table [hidden]="hideTable" [dataSource]="dataSource"
         [trackBy]="dataSource.trackBy" matSort>
+        <!-- [ngClass]="{'app-table__inner--has-expanded-columns': !!expandComponent}" -->
         <ng-container *ngFor="let column of columns" [matColumnDef]="column.columnId">
           <div *ngIf="column.sort">
             <mat-header-cell class="app-table__header-cell" *matHeaderCellDef [ngClass]="column.class" mat-sort-header
@@ -28,10 +29,14 @@
               [config]="column.cellConfig" [func]="column.cell" [row]="row" [dataSource]="dataSource"></app-table-cell>
           </mat-cell>
         </ng-container>
-        <mat-header-row [hidden]="hideTable" class="app-table__header-row" *matHeaderRowDef="columnNames">
+        <mat-header-row [hidden]="hideTable" class="app-table__header-row" *matHeaderRowDef="columnNames"
+          [ngClass]="{'app-table__inner--has-expanded-columns': !!expandComponent}">
         </mat-header-row>
         <app-table-row [ngClass]="{'app-table__inner--fixed-row-height': fixedRowHeight}" class="app-table__row"
-          *matRowDef="let row; columns: columnNames;" [rowState]="getRowState(row)"></app-table-row>
+          *matRowDef="let row; columns: columnNames;" [rowState]="getRowState(row)" [row]="row"
+          [expandComponent]="expandComponent" [inExpandedRow]="inExpandedRow" [height]="fixedRowHeight">
+          <!-- // TODO: RC Height -->
+        </app-table-row>
       </mat-table>
     </mat-card-content>
   </mat-card>
