@@ -8,6 +8,9 @@ import { NgxChartsModule } from '@swimlane/ngx-charts';
 import {
   ApplicationInstanceChartComponent,
 } from '../../../cloud-foundry/src/features/applications/application/application-instance-chart/application-instance-chart.component';
+import { EntityMonitorFactory } from '../../../store/src/monitors/entity-monitor.factory.service';
+import { InternalEventMonitorFactory } from '../../../store/src/monitors/internal-event-monitor.factory';
+import { PaginationMonitorFactory } from '../../../store/src/monitors/pagination-monitor.factory';
 import { CoreModule } from '../core/core.module';
 import { AppNameUniqueDirective } from './app-name-unique.directive/app-name-unique.directive';
 import { AppActionMonitorIconComponent } from './components/app-action-monitor-icon/app-action-monitor-icon.component';
@@ -28,6 +31,7 @@ import { CfAuthModule } from './components/cf-auth/cf-auth.module';
 import { AppChipsComponent } from './components/chips/chips.component';
 import { CodeBlockComponent } from './components/code-block/code-block.component';
 import { ConfirmationDialogService } from './components/confirmation-dialog.service';
+import { CopyToClipboardComponent } from './components/copy-to-clipboard/copy-to-clipboard.component';
 import { DateTimeComponent } from './components/date-time/date-time.component';
 import { DetailsCardComponent } from './components/details-card/details-card.component';
 import { DialogConfirmComponent } from './components/dialog-confirm/dialog-confirm.component';
@@ -45,6 +49,7 @@ import { FileInputComponent } from './components/file-input/file-input.component
 import { FocusDirective } from './components/focus.directive';
 import { GithubCommitAuthorComponent } from './components/github-commit-author/github-commit-author.component';
 import { IntroScreenComponent } from './components/intro-screen/intro-screen.component';
+import { JsonViewerComponent } from './components/json-viewer/json-viewer.component';
 import { listCardComponents } from './components/list/list-cards/card.types';
 import { MetaCardComponent } from './components/list/list-cards/meta-card/meta-card-base/meta-card.component';
 import { MetaCardItemComponent } from './components/list/list-cards/meta-card/meta-card-item/meta-card-item.component';
@@ -60,6 +65,9 @@ import { listTableComponents } from './components/list/list-table/table.types';
 import { EndpointCardComponent } from './components/list/list-types/endpoint/endpoint-card/endpoint-card.component';
 import { EndpointListHelper } from './components/list/list-types/endpoint/endpoint-list.helpers';
 import { EndpointsListConfigService } from './components/list/list-types/endpoint/endpoints-list-config.service';
+import {
+  TableCellEndpointNameComponent,
+} from './components/list/list-types/endpoint/table-cell-endpoint-name/table-cell-endpoint-name.component';
 import { ListComponent } from './components/list/list.component';
 import { ListConfig } from './components/list/list.component.types';
 import { ListHostDirective } from './components/list/simple-list/list-host.directive';
@@ -93,6 +101,7 @@ import { StackedInputActionsComponent } from './components/stacked-input-actions
 import { StartEndDateComponent } from './components/start-end-date/start-end-date.component';
 import { SteppersModule } from './components/stepper/steppers.module';
 import { StratosTitleComponent } from './components/stratos-title/stratos-title.component';
+import { TileSelectorTileComponent } from './components/tile-selector-tile/tile-selector-tile.component';
 import { TileSelectorComponent } from './components/tile-selector/tile-selector.component';
 import { TileGridComponent } from './components/tile/tile-grid/tile-grid.component';
 import { TileGroupComponent } from './components/tile/tile-group/tile-group.component';
@@ -105,9 +114,6 @@ import {
 import { UsageGaugeComponent } from './components/usage-gauge/usage-gauge.component';
 import { UserProfileBannerComponent } from './components/user-profile-banner/user-profile-banner.component';
 import { GitSCMService } from './data-services/scm/scm.service';
-import { EntityMonitorFactory } from './monitors/entity-monitor.factory.service';
-import { InternalEventMonitorFactory } from './monitors/internal-event-monitor.factory';
-import { PaginationMonitorFactory } from './monitors/pagination-monitor.factory';
 import { CapitalizeFirstPipe } from './pipes/capitalizeFirstLetter.pipe';
 import { MbToHumanSizePipe } from './pipes/mb-to-human-size.pipe';
 import { PercentagePipe } from './pipes/percentage.pipe';
@@ -115,12 +121,12 @@ import { UptimePipe } from './pipes/uptime.pipe';
 import { UsageBytesPipe } from './pipes/usage-bytes.pipe';
 import { ValuesPipe } from './pipes/values.pipe';
 import { CloudFoundryUserProvidedServicesService } from './services/cloud-foundry-user-provided-services.service';
+import { LongRunningOperationsService } from './services/long-running-op.service';
 import { MetricsRangeSelectorService } from './services/metrics-range-selector.service';
-import { PanelPreviewService } from './services/panel-preview.service';
 import { UserPermissionDirective } from './user-permission.directive';
-import { JsonViewerComponent } from './components/json-viewer/json-viewer.component';
+import { TableCellSidePanelComponent } from './components/list/list-table/table-cell-side-panel/table-cell-side-panel.component';
+import { CardProgressOverlayComponent } from './components/card-progress-overlay/card-progress-overlay.component';
 
-/* tslint:disable:max-line-length */
 
 @NgModule({
   imports: [
@@ -214,6 +220,7 @@ import { JsonViewerComponent } from './components/json-viewer/json-viewer.compon
     BreadcrumbsComponent,
     PageSubNavSectionComponent,
     EntitySummaryTitleComponent,
+    MarkdownPreviewComponent,
     MarkdownContentObserverDirective,
     SnackBarReturnComponent,
     PollingIndicatorComponent,
@@ -221,7 +228,12 @@ import { JsonViewerComponent } from './components/json-viewer/json-viewer.compon
     JsonViewerComponent,
     SimpleListComponent,
     ListHostDirective,
-    SidepanelPreviewComponent
+    CopyToClipboardComponent,
+    SidepanelPreviewComponent,
+    TileSelectorTileComponent,
+    SidepanelPreviewComponent,
+    TableCellSidePanelComponent,
+    CardProgressOverlayComponent,
   ],
   exports: [
     ApplicationStateIconPipe,
@@ -304,15 +316,20 @@ import { JsonViewerComponent } from './components/json-viewer/json-viewer.compon
     AppNameUniqueDirective,
     SimpleUsageChartComponent,
     EntitySummaryTitleComponent,
+    MarkdownPreviewComponent,
     MarkdownContentObserverDirective,
-    TileSelectorComponent,
     AppNameUniqueDirective,
     PollingIndicatorComponent,
     UnlimitedInputComponent,
     JsonViewerComponent,
     SimpleListComponent,
     ListHostDirective,
+    CopyToClipboardComponent,
     SidepanelPreviewComponent,
+    TileSelectorTileComponent,
+    SidepanelPreviewComponent,
+    TableCellEndpointNameComponent,
+    CardProgressOverlayComponent,
   ],
   entryComponents: [
     DialogConfirmComponent,
@@ -334,7 +351,7 @@ import { JsonViewerComponent } from './components/json-viewer/json-viewer.compon
     // ServiceActionHelperService,
     MetricsRangeSelectorService,
     GitSCMService,
-    MetricsRangeSelectorService,
+    LongRunningOperationsService,
     CloudFoundryUserProvidedServicesService
   ]
 })

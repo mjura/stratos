@@ -9,18 +9,17 @@ import { CFAppState } from '../../../../../cloud-foundry/src/cf-app-state';
 import { Logout } from '../../../../../store/src/actions/auth.actions';
 import { ToggleSideNav } from '../../../../../store/src/actions/dashboard-actions';
 import { AddRecentlyVisitedEntityAction } from '../../../../../store/src/actions/recently-visited.actions';
+import { EntityCatalogHelpers } from '../../../../../store/src/entity-catalog/entity-catalog.helper';
 import { AuthState } from '../../../../../store/src/reducers/auth.reducer';
 import { selectIsMobile } from '../../../../../store/src/selectors/dashboard.selectors';
 import { InternalEventSeverity } from '../../../../../store/src/types/internal-events.types';
 import { IFavoriteMetadata, UserFavorite } from '../../../../../store/src/types/user-favorites.types';
 import { TabNavService } from '../../../../tab-nav.service';
-import { EntityCatalogueHelpers } from '../../../core/entity-catalogue/entity-catalogue.helper';
+import { IPageSideNavTab } from '../../../features/dashboard/page-side-nav/page-side-nav.component';
 import { GlobalEventService, IGlobalEvent } from '../../global-events.service';
 import { StratosStatus } from '../../shared.types';
 import { FavoritesConfigMapper } from '../favorites-meta-card/favorite-config-mapper';
 import { BREADCRUMB_URL_PARAM, IHeaderBreadcrumb, IHeaderBreadcrumbLink } from './page-header.types';
-import { TabNavItem } from '../../../../tab-nav.types';
-import { IPageSideNavTab } from '../../../features/dashboard/page-side-nav/page-side-nav.component';
 
 @Component({
   selector: 'app-page-header',
@@ -52,9 +51,9 @@ export class PageHeaderComponent implements OnDestroy, AfterViewInit {
     if (tabs) {
       this.pTabs = tabs.map(tab => ({
         ...tab,
-        link: tab.link === '-' ? null : this.router.createUrlTree([tab.link], {
-          relativeTo: this.route
-        }).toString()
+        link: tab.link === '-' ?
+          TabNavService.TabsNoLinkValue :
+          this.router.createUrlTree([tab.link], { relativeTo: this.route }).toString()
       }));
       this.tabNavService.setTabs(this.pTabs);
     }
@@ -89,7 +88,7 @@ export class PageHeaderComponent implements OnDestroy, AfterViewInit {
       const prettyType = this.favoritesConfigMapper.getPrettyTypeName(favorite);
       const prettyEndpointType = this.favoritesConfigMapper.getPrettyTypeName({
         endpointType: favorite.endpointType,
-        entityType: EntityCatalogueHelpers.endpointType
+        entityType: EntityCatalogHelpers.endpointType
       });
       if (mapperFunction) {
         const { name, routerLink } = mapperFunction(favorite.metadata);
@@ -164,7 +163,7 @@ export class PageHeaderComponent implements OnDestroy, AfterViewInit {
     this.actionsKey = this.route.snapshot.data ? this.route.snapshot.data.extensionsActionsKey : null;
     this.breadcrumbKey = route.snapshot.queryParams[BREADCRUMB_URL_PARAM] || null;
     this.username$ = store.select(s => s.auth).pipe(
-      map((auth: AuthState) => auth && auth.sessionData ? auth.sessionData.user.name : 'Unknown')
+      map((auth: AuthState) => auth && auth.sessionData && auth.sessionData.user ? auth.sessionData.user.name : 'Unknown')
     );
     this.userNameFirstLetter$ = this.username$.pipe(
       map(name => name[0].toLocaleUpperCase())

@@ -40,6 +40,7 @@ import (
 	"github.com/cloudfoundry-incubator/stratos/src/jetstream/repository/interfaces"
 	"github.com/cloudfoundry-incubator/stratos/src/jetstream/repository/interfaces/config"
 	"github.com/cloudfoundry-incubator/stratos/src/jetstream/repository/localusers"
+	"github.com/cloudfoundry-incubator/stratos/src/jetstream/repository/sessiondata"
 	"github.com/cloudfoundry-incubator/stratos/src/jetstream/repository/tokens"
 )
 
@@ -50,6 +51,7 @@ const (
 	SessionExpiry        = 20 * 60 // Session cookies expire after 20 minutes
 	UpgradeVolume        = "UPGRADE_VOLUME"
 	UpgradeLockFileName  = "UPGRADE_LOCK_FILENAME"
+	LogToJSON            = "LOG_TO_JSON"
 	VCapApplication      = "VCAP_APPLICATION"
 	defaultSessionSecret = "wheeee!"
 )
@@ -64,19 +66,6 @@ var (
 	httpClientMutating        = http.Client{}
 	httpClientMutatingSkipSSL = http.Client{}
 )
-
-func cleanup(dbc *sql.DB, ss HttpSessionStore) {
-	// Print a newline - if you pressed CTRL+C, the alighment will be slightly out, so start a new line first
-	fmt.Println()
-	log.Info("Attempting to shut down gracefully...")
-	log.Info(`... Closing databaseConnectionPool`)
-	dbc.Close()
-	log.Info(`... Closing sessionStore`)
-	ss.Close()
-	log.Info(`.. Stopping sessionStore cleanup`)
-	ss.StopCleanup(ss.Cleanup(time.Minute * 5))
-	log.Info("Graceful shut down complete")
-}
 
 // getEnvironmentLookup return a search path for configuration settings
 func getEnvironmentLookup() *env.VarSet {
@@ -108,7 +97,22 @@ func getEnvironmentLookup() *env.VarSet {
 }
 
 func main() {
+
+	// Register time.Time in gob
+	gob.Register(time.Time{})
+
+	// Create common method for looking up config
+	envLookup := getEnvironmentLookup()
+
 	log.SetFormatter(&log.TextFormatter{ForceColors: true, FullTimestamp: true, TimestampFormat: time.UnixDate})
+
+	// Change to JSON logging if configured
+	if logToJSON, ok := envLookup.Lookup(LogToJSON); ok {
+		if logToJSON == "true" {
+			log.SetFormatter(&log.JSONFormatter{TimestampFormat: time.UnixDate})
+		}
+	}
+
 	log.SetOutput(os.Stdout)
 
 	log.Info("========================================")
@@ -116,12 +120,6 @@ func main() {
 	log.Info("========================================")
 	log.Info("")
 	log.Info("Initialization started.")
-
-	// Register time.Time in gob
-	gob.Register(time.Time{})
-
-	// Create common method for looking up config
-	envLookup := getEnvironmentLookup()
 
 	// Check to see if we are running as the database migrator
 	if migrateDatabase(envLookup) {
@@ -180,6 +178,7 @@ func main() {
 	tokens.InitRepositoryProvider(dc.DatabaseProvider)
 	console_config.InitRepositoryProvider(dc.DatabaseProvider)
 	localusers.InitRepositoryProvider(dc.DatabaseProvider)
+	sessiondata.InitRepositoryProvider(dc.DatabaseProvider)
 
 	// Establish a Postgresql connection pool
 	var databaseConnectionPool *sql.DB
@@ -234,15 +233,48 @@ func main() {
 	}()
 	log.Info("Session store initialized.")
 
+	// Create session data store
+	sessionDataStore, err := sessiondata.NewPostgresSessionDataRepository(databaseConnectionPool)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	// Session Data Store: Ensure the cleanup tick starts now (this will delete expired session data from the DB)
+	dataQuitCleanup, dataDoneCleanup := sessionDataStore.Cleanup(time.Minute * 3)
+	defer func() {
+		log.Info(`... Cleaning up session data store`)
+		sessionDataStore.StopCleanup(dataQuitCleanup, dataDoneCleanup)
+	}()
+	log.Info("Session data store initialized.")
+
 	// Setup the global interface for the proxy
 	portalProxy := newPortalProxy(portalConfig, databaseConnectionPool, sessionStore, sessionStoreOptions, envLookup)
+	portalProxy.SessionDataStore = sessionDataStore
 	log.Info("Initialization complete.")
 
 	c := make(chan os.Signal, 2)
 	signal.Notify(c, os.Interrupt, syscall.SIGTERM)
 	go func() {
 		<-c
-		cleanup(databaseConnectionPool, sessionStore)
+		// Print a newline - if you pressed CTRL+C, the alighment will be slightly out, so start a new line first
+		fmt.Println()
+		log.Info("Attempting to shut down gracefully...")
+
+		// Database connection pool
+		log.Info(`... Closing database connection pool`)
+		databaseConnectionPool.Close()
+
+		// Session store
+		log.Info(`... Closing session store`)
+		sessionStore.Close()
+		log.Info(`... Stopping sessionStore cleanup`)
+		sessionStore.StopCleanup(quitCleanup, doneCleanup)
+
+		// Session Data Store
+		log.Info(`... Stopping sessiondata store cleanup`)
+		sessionDataStore.StopCleanup(dataQuitCleanup, dataDoneCleanup)
+
+		log.Info("Graceful shut down complete")
 		os.Exit(1)
 	}()
 
@@ -251,6 +283,16 @@ func main() {
 	if err != nil {
 		log.Infof("Failed to initialise console config due to: %s", err)
 		return
+	}
+
+	// Init auth service
+	err = portalProxy.InitStratosAuthService(interfaces.AuthEndpointTypes[portalProxy.Config.AuthEndpointType])
+	if err != nil {
+		log.Warnf("Defaulting to UAA authentication: %v", err)
+		err = portalProxy.InitStratosAuthService(interfaces.Remote)
+		if err != nil {
+			log.Fatalf("Could not initialise auth service. %v", err)
+		}
 	}
 
 	// Initialise Plugins
@@ -302,6 +344,11 @@ func (portalProxy *portalProxy) GetDatabaseConnection() *sql.DB {
 	return portalProxy.DatabaseConnectionPool
 }
 
+// GetSessionDataStore returns the store that can be used for extra session data
+func (portalProxy *portalProxy) GetSessionDataStore() interfaces.SessionDataStore {
+	return portalProxy.SessionDataStore
+}
+
 func (portalProxy *portalProxy) GetPlugin(name string) interface{} {
 	plugin := portalProxy.Plugins[name]
 	log.Warn(portalProxy.Plugins)
@@ -340,6 +387,7 @@ func initialiseConsoleConfiguration(portalProxy *portalProxy) error {
 	if consoleConfig.IsSetupComplete() {
 		portalProxy.Config.ConsoleConfig = consoleConfig
 		portalProxy.Config.SSOLogin = consoleConfig.UseSSO
+		portalProxy.Config.AuthEndpointType = consoleConfig.AuthEndpointType
 	}
 
 	return nil
@@ -614,15 +662,6 @@ func newPortalProxy(pc interfaces.PortalConfig, dcp *sql.DB, ss HttpSessionStore
 		UserInfo: pp.GetCNSIUserFromBasicToken,
 	})
 
-	err := pp.InitStratosAuthService(interfaces.AuthEndpointTypes[pp.Config.AuthEndpointType])
-	if err != nil {
-		log.Warnf("Defaulting to UAA authentication: %v", err)
-		err = pp.InitStratosAuthService(interfaces.Remote)
-		if err != nil {
-			log.Fatalf("Could not initialise auth service. %v", err)
-		}
-	}
-
 	// OIDC
 	pp.AddAuthProvider(interfaces.AuthTypeOIDC, interfaces.AuthProvider{
 		Handler: pp.DoOidcFlowRequest,
@@ -753,9 +792,20 @@ func (p *portalProxy) GetHttpClient(skipSSLValidation bool) http.Client {
 	return p.getHttpClient(skipSSLValidation, false)
 }
 
+// GetHttpClientForRequest returns an Http Client for the giving request
 func (p *portalProxy) GetHttpClientForRequest(req *http.Request, skipSSLValidation bool) http.Client {
 	isMutating := req.Method != "GET" && req.Method != "HEAD"
-	return p.getHttpClient(skipSSLValidation, isMutating)
+	client := p.getHttpClient(skipSSLValidation, isMutating)
+
+	// Is this is a long-running request, then use a different timeout
+	if req.Header.Get(longRunningTimeoutHeader) == "true" {
+		longRunningClient := http.Client{}
+		longRunningClient.Transport = client.Transport
+		longRunningClient.Timeout = time.Duration(p.GetConfig().HTTPClientTimeoutLongRunningInSecs) * time.Second
+		return longRunningClient
+	}
+
+	return client
 }
 
 func (p *portalProxy) getHttpClient(skipSSLValidation bool, mutating bool) http.Client {
@@ -798,13 +848,13 @@ func (p *portalProxy) registerRoutes(e *echo.Echo, needSetupMiddleware bool) {
 	// Add middleware to block requests if unconfigured
 	if needSetupMiddleware {
 		e.Use(p.SetupMiddleware())
-		pp.POST("/v1/setup", p.setupConsole)
-		pp.POST("/v1/setup/check", p.setupConsoleCheck)
+		pp.POST("/v1/setup/check", p.setupGetAvailableScopes)
+		pp.POST("/v1/setup/save", p.setupSaveConfig)
 	}
 
 	loginAuthGroup := pp.Group("/v1/auth")
-	loginAuthGroup.POST("/login/uaa", p.StratosAuthService.Login)
-	loginAuthGroup.POST("/logout", p.StratosAuthService.Logout)
+	loginAuthGroup.POST("/login/uaa", p.consoleLogin)
+	loginAuthGroup.POST("/logout", p.consoleLogout)
 
 	// SSO Routes will only respond if SSO is enabled
 	loginAuthGroup.GET("/sso_login", p.initSSOlogin)
@@ -976,9 +1026,8 @@ func echoV2DefaultHTTPErrorHandler(err error, c echo.Context) {
 		}
 	}
 
-	//Only log if there is a message to log
-	he, _ := err.(*echo.HTTPError)
-	if err != nil && he.Message.(string) != "" {
+	// Always log error
+	if err != nil {
 		c.Logger().Error(err)
 	}
 }

@@ -5,7 +5,21 @@ import { RouterModule, Routes } from '@angular/router';
 import { HELM_ENDPOINT_TYPE } from './helm/helm-entity-factory';
 import { KUBERNETES_ENDPOINT_TYPE } from './kubernetes/kubernetes-entity-factory';
 
-const kubernetes: Routes = [
+const customRoutes: Routes = [
+  {
+    path: 'workloads',
+    loadChildren: () => import('./kubernetes/workloads/workloads.module').then(m => m.WorkloadsModule),
+    data: {
+      reuseRoute: true,
+      stratosNavigation: {
+        text: 'Workloads',
+        matIcon: 'workloads',
+        matIconFont: 'stratos-icons',
+        position: 60,
+        requiresEndpointType: KUBERNETES_ENDPOINT_TYPE
+      }
+    }
+  },
   {
     path: 'kubernetes',
     loadChildren: './kubernetes/kubernetes.module#KubernetesModule',
@@ -14,7 +28,7 @@ const kubernetes: Routes = [
         text: 'Kubernetes',
         matIcon: 'kubernetes',
         matIconFont: 'stratos-icons', // TODO: get these from entity config?
-        position: 60,
+        position: 64,
         requiresEndpointType: KUBERNETES_ENDPOINT_TYPE
       }
     }
@@ -32,12 +46,12 @@ const kubernetes: Routes = [
         requiresEndpointType: HELM_ENDPOINT_TYPE
       }
     }
-  }
+  },
 ];
 
 @NgModule({
   imports: [
-    RouterModule.forRoot(kubernetes),
+    RouterModule.forRoot(customRoutes),
   ],
   declarations: []
 })

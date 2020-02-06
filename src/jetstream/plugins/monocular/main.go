@@ -38,9 +38,6 @@ func (m *Monocular) GetChartStore() chartsvc.ChartSvcDatastore {
 // Init performs plugin initialization
 func (m *Monocular) Init() error {
 	log.SetLevel(log.DebugLevel)
-	if !m.portalProxy.GetConfig().EnableTechPreview {
-		return errors.New("Feature is in Tech Preview")
-	}
 	fdbURL := "mongodb://127.0.0.1:27016"
 	fDB := "monocular-plugin"
 	debug := false

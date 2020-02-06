@@ -7,19 +7,16 @@ import { CFAppState } from '../../../../../cloud-foundry/src/cf-app-state';
 import {
   RemoveUserFavoriteAction,
 } from '../../../../../store/src/actions/user-favourites-actions/remove-user-favorite-action';
-import {
-  endpointEntitiesSelector,
-  endpointsEntityRequestDataSelector,
-} from '../../../../../store/src/selectors/endpoint.selectors';
+import { endpointEntitiesSelector } from '../../../../../store/src/selectors/endpoint.selectors';
 import { IFavoriteMetadata, UserFavorite } from '../../../../../store/src/types/user-favorites.types';
-import { ENDPOINT_TYPE, userFavoritesEntitySchema } from '../../../base-entity-schemas';
-import { entityCatalogue } from '../../../core/entity-catalogue/entity-catalogue.service';
+import { userFavoritesEntitySchema } from '../../../base-entity-schemas';
 import { IFavoriteEntity } from '../../../core/user-favorite-manager';
-import { PanelPreviewService } from '../../services/panel-preview.service';
+import { isEndpointConnected } from '../../../features/endpoints/connect.service';
 import { ComponentEntityMonitorConfig, StratosStatus } from '../../shared.types';
 import { ConfirmationDialogConfig } from '../confirmation-dialog.config';
 import { ConfirmationDialogService } from '../confirmation-dialog.service';
 import { MetaCardMenuItem } from '../list/list-cards/meta-card/meta-card-base/meta-card.component';
+import { entityCatalog } from './../../../../../store/src/entity-catalog/entity-catalog.service';
 import { IFavoritesMetaCardConfig } from './favorite-config-mapper';
 
 
@@ -69,13 +66,16 @@ export class FavoritesMetaCardComponent {
   public routerLink$: Observable<string>;
   public actions$: Observable<MetaCardMenuItem[]>;
 
+  // Optional icon for the favorite
+  public iconUrl$: Observable<string>;
+
   @Input()
   set favoriteEntity(favoriteEntity: IFavoriteEntity) {
     if (!this.placeholder && favoriteEntity) {
       const endpoint$ = this.store.select(endpointEntitiesSelector).pipe(
         map(endpoints => endpoints[favoriteEntity.favorite.endpointId])
       );
-      this.endpointConnected$ = endpoint$.pipe(map(endpoint => !!endpoint.user));
+      this.endpointConnected$ = endpoint$.pipe(map(endpoint => isEndpointConnected(endpoint)));
       this.actions$ = this.endpointConnected$.pipe(
         map(connected => connected ? this.config.menuItems : [])
       );
@@ -85,16 +85,26 @@ export class FavoritesMetaCardComponent {
       this.prettyName = prettyName || 'Unknown';
       this.entityConfig = new ComponentEntityMonitorConfig(favorite.guid, userFavoritesEntitySchema);
 
+      // If this favorite is an endpoint, lookup the image for it from the entitiy catalog
+      if (this.favorite.entityType === 'endpoint') {
+        this.iconUrl$ = endpoint$.pipe(map(a => {
+          const entityDef = entityCatalog.getEndpoint(a.cnsi_type, a.sub_type);
+          return entityDef.definition.logoUrl;
+        }));
+      } else {
+        this.iconUrl$ = observableOf('');
+      }
+
       this.setConfirmation(this.prettyName, favorite);
 
       const config = cardMapper && favorite && favorite.metadata ? cardMapper(favorite.metadata) : null;
+
       if (config) {
+        this.name$ = observableOf(config.name);
         if (this.endpoint) {
-          this.name$ = endpoint$.pipe(map(endpoint => config.name + (endpoint.user ? '' : ' (Disconnected)')));
-          this.routerLink$ = endpoint$.pipe(map(endpoint => endpoint.user ? config.routerLink : '/endpoints'));
+          this.routerLink$ = this.endpointConnected$.pipe(map(connected => connected ? config.routerLink : '/endpoints'));
         } else {
-          this.name$ = observableOf(config.name);
-          this.routerLink$ = endpoint$.pipe(map(endpoint => endpoint.user ? config.routerLink : null));
+          this.routerLink$ = this.endpointConnected$.pipe(map(connected => connected ? config.routerLink : null));
         }
         config.lines = this.mapLinesToObservables(config.lines);
         this.config = config;
@@ -104,31 +114,8 @@ export class FavoritesMetaCardComponent {
 
   constructor(
     private store: Store<CFAppState>,
-    private confirmDialog: ConfirmationDialogService,
-    private panelPreviewService: PanelPreviewService
+    private confirmDialog: ConfirmationDialogService
   ) { }
-
-  previewPanel() {
-    const catalogueEntity = entityCatalogue.getEntity(this.favorite.endpointType, this.favorite.entityType);
-    const previewComponent = catalogueEntity.builders.entityBuilder.getPreviewableComponent();
-
-    // TODO: use 'endpoint' as constant
-    if (this.favorite.entityType === ENDPOINT_TYPE) {
-      const entity$ = this.store.select(endpointsEntityRequestDataSelector(this.favorite.endpointId));
-      this.panelPreviewService.show(previewComponent, {
-        title: this.favorite.metadata.name,
-        entity$,
-        cfGuid: this.favorite.endpointId
-      });
-    } else {
-      this.panelPreviewService.show(previewComponent, {
-        title: this.favorite.metadata.name,
-        cfGuid: this.favorite.metadata.cfGuid,
-        orgGuid: this.favorite.metadata.orgGuid,
-        guid: this.favorite.metadata.guid
-      });
-    }
-  }
 
   public setConfirmation(prettyName: string, favorite: UserFavorite<IFavoriteMetadata>) {
     this.confirmation = new ConfirmationDialogConfig(

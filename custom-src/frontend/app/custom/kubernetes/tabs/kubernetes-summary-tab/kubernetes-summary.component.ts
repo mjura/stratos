@@ -6,18 +6,18 @@ import { combineLatest, interval, Observable, Subscription } from 'rxjs';
 import { map, startWith } from 'rxjs/operators';
 
 import { AppState } from '../../../../../../store/src/app-state';
+import { entityCatalog } from '../../../../../../store/src/entity-catalog/entity-catalog.service';
+import { PaginationMonitorFactory } from '../../../../../../store/src/monitors/pagination-monitor.factory';
 import { getPaginationObservables } from '../../../../../../store/src/reducers/pagination-reducer/pagination-reducer.helper';
 import { PaginatedAction } from '../../../../../../store/src/types/pagination.types';
-import { entityCatalogue } from '../../../../core/entity-catalogue/entity-catalogue.service';
 import { safeUnsubscribe } from '../../../../core/utils.service';
 import {
   IChartThresholds,
   ISimpleUsageChartData,
 } from '../../../../shared/components/simple-usage-chart/simple-usage-chart.types';
-import { PaginationMonitorFactory } from '../../../../shared/monitors/pagination-monitor.factory';
 import { KubernetesEndpointService } from '../../services/kubernetes-endpoint.service';
-import { GetKubernetesNodes, GetKubernetesPods } from '../../store/kubernetes.actions';
-import { GetKubernetesApps } from './../../store/kubernetes.actions';
+import { GetKubernetesNamespaces, GetKubernetesNodes, GetKubernetesPods } from '../../store/kubernetes.actions';
+import { Router } from '@angular/router';
 
 interface IValueLabels {
   usedLabel?: string;
@@ -38,18 +38,20 @@ interface IEndpointDetails {
 export class KubernetesSummaryTabComponent implements OnInit, OnDestroy {
   public podCount$: Observable<number>;
   public nodeCount$: Observable<number>;
-  public appCount$: Observable<number>;
+  public namespaceCount$: Observable<number>;
+
   public highUsageColors = {
     domain: ['#00000026', '#00af00']
   };
   public normalUsageColors = {
     domain: ['#00af00', '#00af002e']
   };
+  public chartHeight = '150px';
   public endpointDetails$: Observable<IEndpointDetails> = this.kubeEndpointService.endpoint$.pipe(
     map(endpoint => {
-      const endpointConfig = entityCatalogue.getEndpoint(endpoint.entity.cnsi_type, endpoint.entity.sub_type);
+      const endpointConfig = entityCatalog.getEndpoint(endpoint.entity.cnsi_type, endpoint.entity.sub_type);
       const { logoUrl, label } = endpointConfig.definition;
-      // const { imagePath, label } = entityCatalogue.getEndpoint(endpoint.entity.cnsi_type, endpoint.entity.sub_type);
+      // const { imagePath, label } = entityCatalog.getEndpoint(endpoint.entity.cnsi_type, endpoint.entity.sub_type);
 
       // const { imagePath, label } = getEndpointType(endpoint.entity.cnsi_type, endpoint.entity.sub_type);
       return {
@@ -98,23 +100,29 @@ export class KubernetesSummaryTabComponent implements OnInit, OnDestroy {
     public httpClient: HttpClient,
     public paginationMonitorFactory: PaginationMonitorFactory,
     private store: Store<AppState>,
-    private ngZone: NgZone
+    private ngZone: NgZone,
+    private router: Router,
   ) {
   }
 
+  // Go the Kubernetes Dashboard configuration page
+  public configureDashboard() {
+    const guid = this.kubeEndpointService.baseKube.guid;
+    this.router.navigate([`/kubernetes/${guid}/dashboard-config`]);
+  }
   ngOnInit() {
     const guid = this.kubeEndpointService.baseKube.guid;
 
     const podCountAction = new GetKubernetesPods(guid);
     const nodeCountAction = new GetKubernetesNodes(guid);
-    const appCountAction = new GetKubernetesApps(guid);
-    const applications$ = this.getPaginationObservable(appCountAction);
+    const namespacesCountAction = new GetKubernetesNamespaces(guid);
     const pods$ = this.getPaginationObservable(podCountAction);
     const nodes$ = this.getPaginationObservable(nodeCountAction);
+    const namespaces$ = this.getPaginationObservable(namespacesCountAction);
 
     this.podCount$ = this.kubeEndpointService.getCountObservable(pods$);
     this.nodeCount$ = this.kubeEndpointService.getCountObservable(nodes$);
-    this.appCount$ = this.kubeEndpointService.getCountObservable(applications$);
+    this.namespaceCount$ = this.kubeEndpointService.getCountObservable(namespaces$);
 
     this.podCapacity$ = this.kubeEndpointService.getPodCapacity(nodes$, pods$);
     this.diskPressure$ = this.kubeEndpointService.getNodeStatusCount(nodes$, 'DiskPressure', {
@@ -155,7 +163,6 @@ export class KubernetesSummaryTabComponent implements OnInit, OnDestroy {
       this.endpointDetails$,
       this.podCount$,
       this.nodeCount$,
-      this.appCount$,
       this.podCapacity$,
       this.diskPressure$,
       this.memoryPressure$,

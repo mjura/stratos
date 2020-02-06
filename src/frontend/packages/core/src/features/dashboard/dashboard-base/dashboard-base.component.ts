@@ -4,12 +4,14 @@ import { AfterViewInit, Component, NgZone, OnDestroy, OnInit, ViewChild, ViewCon
 import { MatDrawer } from '@angular/material';
 import { ActivatedRoute, ActivatedRouteSnapshot, NavigationEnd, Route, Router } from '@angular/router';
 import { Store } from '@ngrx/store';
+import { entityCatalog } from 'frontend/packages/store/src/entity-catalog/entity-catalog.service';
+import { IEntityMetadata } from 'frontend/packages/store/src/entity-catalog/entity-catalog.types';
 import { combineLatest, Observable, of, Subscription } from 'rxjs';
 import { distinctUntilChanged, filter, map, startWith, withLatestFrom } from 'rxjs/operators';
 
-import { CF_ENDPOINT_TYPE } from '../../../../../cloud-foundry/cf-types';
 import { GetCurrentUsersRelations } from '../../../../../cloud-foundry/src/actions/permissions.actions';
 import { cfInfoEntityType } from '../../../../../cloud-foundry/src/cf-entity-types';
+import { CF_ENDPOINT_TYPE } from '../../../../../cloud-foundry/src/cf-types';
 import {
   CfInfoDefinitionActionBuilders,
 } from '../../../../../cloud-foundry/src/entity-action-builders/cf-info.action-builders';
@@ -22,9 +24,7 @@ import { EndpointHealthCheck } from '../../../../endpoints-health-checks';
 import { TabNavService } from '../../../../tab-nav.service';
 import { CustomizationService } from '../../../core/customizations.types';
 import { EndpointsService } from '../../../core/endpoints.service';
-import { entityCatalogue } from '../../../core/entity-catalogue/entity-catalogue.service';
-import { IEntityMetadata } from '../../../core/entity-catalogue/entity-catalogue.types';
-import { PanelPreviewService } from '../../../shared/services/panel-preview.service';
+import { SidePanelService } from '../../../shared/services/side-panel.service';
 import { PageHeaderService } from './../../../core/page-header-service/page-header.service';
 import { SideNavItem } from './../side-nav/side-nav.component';
 
@@ -67,7 +67,7 @@ export class DashboardBaseComponent implements OnInit, OnDestroy, AfterViewInit 
     private endpointsService: EndpointsService,
     public tabNavService: TabNavService,
     private ngZone: NgZone,
-    public panelPreviewService: PanelPreviewService,
+    public sidePanelService: SidePanelService,
     private cs: CustomizationService
   ) {
     this.noMargin$ = this.router.events.pipe(
@@ -128,13 +128,11 @@ export class DashboardBaseComponent implements OnInit, OnDestroy, AfterViewInit 
   }
 
   sideHelpClosed() {
-    this.panelPreviewService.hide();
+    this.sidePanelService.hide();
   }
 
   ngAfterViewInit() {
-    console.log('*************');
-    console.log('SETTING PREVIEW PANEL');
-    this.panelPreviewService.setContainer(this.previewPanelContainer);
+    this.sidePanelService.setContainer(this.previewPanelContainer);
   }
 
   ngOnInit() {
@@ -147,7 +145,7 @@ export class DashboardBaseComponent implements OnInit, OnDestroy, AfterViewInit 
     // TODO: Move cf code out to cf module #3849
     this.endpointsService.registerHealthCheck(
       new EndpointHealthCheck(CF_ENDPOINT_TYPE, (endpoint) => {
-        entityCatalogue.getEntity<IEntityMetadata, any, CfInfoDefinitionActionBuilders>(CF_ENDPOINT_TYPE, cfInfoEntityType)
+        entityCatalog.getEntity<IEntityMetadata, any, CfInfoDefinitionActionBuilders>(CF_ENDPOINT_TYPE, cfInfoEntityType)
           .actionDispatchManager.dispatchGet(endpoint.guid);
       })
     );

@@ -5,12 +5,14 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"net/http"
 
 	"github.com/helm/monocular/chartsvc"
 	"github.com/labstack/echo"
 	log "github.com/sirupsen/logrus"
 	"sigs.k8s.io/yaml"
+
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/client-go/kubernetes"
 
 	"helm.sh/helm/v3/pkg/action"
 	"helm.sh/helm/v3/pkg/chart/loader"
@@ -37,9 +39,8 @@ type Monocular interface {
 	GetChartStore() chartsvc.ChartSvcDatastore
 }
 
-// InstallRelease will install a release
+// InstallRelease will install a Helm 3 release
 func (c *KubernetesSpecification) InstallRelease(ec echo.Context) error {
-
 	bodyReader := ec.Request().Body
 	buf := new(bytes.Buffer)
 	buf.ReadFrom(bodyReader)
@@ -47,96 +48,81 @@ func (c *KubernetesSpecification) InstallRelease(ec echo.Context) error {
 	var params installRequest
 	err := json.Unmarshal(buf.Bytes(), &params)
 	if err != nil {
-		return fmt.Errorf("Could not get Create Release Parameters: %v+", err)
+		return interfaces.NewJetstreamErrorf("Could not get Create Release Parameters: %v+", err)
 	}
-
-	log.Warn("%+v", params)
 
 	chartID := fmt.Sprintf("%s/%s", params.Chart.Repository, params.Chart.Name)
 
-	log.Info("Installing release")
-	log.Info(chartID)
+	log.Debugf("Helm: Installing release %s", chartID)
 
 	downloadURL, err := c.getChart(chartID, params.Chart.Version)
 	if err != nil {
-		return fmt.Errorf("Could not get the Download URL")
+		return interfaces.NewJetstreamErrorf("Could not get the Download URL for the Helm Chart")
 	}
 
 	log.Debugf("Chart Download URL: %s", downloadURL)
 
-	// Should we ignore SSL certs?
-	// TODO: Look up Helm Repository endpoint and use the value from that
-	http := c.portalProxy.GetHttpClient(true)
-
-	resp, err := http.Get(downloadURL)
-
+	// NWM: Should we look up Helm Repository endpoint and use the value from that
+	httpClient := c.portalProxy.GetHttpClient(false)
+	resp, err := httpClient.Get(downloadURL)
 	if resp.StatusCode != 200 {
-		return fmt.Errorf("Could not download Chart Archive: %s", resp.Status)
+		return interfaces.NewJetstreamErrorf("Could not download Chart Archive: %s", resp.Status)
 	}
 
 	defer resp.Body.Close()
 
 	chart, err := loader.LoadArchive(resp.Body)
 	if err != nil {
-		return fmt.Errorf("Could not load chart from archive: %v+", err)
+		return interfaces.NewJetstreamErrorf("Could not load chart from archive: %v+", err)
 	}
 
-	log.Warn("Loaded helm chart")
-	log.Warn(chart.Name())
+	log.Debugf("Loaded helm chart: %s", chart.Name())
 
 	endpointGUID := params.Endpoint
 	userGUID := ec.Get("user_id").(string)
 
 	config, hc, err := c.GetHelmConfiguration(endpointGUID, userGUID, params.Namespace)
 	if err != nil {
-		return fmt.Errorf("Could not get Helm Configuration for endpoint: %v+", err)
+		return interfaces.NewJetstreamErrorf("Could not get Helm Configuration for endpoint: %+v", err)
 	}
 
 	defer hc.Cleanup()
 
-	// if _, err := chartutil.LoadRequirements(chart); err == nil {
-	// 	log.Debug("Chart requirements loaded")
-	// } else if err != chartutil.ErrRequirementsNotFound {
-	// 	log.Error("Can not load requirements for helm chart")
-	// } else {
-	// 	log.Error(err)
-	// }
-
-	log.Warn("Got values")
-	log.Warn(params.Values)
-
 	userSuppliedValues := map[string]interface{}{}
 	if err := yaml.Unmarshal([]byte(params.Values), &userSuppliedValues); err != nil {
 		// Could not parse the user's values
-		return err
+		return interfaces.NewJetstreamErrorf("Could not parse values: %+v", err)
 	}
 
-	log.Warn("Installing.....")
+	// In Helm 3, the namespace must already exist
+	kubeClient, _ := c.GetConfigForEndpointUser(endpointGUID, userGUID)
+	clientset, _ := kubernetes.NewForConfig(kubeClient)
+	coreclient := clientset.CoreV1()
+	_, err = coreclient.Namespaces().Get(params.Namespace, metav1.GetOptions{})
+	if err != nil {
+		return interfaces.NewJetstreamErrorf("Namespace '%s' does not exist", params.Namespace)
+	}
+
+	// Check release name is valid and does not already exist
+	statusAction := action.NewStatus(config)
+	_, err = statusAction.Run(params.Name)
+	if err == nil {
+		return interfaces.NewJetstreamUserError("A Release with that name already exists - please choose another")
+	}
 
 	install := action.NewInstall(config)
 	install.ReleaseName = params.Name
 	install.Namespace = params.Namespace
 
-	log.Warnf("%+v", install)
-
-	// Set timeout
-	// Wait?
-	// Generate Name ?
-	// Atomic?
-
 	release, err := install.Run(chart, userSuppliedValues)
 	if err != nil {
-		log.Error(err)
-		return fmt.Errorf("Could not install Helm Chart: %v+", err)
+		return interfaces.NewJetstreamError(fmt.Sprintf("Error installing %+v", err))
 	}
-
-	log.Warn("All okay")
 
 	return ec.JSON(200, release)
 }
 
 func (c *KubernetesSpecification) getChart(chartID, version string) (string, error) {
-
 	helm := c.portalProxy.GetPlugin("monocular")
 	if helm == nil {
 		return "", errors.New("Could not find monocular plugin")
@@ -150,7 +136,7 @@ func (c *KubernetesSpecification) getChart(chartID, version string) (string, err
 	store := monocular.GetChartStore()
 	chart, err := store.GetChart(chartID)
 	if err != nil {
-		log.Error("Could not find chart")
+		return "", errors.New("Could not find Chart")
 	}
 
 	// Find the download URL for the version
@@ -167,34 +153,25 @@ func (c *KubernetesSpecification) getChart(chartID, version string) (string, err
 
 // DeleteRelease will delete a release
 func (c *KubernetesSpecification) DeleteRelease(ec echo.Context) error {
-
 	endpointGUID := ec.Param("endpoint")
 	releaseName := ec.Param("name")
 	namespace := ec.Param("namespace")
-
-	// I think we're going to need the namespace
 
 	userGUID := ec.Get("user_id").(string)
 
 	config, hc, err := c.GetHelmConfiguration(endpointGUID, userGUID, namespace)
 	if err != nil {
-		log.Errorf("Helm: DeleteRelease could not get a Helm Configuration: %s", err)
-		return err
+		return interfaces.NewJetstreamErrorf("Could not get Helm Configuration for endpoint: %+v", err)
 	}
 
 	defer hc.Cleanup()
 
 	uninstall := action.NewUninstall(config)
 
-	log.Warnf("%+v", config)
-	log.Warnf("%+v", uninstall)
-
 	deleteResponse, err := uninstall.Run(releaseName)
 	if err != nil {
-		return interfaces.NewJetstreamError(http.StatusInternalServerError, "Could not delete Helm Release")
+		return interfaces.NewJetstreamError("Could not delete Helm Release")
 	}
-
-	log.Warnf("%+v", deleteResponse)
 
 	return ec.JSON(200, deleteResponse)
 }
