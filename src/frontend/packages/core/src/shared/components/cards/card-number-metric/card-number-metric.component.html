@@ -14,6 +14,18 @@
         </div>
         <div class="number-metric-card__label">{{ labelSingular && value === '1' ? labelSingular : label }}</div>
       </div>
+      <div class="number-metric-card__alerts" *ngIf="alertInfo">
+        <div *ngIf="alertInfo.info" class="number-metric-card__alert-badge">
+          {{ alertInfo.info }}
+        </div>
+        <div *ngIf="alertInfo.warning" class="number-metric-card__alert-badge">
+          <mat-icon>warning</mat-icon>
+          <div>{{ alertInfo.warning }}</div>
+        </div>
+        <div *ngIf="alertInfo.error" class="number-metric-card__alert-badge">
+          {{ alertInfo.error }}
+        </div>
+      </div>
     </mat-card>
   </div>
 </ng-template>

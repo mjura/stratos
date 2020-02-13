@@ -33,8 +33,11 @@ export class KubernetesTabBaseComponent implements OnInit {
 
   tabLinks = [
     { link: 'summary', label: 'Summary', icon: 'kubernetes', iconFont: 'stratos-icons' },
+    { link: 'analysis', label: 'Analysis', icon: 'assignment' },
+    { link: '-', label: 'Cluster' },
     { link: 'nodes', label: 'Nodes', icon: 'developer_board' },
     { link: 'namespaces', label: 'Namespaces', icon: 'language' },
+    { link: '-', label: 'Resources' },
     { link: 'pods', label: 'Pods', icon: 'adjust' },
   ];
 

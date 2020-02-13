@@ -28,6 +28,7 @@ import {
   kubernetesPodsEntityType,
   kubernetesServicesEntityType,
   kubernetesStatefulSetsEntityType,
+  analysisReportEntityType,
 } from './kubernetes-entity-factory';
 import {
   KubernetesApp,
@@ -147,6 +148,7 @@ export function generateKubernetesEntities(): StratosBaseCatalogEntity[] {
     generateNamespacesEntity(endpointDefinition),
     generateServicesEntity(endpointDefinition),
     generateDashboardEntity(endpointDefinition),
+    generateAnalysisReportsEntity(endpointDefinition),
     generateMetricEntity(endpointDefinition),
     ...generateWorkloadsEntities(endpointDefinition)
   ];
@@ -226,6 +228,15 @@ function generateDashboardEntity(endpointDefinition: StratosEndpointExtensionDef
   const definition = {
     type: kubernetesDashboardEntityType,
     schema: kubernetesEntityFactory(kubernetesDashboardEntityType),
+    endpoint: endpointDefinition
+  };
+  return new StratosCatalogEntity<IFavoriteMetadata>(definition);
+}
+
+function generateAnalysisReportsEntity(endpointDefinition: StratosEndpointExtensionDefinition) {
+  const definition = {
+    type: analysisReportEntityType,
+    schema: kubernetesEntityFactory(analysisReportEntityType),
     endpoint: endpointDefinition
   };
   return new StratosCatalogEntity<IFavoriteMetadata>(definition);

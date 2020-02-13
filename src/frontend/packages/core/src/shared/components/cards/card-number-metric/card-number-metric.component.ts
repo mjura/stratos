@@ -1,4 +1,4 @@
-import { Component, Input, OnChanges, OnInit } from '@angular/core';
+import { Component, Input, OnChanges, OnInit, EventEmitter, Output } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { BehaviorSubject } from 'rxjs';
 
@@ -7,6 +7,14 @@ import { RouterNav } from '../../../../../../store/src/actions/router.actions';
 import { UtilsService } from '../../../../core/utils.service';
 import { StratosStatus } from '../../../shared.types';
 import { determineCardStatus } from '../card-status/card-status.component';
+
+enum AlertLevel {
+  OK = 1,
+  Info,
+  Warning,
+  Error,
+  Unknown,
+}
 
 @Component({
   selector: 'app-card-number-metric',
@@ -26,6 +34,17 @@ export class CardNumberMetricComponent implements OnInit, OnChanges {
   @Input() textOnly = false;
   @Input() labelAtTop = false;
   @Input() link: () => void | string;
+  @Output() showAlerts = new EventEmitter<any>();
+
+  @Input('alerts')
+  set alerts(alerts) {
+    if (alerts) {
+      console.log('Set alerts');
+      this.processAlerts(alerts);
+    }
+  }
+
+  alertInfo: any;
 
   formattedValue: string;
   formattedLimit: string;
@@ -102,4 +121,27 @@ export class CardNumberMetricComponent implements OnInit, OnChanges {
       this.link();
     }
   }
+
+  processAlerts(alerts) {
+    this.alertInfo = {
+      info: 0,
+      warning: 0,
+      error: 0
+    };
+
+    alerts.forEach((alert) => {
+      switch (alert.level as AlertLevel) {
+        case AlertLevel.Warning:
+          this.alertInfo.warning++;
+          break;
+        case AlertLevel.Error:
+          this.alertInfo.error++;
+          break;
+        case AlertLevel.Info:
+          this.alertInfo.info++;
+          break;
+      }
+    });
+  }
+
 }

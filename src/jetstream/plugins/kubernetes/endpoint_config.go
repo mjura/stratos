@@ -40,6 +40,25 @@ func (c *KubernetesSpecification) GetConfigForEndpointUser(endpointID, userID st
 	return c.GetConfigForEndpoint(cnsiRecord.APIEndpoint.String(), tokenRec)
 }
 
+func (c *KubernetesSpecification) GetKubeConfigForEndpointUser(endpointID, userID string) (string, error) {
+
+	var p = c.portalProxy
+
+	cnsiRecord, err := p.GetCNSIRecord(endpointID)
+	if err != nil {
+		//return sendSSHError("Could not get endpoint information")
+		return "", errors.New("Could not get endpoint information")
+	}
+
+	// Get token for this users
+	tokenRec, ok := p.GetCNSITokenRecord(endpointID, userID)
+	if !ok {
+		return "", errors.New("Could not get token")
+	}
+
+	return c.GetKubeConfigForEndpoint(cnsiRecord.APIEndpoint.String(), tokenRec, "")
+}
+
 func (c *KubernetesSpecification) getKubeConfigForEndpoint(masterURL string, token interfaces.TokenRecord, namespace string) (*clientcmdapi.Config, error) {
 
 	name := "cluster-0"

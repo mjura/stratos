@@ -8,18 +8,22 @@ import { ClearPaginationOfType } from 'frontend/packages/store/src/actions/pagin
 import { RouterNav } from 'frontend/packages/store/src/actions/router.actions';
 import { HideSnackBar, ShowSnackBar } from 'frontend/packages/store/src/actions/snackBar.actions';
 import { AppState } from 'frontend/packages/store/src/app-state';
-import { combineLatest, Observable, ReplaySubject } from 'rxjs';
-import { filter, first, map, publishReplay, refCount, startWith } from 'rxjs/operators';
+import { combineLatest, Observable, ReplaySubject, Subject } from 'rxjs';
+import { filter, first, map, publishReplay, refCount, startWith, distinctUntilChanged, take } from 'rxjs/operators';
 
 import { endpointsEntityRequestDataSelector } from '../../../../../../../../store/src/selectors/endpoint.selectors';
 import { GetHelmReleases } from '../../../store/workloads.actions';
 import { HelmReleaseChartData, HelmReleaseResource } from '../../../workload.types';
 import { HelmReleaseHelperService } from '../helm-release-helper.service';
+import { KubernetesAnalysisService } from '../../../../services/kubernetes.analysis.service';
 
 @Component({
   selector: 'app-helm-release-summary-tab',
   templateUrl: './helm-release-summary-tab.component.html',
-  styleUrls: ['./helm-release-summary-tab.component.scss']
+  styleUrls: ['./helm-release-summary-tab.component.scss'],
+  providers: [
+    KubernetesAnalysisService,
+  ]
 })
 export class HelmReleaseSummaryTabComponent implements OnDestroy {
   // Confirmation dialogs
@@ -35,6 +39,8 @@ export class HelmReleaseSummaryTabComponent implements OnDestroy {
   public containersChartData = [];
 
   private successChartColor = '#4DD3A7';
+
+  public path: string;
 
   public podChartColors = [
     {
@@ -84,14 +90,20 @@ export class HelmReleaseSummaryTabComponent implements OnDestroy {
   public chartData$: Observable<HelmReleaseChartData>;
   public resources$: Observable<HelmReleaseResource[]>;
 
+  // Cached analysis report
+  private analysisReport;
+
+  private analysisReportUpdated = new Subject<string>();
+  private analysisReportUpdated$ = this.analysisReportUpdated.pipe(startWith(null), distinctUntilChanged());
+
   constructor(
     public helmReleaseHelper: HelmReleaseHelperService,
     private store: Store<AppState>,
     private confirmDialog: ConfirmationDialogService,
     private httpClient: HttpClient,
-    private logService: LoggerService
+    private logService: LoggerService,
+    public analyzerService: KubernetesAnalysisService,
   ) {
-
     this.isBusy$ = combineLatest([
       this.helmReleaseHelper.isFetching$,
       this.busyDeletingSubject.asObservable().pipe(
@@ -102,10 +114,20 @@ export class HelmReleaseSummaryTabComponent implements OnDestroy {
       startWith(true)
     );
 
+
+    this.path = `${this.helmReleaseHelper.namespace}/${this.helmReleaseHelper.releaseTitle}`;
+
     this.chartData$ = this.helmReleaseHelper.fetchReleaseChartStats();
 
-    this.resources$ = this.helmReleaseHelper.fetchReleaseGraph().pipe(
-      map((graph: any) => {
+    this.resources$ = combineLatest(
+      this.helmReleaseHelper.fetchReleaseGraph(),
+      this.analysisReportUpdated$
+    ).pipe(
+      take(4),
+      //map(([graph: any, id: string]) => {
+      map(([graph, id]) => {
+        console.log('Recalculating resources');
+        console.log(id);
         const resources = {};
         // Collect the resources
         Object.values(graph.nodes).forEach((node: any) => {
@@ -121,11 +143,13 @@ export class HelmReleaseSummaryTabComponent implements OnDestroy {
           resources[node.data.kind].count++;
           resources[node.data.kind].statuses.push(node.data.status);
         });
+        this.applyAnalysis(resources, this.analysisReport);
         return Object.values(resources).sort((a: any, b: any) => a.kind.localeCompare(b.kind));
       }),
       publishReplay(1),
       refCount()
     );
+
 
     this.hasResources$ = combineLatest([
       this.chartData$,
@@ -141,6 +165,20 @@ export class HelmReleaseSummaryTabComponent implements OnDestroy {
       },
       'Delete'
     );
+
+  }
+
+  public analysisChanged(report) {
+    if (report === null) {
+      // No report selected
+      this.analysisReport = null;
+      this.analysisReportUpdated.next('');
+    } else {
+        this.analyzerService.getByID(report.id).subscribe(results => {
+        this.analysisReport = results;
+        this.analysisReportUpdated.next(report.id);
+      });
+    }
   }
 
   private getIcon(kind: string) {
@@ -217,5 +255,32 @@ export class HelmReleaseSummaryTabComponent implements OnDestroy {
       map(e => e.name),
       first()
     );
+  }
+
+  public runAnalysis(id: string) {
+    this.helmReleaseHelper.release$.pipe(first()).subscribe(release => {
+      this.analyzerService.run(id, this.helmReleaseHelper.endpointGuid, release.namespace, release.name);
+    });
+  }
+
+  private applyAnalysis(resources, report) {
+    console.log('apply analysis');
+    console.log(resources);
+    console.log(report);
+
+    if (report && Object.keys(resources).length > 0) {
+      Object.values(report.alerts).forEach((group: any) => {
+        group.forEach(alert => {
+          // Can we find a corresponding group in the resources?
+          const res = Object.keys(resources).find((i) => i.toLowerCase() === alert.kind);
+          if (res) {
+            const resItem = resources[res];
+            resItem.alerts = group;
+          }
+        });
+      });
+      console.log('--------- UPDATED --------');
+      console.log(resources);
+    }
   }
 }

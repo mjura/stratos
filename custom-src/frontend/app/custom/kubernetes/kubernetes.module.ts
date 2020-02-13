@@ -87,7 +87,15 @@ import { KubernetesNodesTabComponent } from './tabs/kubernetes-nodes-tab/kuberne
 import { KubernetesPodsTabComponent } from './tabs/kubernetes-pods-tab/kubernetes-pods-tab.component';
 import { KubernetesSummaryTabComponent } from './tabs/kubernetes-summary-tab/kubernetes-summary.component';
 import { KubedashConfigurationComponent } from './kubernetes-dashboard/kubedash-configuration/kubedash-configuration.component';
-
+import { KubernetesAnalysisTabComponent } from './tabs/kubernetes-analysis-tab/kubernetes-analysis-tab.component';
+import { KubernetesAnalysisReportComponent } from './tabs/kubernetes-analysis-tab/kubernetes-analysis-report/kubernetes-analysis-report.component';
+import { KubernetesAnalysisInfoComponent } from './tabs/kubernetes-analysis-tab/kubernetes-analysis-info/kubernetes-analysis-info.component';
+import { AnalysisInfoCardComponent } from './tabs/kubernetes-analysis-tab/kubernetes-analysis-info/analysis-info-card/analysis-info-card.component';
+import { AnalysisReportViewerComponent } from './analysis-report-viewer/analysis-report-viewer.component';
+import { JsonReportViewerComponent } from './analysis-report-viewer/json-report-viewer/json-report-viewer.component';
+import { JUnitReportViewerComponent } from './analysis-report-viewer/junit-report-viewer/junit-report-viewer.component';
+import { PopeyeReportViewerComponent } from './analysis-report-viewer/popeye-report-viewer/popeye-report-viewer.component';
+import { AnalysisReportSelectorComponent } from './analysis-report-viewer/analysis-report-selector/analysis-report-selector.component';
 
 /* tslint:enable */
 
@@ -109,6 +117,7 @@ import { KubedashConfigurationComponent } from './kubernetes-dashboard/kubedash-
     KubernetesNamespacesTabComponent,
     KubernetesDashboardTabComponent,
     KubernetesSummaryTabComponent,
+    KubernetesAnalysisTabComponent,
     PodMetricsComponent,
     KubernetesNodeLinkComponent,
     KubernetesNodeIpsComponent,
@@ -141,6 +150,14 @@ import { KubedashConfigurationComponent } from './kubernetes-dashboard/kubedash-
     KubernetesResourceViewerComponent,
     KubeServiceCardComponent,
     KubedashConfigurationComponent,
+    KubernetesAnalysisReportComponent,
+    KubernetesAnalysisInfoComponent,
+    AnalysisInfoCardComponent,
+    AnalysisReportViewerComponent,
+    PopeyeReportViewerComponent,
+    JUnitReportViewerComponent,
+    JsonReportViewerComponent,
+    AnalysisReportSelectorComponent,
   ],
   providers: [
     KubernetesService,
@@ -163,10 +180,19 @@ import { KubedashConfigurationComponent } from './kubernetes-dashboard/kubedash-
     KubernetesServicePortsComponent,
     KubernetesPodStatusComponent,
     KubeServiceCardComponent,
-    KubernetesResourceViewerComponent
+    KubernetesResourceViewerComponent,
+    PopeyeReportViewerComponent,
+    JUnitReportViewerComponent,
+    JsonReportViewerComponent,
+    AnalysisReportSelectorComponent,
   ],
   exports: [
-    KubernetesResourceViewerComponent
+    KubernetesResourceViewerComponent,
+    AnalysisReportViewerComponent,
+    PopeyeReportViewerComponent,
+    JUnitReportViewerComponent,
+    JsonReportViewerComponent,
+    AnalysisReportSelectorComponent,
   ]
 })
 export class KubernetesModule { }

@@ -27,6 +27,7 @@ import {
   kubernetesPodsEntityType,
   kubernetesServicesEntityType,
   kubernetesStatefulSetsEntityType,
+  analysisReportEntityType,
 } from '../kubernetes-entity-factory';
 import { KubernetesPodExpandedStatusHelper } from '../services/kubernetes-expanded-state';
 import { getKubeAPIResourceGuid } from './kube.selectors';
@@ -71,6 +72,7 @@ import {
   KubeAction,
   KubePaginationAction,
 } from './kubernetes.actions';
+import { GetAnalysisReports, GET_ANALYSIS_REPORTS } from '../store/kubernetes.actions';
 
 export interface KubeDashboardContainer {
   name: string;
@@ -104,6 +106,41 @@ export class KubernetesEffects {
   proxyAPIVersion = environment.proxyAPIVersion;
 
   constructor(private http: HttpClient, private actions$: Actions, private store: Store<AppState>) { }
+
+  // Analysis reports
+  @Effect()
+  fetchAnalysisReports$ = this.actions$.pipe(
+    ofType<GetAnalysisReports>(GET_ANALYSIS_REPORTS),
+    flatMap(action => {
+      this.store.dispatch(new StartRequestAction(action));
+      const headers = new HttpHeaders({});
+      const requestArgs = {
+        headers
+      };
+      const url = `/pp/${this.proxyAPIVersion}/analysis/reports`;
+      const entityConfig = entityCatalog.getEntity(KUBERNETES_ENDPOINT_TYPE, analysisReportEntityType);
+      const entityKey = entityCatalog.getEntityKey(action);
+      console.log(entityConfig);
+      console.log(entityKey);
+      return this.http
+        .get(url, requestArgs)
+        .pipe(mergeMap(response => {
+          console.log(response);
+          const res = {
+            entities: { [entityKey]: {} },
+            result: []
+          } as NormalizedResponse;
+          const items = response as Array<any>;
+          items.forEach(item => {
+            const id = item.id;
+            res.entities[entityKey][id] = item;
+            res.result.push(id);
+          });
+          return [new WrapperRequestActionSuccess(res, action)];
+        })
+      );
+    })
+  );
 
   @Effect()
   fetchDashboardInfo$ = this.actions$.pipe(

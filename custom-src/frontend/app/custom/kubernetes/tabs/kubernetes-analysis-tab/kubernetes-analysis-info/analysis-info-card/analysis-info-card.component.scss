@@ -1,0 +1,23 @@
+.info {
+
+  &__card {
+    display: flex;
+
+    h1 {
+      font-size: 16px;
+      padding: 0;
+    }
+  }
+
+  &__card-icon {
+    &>img {
+      max-width: 120px;
+    }
+    margin-right: 10px;
+  }
+
+  &__card-text {
+    flex: 1;
+  }
+
+}

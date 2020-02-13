@@ -16,7 +16,9 @@ import {
   kubernetesPodsEntityType,
   kubernetesServicesEntityType,
   kubernetesStatefulSetsEntityType,
+  analysisReportEntityType,
 } from '../kubernetes-entity-factory';
+import { MonocularPaginationAction } from '../../helm/store/helm.actions';
 
 export const GET_RELEASE_POD_INFO = '[KUBERNETES Endpoint] Get Release Pods Info';
 export const GET_RELEASE_POD_INFO_SUCCESS = '[KUBERNETES Endpoint] Get Release Pods Info Success';
@@ -80,6 +82,9 @@ export const GET_KUBE_DASHBOARD = '[KUBERNETES Endpoint] Get K8S Dashboard Info'
 export const GET_KUBE_DASHBOARD_SUCCESS = '[KUBERNETES Endpoint] Get Dashboard Success';
 export const GET_KUBE_DASHBOARD_FAILURE = '[KUBERNETES Endpoint] Get Dashboard Failure';
 
+export const GET_ANALYSIS_REPORTS = '[ANALYSIS] Get Reports';
+export const GET_ANALYSIS_REPORTS_SUCCESS = '[ANALYSIS] Get Reports Success';
+export const GET_ANALYSIS_REPORTS_FAILURE = '[ANALYSIS] Get Reports Failure';
 
 const sortPodsByName = {
   'order-direction': 'desc' as SortDirection,
@@ -384,4 +389,25 @@ export class FetchKubernetesChartMetricsAction extends MetricsChartAction {
   }
 }
 
+//export interface AnalysisPaginationAction extends PaginatedAction, EntityRequestAction { }
 
+// Get the analysis reports for the given endpoint ID
+export class GetAnalysisReports implements MonocularPaginationAction {
+  constructor(public endpointId: string) {
+    this.paginationKey = `k8s-${endpointId}`;
+  }
+  type = GET_ANALYSIS_REPORTS;
+  endpointType = KUBERNETES_ENDPOINT_TYPE;
+  entityType = analysisReportEntityType;
+  entity = [kubernetesEntityFactory(analysisReportEntityType)];
+  actions = [
+    GET_ANALYSIS_REPORTS,
+    GET_ANALYSIS_REPORTS_SUCCESS,
+    GET_ANALYSIS_REPORTS_FAILURE
+  ];
+  paginationKey: string;
+  initialParams = {
+    'order-direction': 'desc',
+    'order-direction-field': 'name',
+  };
+}

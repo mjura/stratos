@@ -9,7 +9,7 @@ import { PaginatedAction } from 'frontend/packages/store/src/types/pagination.ty
 import { EntityRequestAction, WrapperRequestActionSuccess } from 'frontend/packages/store/src/types/request.types';
 import { Observable, Subject, Subscription } from 'rxjs';
 import makeWebSocketObservable, { GetWebSocketResponses } from 'rxjs-websockets';
-import { catchError, map, share, switchMap } from 'rxjs/operators';
+import { catchError, map, share, switchMap, startWith } from 'rxjs/operators';
 
 import { KubernetesPodExpandedStatusHelper } from '../../../services/kubernetes-expanded-state';
 import { getKubeAPIResourceGuid } from '../../../store/kube.selectors';
@@ -23,6 +23,7 @@ import {
 } from '../../store/workloads.actions';
 import { HelmReleaseGraph, HelmReleaseGuid, HelmReleasePod } from '../../workload.types';
 import { HelmReleaseHelperService } from '../tabs/helm-release-helper.service';
+import { KubernetesAnalysisService } from '../../../services/kubernetes.analysis.service';
 
 type IDGetterFunction = (data: any) => string;
 
@@ -34,6 +35,7 @@ type IDGetterFunction = (data: any) => string;
   styleUrls: ['./helm-release-tab-base.component.scss'],
   providers: [
     HelmReleaseHelperService,
+    KubernetesAnalysisService,
     {
       provide: HelmReleaseGuid,
       useFactory: (activatedRoute: ActivatedRoute) => ({
@@ -61,22 +63,32 @@ export class HelmReleaseTabBaseComponent implements OnDestroy {
 
   public title = '';
 
-  tabLinks: IPageSideNavTab[] = [
-    { link: 'summary', label: 'Summary', icon: 'helm', iconFont: 'stratos-icons' },
-    { link: 'notes', label: 'Notes', icon: 'subject' },
-    { link: 'values', label: 'Values', icon: 'list' },
-    { link: '-', label: 'Resources' },
-    // { link: 'graph', label: 'Overview', icon: 'share' },
-    { link: 'pods', label: 'Pods', icon: 'adjust' },
-    { link: 'services', label: 'Services', icon: 'service', iconFont: 'stratos-icons' }
-  ];
+  tabLinks: IPageSideNavTab[];
+
   constructor(
     public helmReleaseHelper: HelmReleaseHelperService,
     private store: Store<AppState>,
-    private logService: LoggerService
+    private logService: LoggerService,
+    private analysisService: KubernetesAnalysisService,
   ) {
     this.title = this.helmReleaseHelper.releaseTitle;
 
+    const path = `${this.helmReleaseHelper.namespace}/${this.title}`;
+    const hideAnalysisTab$ = this.analysisService.getLatestCheck(this.helmReleaseHelper.endpointGuid, path).pipe(
+      startWith(true),
+      map(can => !can)
+    );
+
+    this.tabLinks = [
+      { link: 'summary', label: 'Summary', icon: 'helm', iconFont: 'stratos-icons' },
+      { link: 'notes', label: 'Notes', icon: 'subject' },
+      { link: 'values', label: 'Values', icon: 'list' },
+      { link: 'analysis', label: 'Analysis', icon: 'assignment', hidden$: hideAnalysisTab$ },
+      { link: '-', label: 'Resources' },
+      // { link: 'graph', label: 'Overview', icon: 'share' },
+      { link: 'pods', label: 'Pods', icon: 'adjust' },
+      { link: 'services', label: 'Services', icon: 'service', iconFont: 'stratos-icons' }
+    ];
 
     const releaseRef = this.helmReleaseHelper.guidAsUrlFragment();
     const host = window.location.host;
