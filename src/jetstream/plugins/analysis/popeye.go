@@ -27,7 +27,7 @@ func runPopeye(dbStore store.AnalysisStore, kubeconfig, folder string, report st
 
 	// Remove the config file when we are done
 	defer (func() {
-		os.Remove(kubeconfig)
+		//os.Remove(kubeconfig)
 	})()
 
 	path := ""

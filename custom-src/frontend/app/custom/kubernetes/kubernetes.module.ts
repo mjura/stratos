@@ -96,6 +96,8 @@ import { JsonReportViewerComponent } from './analysis-report-viewer/json-report-
 import { JUnitReportViewerComponent } from './analysis-report-viewer/junit-report-viewer/junit-report-viewer.component';
 import { PopeyeReportViewerComponent } from './analysis-report-viewer/popeye-report-viewer/popeye-report-viewer.component';
 import { AnalysisReportSelectorComponent } from './analysis-report-viewer/analysis-report-selector/analysis-report-selector.component';
+import { ResourceAlertPreviewComponent } from './analysis-report-viewer/resource-alert-preview/resource-alert-preview.component';
+import { ResourceAlertViewComponent } from './analysis-report-viewer/resource-alert-preview/resource-alert-view/resource-alert-view.component';
 
 /* tslint:enable */
 
@@ -158,6 +160,8 @@ import { AnalysisReportSelectorComponent } from './analysis-report-viewer/analys
     JUnitReportViewerComponent,
     JsonReportViewerComponent,
     AnalysisReportSelectorComponent,
+    ResourceAlertPreviewComponent,
+    ResourceAlertViewComponent,
   ],
   providers: [
     KubernetesService,
@@ -185,6 +189,7 @@ import { AnalysisReportSelectorComponent } from './analysis-report-viewer/analys
     JUnitReportViewerComponent,
     JsonReportViewerComponent,
     AnalysisReportSelectorComponent,
+    ResourceAlertPreviewComponent,
   ],
   exports: [
     KubernetesResourceViewerComponent,
@@ -193,6 +198,8 @@ import { AnalysisReportSelectorComponent } from './analysis-report-viewer/analys
     JUnitReportViewerComponent,
     JsonReportViewerComponent,
     AnalysisReportSelectorComponent,
+    ResourceAlertPreviewComponent,
+    ResourceAlertViewComponent,
   ]
 })
 export class KubernetesModule { }

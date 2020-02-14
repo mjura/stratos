@@ -9,7 +9,7 @@ import { StratosStatus } from '../../../shared.types';
 import { determineCardStatus } from '../card-status/card-status.component';
 
 enum AlertLevel {
-  OK = 1,
+  OK = 0,
   Info,
   Warning,
   Error,
@@ -142,6 +142,10 @@ export class CardNumberMetricComponent implements OnInit, OnChanges {
           break;
       }
     });
+  }
+
+  public alertsClicked() {
+    this.showAlerts.emit(this.alertInfo);
   }
 
 }

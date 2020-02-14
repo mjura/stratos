@@ -1,5 +1,5 @@
 export enum ResourceAlertLevel {
-  OK = 1,
+  OK = 0,
   Info,
   Warning,
   Error,

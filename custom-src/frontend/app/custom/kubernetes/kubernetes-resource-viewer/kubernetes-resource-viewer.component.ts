@@ -44,8 +44,12 @@ export class KubernetesResourceViewerComponent implements PreviewableComponent {
   public hasPodMetrics$: Observable<boolean>;
   public podRouterLink$: Observable<string[]>;
 
+  private analysis;
+  private alerts;
+
   setProps(props: KubernetesResourceViewerConfig) {
     this.title = props.title;
+    this.analysis = props.analysis;
     this.resource$ = props.resource$.pipe(
       map((item: any) => {// KubeAPIResource
         const resource: KubernetesResourceViewerResource = {} as KubernetesResourceViewerResource;
@@ -83,6 +87,9 @@ export class KubernetesResourceViewerComponent implements PreviewableComponent {
 
         resource.kind = item.kind || props.resourceKind;
         resource.apiVersion = item.apiVersion || this.getVersionFromSelfLink(item.metadata.selfLink);
+
+        // Apply analsysis if there is one
+        this.applyAnalysis(resource);
         return resource;
       }),
       publishReplay(1),
@@ -121,6 +128,16 @@ export class KubernetesResourceViewerComponent implements PreviewableComponent {
 
   private getEndpointId(res): string {
     return this.kubeEndpointService.kubeGuid || res.endpointId || res.metadata.kubeId;
+  }
+
+  private applyAnalysis(resource) {
+    let id = (resource.kind || 'pod').toLowerCase();
+    id = `${id}/${resource.raw.metadata.namespace}/${resource.raw.metadata.name}`;
+    if (this.analysis && this.analysis.alerts[id]) {
+      this.alerts = this.analysis.alerts[id];
+    } else {
+      this.alerts = null;
+    }
   }
 
 }

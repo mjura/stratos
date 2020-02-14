@@ -1,3 +1,4 @@
+import { MatSnackBar } from '@angular/material';
 import { Observable, of } from 'rxjs';
 
 import { HttpClient, HttpHeaders } from '@angular/common/http';
@@ -32,6 +33,7 @@ export class KubernetesAnalysisService {
     public activatedRoute: ActivatedRoute,
     public store: Store<AppState>,
     public http: HttpClient,
+    private snackBar: MatSnackBar,
   ) {
     this.kubeGuid = kubeEndpointService.kubeGuid;
 
@@ -137,10 +139,10 @@ export class KubernetesAnalysisService {
     );
 
     start.subscribe(a => {
-      console.log('==========');
-      console.log(a);
-
       this.refresh();
+      this.snackBar.open(`Analysis is running`, 'Dismiss', { duration: 3000 });
+      // const ref = this.snackBar.open('Application deployment complete', 'View', { duration: 5000 });
+      // ref.onAction().subscribe(() => { this.goToAppSummary(); });
     });
   }
 

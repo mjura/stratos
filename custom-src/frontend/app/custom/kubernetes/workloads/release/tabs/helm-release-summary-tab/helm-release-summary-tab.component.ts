@@ -1,5 +1,5 @@
 import { HttpClient } from '@angular/common/http';
-import { Component, OnDestroy } from '@angular/core';
+import { Component, OnDestroy, ComponentFactoryResolver } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { LoggerService } from 'frontend/packages/core/src/core/logger.service';
 import { ConfirmationDialogConfig } from 'frontend/packages/core/src/shared/components/confirmation-dialog.config';
@@ -16,6 +16,8 @@ import { GetHelmReleases } from '../../../store/workloads.actions';
 import { HelmReleaseChartData, HelmReleaseResource } from '../../../workload.types';
 import { HelmReleaseHelperService } from '../helm-release-helper.service';
 import { KubernetesAnalysisService } from '../../../../services/kubernetes.analysis.service';
+import { SidePanelService } from 'frontend/packages/core/src/shared/services/side-panel.service';
+import { ResourceAlertPreviewComponent } from '../../../../analysis-report-viewer/resource-alert-preview/resource-alert-preview.component';
 
 @Component({
   selector: 'app-helm-release-summary-tab',
@@ -97,12 +99,14 @@ export class HelmReleaseSummaryTabComponent implements OnDestroy {
   private analysisReportUpdated$ = this.analysisReportUpdated.pipe(startWith(null), distinctUntilChanged());
 
   constructor(
+    private componentFactoryResolver: ComponentFactoryResolver,
     public helmReleaseHelper: HelmReleaseHelperService,
     private store: Store<AppState>,
     private confirmDialog: ConfirmationDialogService,
     private httpClient: HttpClient,
     private logService: LoggerService,
     public analyzerService: KubernetesAnalysisService,
+    private previewPanel: SidePanelService,
   ) {
     this.isBusy$ = combineLatest([
       this.helmReleaseHelper.isFetching$,
@@ -123,11 +127,7 @@ export class HelmReleaseSummaryTabComponent implements OnDestroy {
       this.helmReleaseHelper.fetchReleaseGraph(),
       this.analysisReportUpdated$
     ).pipe(
-      take(4),
-      //map(([graph: any, id: string]) => {
       map(([graph, id]) => {
-        console.log('Recalculating resources');
-        console.log(id);
         const resources = {};
         // Collect the resources
         Object.values(graph.nodes).forEach((node: any) => {
@@ -264,10 +264,6 @@ export class HelmReleaseSummaryTabComponent implements OnDestroy {
   }
 
   private applyAnalysis(resources, report) {
-    console.log('apply analysis');
-    console.log(resources);
-    console.log(report);
-
     if (report && Object.keys(resources).length > 0) {
       Object.values(report.alerts).forEach((group: any) => {
         group.forEach(alert => {
@@ -279,8 +275,17 @@ export class HelmReleaseSummaryTabComponent implements OnDestroy {
           }
         });
       });
-      console.log('--------- UPDATED --------');
-      console.log(resources);
     }
+  }
+
+  public showAlerts(alerts, resource) {
+    this.previewPanel.show(
+      ResourceAlertPreviewComponent,
+      {
+        resource,
+        alerts,
+      },
+      this.componentFactoryResolver
+    );
   }
 }

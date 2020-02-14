@@ -27,6 +27,10 @@
       </div>
     </app-metadata-item>
 
+    <app-metadata-item class="resource-preview__labels" label="Alerts" *ngIf="alerts">
+      <app-resource-alert-view [showHeader]="false" [alerts]="alerts"></app-resource-alert-view>  
+    </app-metadata-item>
+
     <app-json-viewer #viewer [json]="resource.jsonView"></app-json-viewer>
 
   </div>

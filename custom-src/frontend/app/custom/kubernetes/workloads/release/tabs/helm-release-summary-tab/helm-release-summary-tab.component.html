@@ -76,7 +76,7 @@
       <app-metadata-item class="chart-details__item" label="All Resources"></app-metadata-item>
       <div *ngIf="resources$ | async as resources" class="grid">
         <app-card-number-metric *ngFor="let res of resources" label="{{ res.label }}" icon="{{ res.icon.name }}" [alerts]="res.alerts"
-          (showAlerts)="showAlerts($event)" iconFont="{{ res.icon.font }}" value="{{ res.count }}">
+          (showAlerts)="showAlerts($event, res)" iconFont="{{ res.icon.font }}" value="{{ res.count }}">
         </app-card-number-metric>
       </div>
     </div>
