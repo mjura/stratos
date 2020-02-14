@@ -34,6 +34,7 @@ export class HelmReleaseSummaryTabComponent implements OnDestroy {
   private busyDeletingSubject = new ReplaySubject<boolean>();
   public isBusy$: Observable<boolean>;
   public hasResources$: Observable<boolean>;
+  public hasAllResources$: Observable<boolean>;
   private readonly DEFAULT_LOADING_MESSAGE = 'Retrieving Release Details';
   public loadingMessage = this.DEFAULT_LOADING_MESSAGE;
 
@@ -166,6 +167,12 @@ export class HelmReleaseSummaryTabComponent implements OnDestroy {
       'Delete'
     );
 
+    this.hasAllResources$ = combineLatest([
+      this.resources$,
+      this.hasResources$
+    ]).pipe(
+      map(([resources, hasSome]) => hasSome && resources && resources.length > 0)
+    );
   }
 
   public analysisChanged(report) {

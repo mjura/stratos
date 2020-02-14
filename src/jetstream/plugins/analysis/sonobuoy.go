@@ -14,7 +14,7 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
-func runKubeScore(dbStore store.AnalysisStore, kubeconfig, folder string, report store.AnalysisRecord, body []byte) error {
+func runSonobuoy(dbStore store.AnalysisStore, kubeconfig, folder string, report store.AnalysisRecord, body []byte) error {
 	path := ""
 	namespace := ""
 	options := &popeyeConfig{}
@@ -26,20 +26,20 @@ func runKubeScore(dbStore store.AnalysisStore, kubeconfig, folder string, report
 			path = fmt.Sprintf("%s/%s", path, options.App)
 		}
 	}
-	report.Name = "Kube-score cluster analysis"
-	report.Type = "kubescore"
-	report.Format = "kubescore"
+	report.Name = "Sonobuoy cluster analysis"
+	report.Type = "sonobuoy"
+	report.Format = "junit"
 
-	scriptPath := filepath.Join(getScriptFolder(), "kubescore-runner.sh")
+	scriptPath := filepath.Join(getScriptFolder(), "sonobuoy-runner.sh")
 	args := []string{scriptPath, kubeconfig, namespace}
 	log.Error(scriptPath)
 
 	report.Path = path
 	parts := len(strings.Split(path, "/"))
 	if parts == 2 {
-		report.Name = fmt.Sprintf("Kube-score workload analysis: %s in %s", options.App, namespace)
+		report.Name = fmt.Sprintf("Sonobuoy workload analysis: %s in %s", options.App, namespace)
 	} else if parts == 1 && len(namespace) > 0 {
-		report.Name = fmt.Sprintf("Kube-score namespace analysis: %s", namespace)
+		report.Name = fmt.Sprintf("Sonobuoy namespace analysis: %s", namespace)
 	}
 
 	_, err := dbStore.Save(report)
@@ -60,7 +60,7 @@ func runKubeScore(dbStore store.AnalysisStore, kubeconfig, folder string, report
 		end := time.Now()
 
 		// Remove the config file when we are done
-		os.Remove(kubeconfig)
+		//os.Remove(kubeconfig)
 
 		if err != nil {
 			// There was an error

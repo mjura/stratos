@@ -10,6 +10,7 @@ import { BasicKubeAPIResource, KubeAPIResource } from '../store/kube.types';
 
 export interface KubernetesResourceViewerConfig {
   title: string;
+  analysis?: any;
   resource$: Observable<BasicKubeAPIResource>;
   resourceKind: string;
 }

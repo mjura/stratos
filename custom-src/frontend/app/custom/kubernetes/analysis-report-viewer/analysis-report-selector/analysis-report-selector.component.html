@@ -5,7 +5,7 @@
   </mat-menu>
   
   <button mat-button [matMenuTriggerFor]="appMenu" *ngIf="analyzers.length > 0">
-    <span>Overlay Analysis</span>
+    <span>{{ prompt }}</span>
     <span *ngIf="selection">: {{ selection.title }}</span>
     <mat-icon>arrow_drop_down</mat-icon>
   </button>

@@ -1,7 +1,10 @@
+import { KubeScoreReportViewerComponent } from './kube-score-report-viewer/kube-score-report-viewer.component';
 import { PopeyeReportViewerComponent } from './popeye-report-viewer/popeye-report-viewer.component';
 import { Component, OnInit, ViewContainerRef, ComponentFactoryResolver, ComponentRef, OnDestroy, ViewChild, Type, Input } from '@angular/core';
 
 export interface IReportViewer {
+  //setReport(report);
+  report: any;
 }
 
 @Component({
@@ -35,13 +38,18 @@ export class AnalysisReportViewerComponent implements OnInit, OnDestroy {
   }
 
   updateReport(report) {
-    if (report.format === 'popeye') {
-      this.createComponent(PopeyeReportViewerComponent);
+    switch (report.format) {
+      case 'popeye':
+        this.createComponent(PopeyeReportViewerComponent, report);
+        break;
+      case 'kubescore':
+        this.createComponent(KubeScoreReportViewerComponent, report);
+        break;
     }
   }
 
   // Dynamically create the component for the report type type
-  createComponent(component: Type<IReportViewer>) {
+  createComponent(component: Type<IReportViewer>, report) {
     if (!component || !this.container) {
       return;
     }
@@ -51,7 +59,8 @@ export class AnalysisReportViewerComponent implements OnInit, OnDestroy {
     }
     const factory = this.resolver.resolveComponentFactory<IReportViewer>(component);
     this.reportComponentRef = this.container.createComponent<IReportViewer>(factory);
-    // this.authFormComponentRef.instance.formGroup = this.endpointForm;
+    //this.reportComponentRef.instance.setReport(report);
+    this.reportComponentRef.instance.report = report;
   }
 
   ngOnDestroy() {

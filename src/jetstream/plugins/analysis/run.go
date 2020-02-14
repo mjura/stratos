@@ -111,6 +111,8 @@ func (c *Analysis) runReport(ec echo.Context) error {
 		runPopeye(dbStore, file, folder, report, requestBody)
 	case "kube-score":
 		runKubeScore(dbStore, file, folder, report, requestBody)
+	case "sonobuoy":
+		runSonobuoy(dbStore, file, folder, report, requestBody)
 	default:
 		return fmt.Errorf("Unkown analyzer: %s", analyzer)
 	}
@@ -120,4 +122,12 @@ func (c *Analysis) runReport(ec echo.Context) error {
 	resp := "OK"
 
 	return ec.JSON(200, resp)
+}
+
+func getScriptFolder() string {
+	dir, err := filepath.Abs(filepath.Dir(os.Args[0]))
+	if err != nil {
+		return "."
+	}
+	return filepath.Join(dir, "plugins", "analysis", "scripts")
 }

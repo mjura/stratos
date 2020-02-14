@@ -98,6 +98,8 @@ import { PopeyeReportViewerComponent } from './analysis-report-viewer/popeye-rep
 import { AnalysisReportSelectorComponent } from './analysis-report-viewer/analysis-report-selector/analysis-report-selector.component';
 import { ResourceAlertPreviewComponent } from './analysis-report-viewer/resource-alert-preview/resource-alert-preview.component';
 import { ResourceAlertViewComponent } from './analysis-report-viewer/resource-alert-preview/resource-alert-view/resource-alert-view.component';
+import { KubeScoreReportViewerComponent } from './analysis-report-viewer/kube-score-report-viewer/kube-score-report-viewer.component';
+import { AnalysisStatusCellComponent } from './list-types/analysis-status-cell/analysis-status-cell.component';
 
 /* tslint:enable */
 
@@ -162,6 +164,8 @@ import { ResourceAlertViewComponent } from './analysis-report-viewer/resource-al
     AnalysisReportSelectorComponent,
     ResourceAlertPreviewComponent,
     ResourceAlertViewComponent,
+    KubeScoreReportViewerComponent,
+    AnalysisStatusCellComponent,
   ],
   providers: [
     KubernetesService,
@@ -188,8 +192,10 @@ import { ResourceAlertViewComponent } from './analysis-report-viewer/resource-al
     PopeyeReportViewerComponent,
     JUnitReportViewerComponent,
     JsonReportViewerComponent,
+    KubeScoreReportViewerComponent,
     AnalysisReportSelectorComponent,
     ResourceAlertPreviewComponent,
+    AnalysisStatusCellComponent,
   ],
   exports: [
     KubernetesResourceViewerComponent,
@@ -197,9 +203,11 @@ import { ResourceAlertViewComponent } from './analysis-report-viewer/resource-al
     PopeyeReportViewerComponent,
     JUnitReportViewerComponent,
     JsonReportViewerComponent,
+    KubeScoreReportViewerComponent,
     AnalysisReportSelectorComponent,
     ResourceAlertPreviewComponent,
     ResourceAlertViewComponent,
+    AnalysisStatusCellComponent,
   ]
 })
 export class KubernetesModule { }

@@ -15,20 +15,26 @@ export class AnalysisReportSelectorComponent implements OnInit {
 
   public analyzers$: Observable<any>;
 
-  @Input('endpoint')
-  endpoint;
-
-  @Input('path')
-  path;
+  @Input() endpoint;
+  @Input() path;
+  @Input() prompt = 'Overlay Analysis';
+  @Input() allowNone = true;
+  @Input() autoSelect;
 
   @Output() selected = new EventEmitter<any>();
+  @Output() list = new EventEmitter<any>();
+
+  autoSelected = false;
 
   constructor(public analysisService: KubernetesAnalysisService) { }
 
   ngOnInit() {
     this.analyzers$ = this.analysisService.getByPath(this.endpoint, this.path).pipe(
       map(d => {
-        const res = [{title: 'None'}];
+        const res = [];
+        if (this.allowNone) {
+          res.push({title: 'None'});
+        }
         d.forEach(r => {
           const c = {... r};
           const title = c.type.substr(0, 1).toUpperCase() + c.type.substr(1);
@@ -36,6 +42,11 @@ export class AnalysisReportSelectorComponent implements OnInit {
           c.title = `${title} (${age})`;
           res.push(c);
         });
+        this.list.emit(res);
+        // Auto-select first report
+        if (!this.autoSelected && this.autoSelect && res.length > 0) {
+          this.onSelected(res[0]);
+        }
         return res;
       })
     );
@@ -43,7 +54,6 @@ export class AnalysisReportSelectorComponent implements OnInit {
 
   // Selection changed
   public onSelected(d) {
-    console.log(d);
     this.selection = d;
     if (!d.id) {
       this.selected.emit(null);

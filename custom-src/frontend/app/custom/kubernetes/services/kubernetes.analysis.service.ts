@@ -12,6 +12,7 @@ import { GetAnalysisReports } from '../store/kubernetes.actions';
 import { ClearPaginationOfType } from 'frontend/packages/store/src/actions/pagination.actions';
 import { map, catchError } from 'rxjs/operators';
 import { PopeyeReportHelper } from './popeye-report.helper';
+import { KubeScoreReportHelper } from './kubescore-report.helper';
 
 export interface KubernetesAnalysisType {
   name: string;
@@ -200,9 +201,7 @@ export class KubernetesAnalysisService {
 
   private processReport(report: any) {
     // Check the path of the report
-
     if (report.path.split('/').length !== 2) {
-      console.log('NOT AN APPLICATION REPORT');
       return;
     }
 
@@ -211,8 +210,12 @@ export class KubernetesAnalysisService {
         const helper = new PopeyeReportHelper(report);
         helper.map();
         break;
+      case 'kubescore':
+        const kubeScoreHelper = new KubeScoreReportHelper(report);
+        kubeScoreHelper.map();
+        break;
       default:
-        console.log('"Do not know how to handle this report type');
+        console.log('Do not know how to handle this report type');
         break;
     }
   }

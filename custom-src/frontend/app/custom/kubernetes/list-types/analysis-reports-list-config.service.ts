@@ -1,5 +1,5 @@
 import { AnalysisReportsDataSource } from './analysis-reports-list-source';
-import { Injectable } from '@angular/core';
+import { Injectable, NgZone } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { Store } from '@ngrx/store';
 import * as moment from 'moment';
@@ -13,6 +13,7 @@ import { defaultHelmKubeListPageSize } from '../../kubernetes/list-types/kube-he
 import { AnalysisReport } from '../store/kube.types';
 import { KubernetesEndpointService } from '../services/kubernetes-endpoint.service';
 import { KubernetesAnalysisService } from '../services/kubernetes.analysis.service';
+import { AnalysisStatusCellComponent } from './analysis-status-cell/analysis-status-cell.component';
 
 @Injectable()
 export class AnalysisReportsListConfig implements IListConfig<AnalysisReport> {
@@ -67,9 +68,10 @@ export class AnalysisReportsListConfig implements IListConfig<AnalysisReport> {
     {
       columnId: 'status',
       headerCell: () => 'Status',
-      cellDefinition: {
-        getValue: (row: AnalysisReport) => row.status
-      },
+      cellComponent: AnalysisStatusCellComponent,
+      // cellDefinition: {
+      //   getValue: (row: AnalysisReport) => row.status
+      // },
       sort: {
         type: 'sort',
         orderKey: 'status',
@@ -119,9 +121,10 @@ export class AnalysisReportsListConfig implements IListConfig<AnalysisReport> {
     kubeEndpointService: KubernetesEndpointService,
     private route: ActivatedRoute,
     private analysisService: KubernetesAnalysisService,
+    ngZone: NgZone,
   ) {
     this.guid = kubeEndpointService.baseKube.guid;
-    this.AppsDataSource = new AnalysisReportsDataSource(store, this, kubeEndpointService);
+    this.AppsDataSource = new AnalysisReportsDataSource(store, this, kubeEndpointService, ngZone);
   }
 
   private listActionDelete: IListAction<any> = {

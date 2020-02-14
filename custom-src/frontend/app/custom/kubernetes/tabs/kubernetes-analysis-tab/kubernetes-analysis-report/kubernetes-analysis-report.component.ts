@@ -39,31 +39,7 @@ export class KubernetesAnalysisReportComponent implements OnInit {
     this.report$ = this.http.get(url, requestArgs).pipe(
       map((response: any) => {
         this.errorMsg.next('');
-
-        // Make the response easier to render
-
-        response.report.popeye.sanitizers.forEach(s => {
-          const groups = [];
-          let totalIssues = 0;
-          if (s.issues) {
-            Object.keys(s.issues).forEach(key => {
-              const issues = s.issues[key];
-              totalIssues += issues.length;
-              if (issues.length > 0) {
-                groups.push({
-                  name: key,
-                  issues
-                });
-              }
-            });
-            s.hide = totalIssues === 0;
-          } else {
-            s.hide = true;
-          }
-          s.groups = groups;
-          // delete s.issues;
-        });
-        return response.report;
+        return response;
       }),
       catchError((e, c) => {
         const msg = { firstLine: 'Failed to load Analysis Report'};
@@ -78,23 +54,5 @@ export class KubernetesAnalysisReportComponent implements OnInit {
     );
 
     this.report$.subscribe(data => console.log(data));
-  }
-
-  public getIssueGroups(section) {
-    const groups = [];
-    console.log(section);
-    if (!section.issues) {
-      return [];
-    }
-    Object.keys(section.issues).forEach(key => {
-      const issues = section.issues[key];
-      if (issues.length > 0) {
-        groups.push({
-          name: key,
-          issues
-        });
-      }
-    });
-    return groups;
   }
 }

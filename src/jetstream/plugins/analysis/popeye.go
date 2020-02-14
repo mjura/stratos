@@ -24,12 +24,6 @@ type popEyeResult struct {
 }
 
 func runPopeye(dbStore store.AnalysisStore, kubeconfig, folder string, report store.AnalysisRecord, body []byte) error {
-
-	// Remove the config file when we are done
-	defer (func() {
-		//os.Remove(kubeconfig)
-	})()
-
 	path := ""
 	namespace := ""
 	options := &popeyeConfig{}
@@ -57,7 +51,7 @@ func runPopeye(dbStore store.AnalysisStore, kubeconfig, folder string, report st
 	parts := len(strings.Split(path, "/"))
 	if parts == 2 {
 		report.Name = fmt.Sprintf("Popeye workload analysis: %s in %s", options.App, namespace)
-	} else if parts == 1 {
+	} else if parts == 1 && len(namespace) > 0 {
 		report.Name = fmt.Sprintf("Popeye namespace analysis: %s", namespace)
 	}
 
@@ -66,34 +60,37 @@ func runPopeye(dbStore store.AnalysisStore, kubeconfig, folder string, report st
 		return err
 	}
 
-	cmd := exec.Command("popeye", args...)
-	cmd.Dir = folder
+	go func() {
+		cmd := exec.Command("popeye", args...)
+		cmd.Dir = folder
 
-	start := time.Now()
-	out, err := cmd.Output()
-	end := time.Now()
-	if err != nil {
-		// There was an error
-		// Remove the folder
-		os.Remove(folder)
-		report.Status = "error"
-	} else {
-		reportFile := filepath.Join(folder, "report.json")
-		ioutil.WriteFile(reportFile, out, os.ModePerm)
-		report.Status = "completed"
+		start := time.Now()
+		out, err := cmd.Output()
+		end := time.Now()
 
-		// Parse the report
-		if summary, err := parsePopeyeReport(reportFile); err == nil {
-			report.Result = serializePopeyeReport(summary)
+		// Remove the config file when we are done
+		os.Remove(kubeconfig)
+
+		if err != nil {
+			// There was an error
+			// Remove the folder
+			os.Remove(folder)
+			report.Status = "error"
+		} else {
+			reportFile := filepath.Join(folder, "report.json")
+			ioutil.WriteFile(reportFile, out, os.ModePerm)
+			report.Status = "completed"
+
+			// Parse the report
+			if summary, err := parsePopeyeReport(reportFile); err == nil {
+				report.Result = serializePopeyeReport(summary)
+			}
 		}
-	}
 
-	report.Duration = int(end.Sub(start).Seconds())
+		report.Duration = int(end.Sub(start).Seconds())
 
-	dbStore.UpdateReport(report.UserID, &report)
-	if err != nil {
-		return errors.New("Could not update Analysis Report")
-	}
+		dbStore.UpdateReport(report.UserID, &report)
+	}()
 
 	return nil
 }
