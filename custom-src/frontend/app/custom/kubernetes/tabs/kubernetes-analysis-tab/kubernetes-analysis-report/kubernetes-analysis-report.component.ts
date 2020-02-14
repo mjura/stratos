@@ -23,7 +23,6 @@ export class KubernetesAnalysisReportComponent implements OnInit {
   constructor(public http: HttpClient, route: ActivatedRoute) {
     const parts = route.snapshot.params;
     this.id = parts.id;
-    console.log(this.id);
   }
 
   ngOnInit() {

@@ -1,4 +1,4 @@
-import { KubernetesAnalysisInfoComponent } from './tabs/kubernetes-analysis-tab/kubernetes-analysis-info/kubernetes-analysis-info.component';
+import { KubernetesNamespaceAnalysisReportComponent } from './kubernetes-namespace/kubernetes-namespace-analysis-report/kubernetes-namespace-analysis-report.component';
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 
@@ -26,6 +26,9 @@ import { KubernetesSummaryTabComponent } from './tabs/kubernetes-summary-tab/kub
 import { KubedashConfigurationComponent } from './kubernetes-dashboard/kubedash-configuration/kubedash-configuration.component';
 import { KubernetesAnalysisTabComponent } from './tabs/kubernetes-analysis-tab/kubernetes-analysis-tab.component';
 import { KubernetesAnalysisReportComponent } from './tabs/kubernetes-analysis-tab/kubernetes-analysis-report/kubernetes-analysis-report.component';
+import {
+  KubernetesAnalysisInfoComponent
+} from './tabs/kubernetes-analysis-tab/kubernetes-analysis-info/kubernetes-analysis-info.component';
 
 const kubernetes: Routes = [{
   path: '',
@@ -83,7 +86,10 @@ const kubernetes: Routes = [{
       path: 'services',
       component: KubernetesNamespaceServicesComponent
     },
-
+    {
+      path: 'analysis',
+      component: KubernetesNamespaceAnalysisReportComponent
+    }
   ]
 },
 {

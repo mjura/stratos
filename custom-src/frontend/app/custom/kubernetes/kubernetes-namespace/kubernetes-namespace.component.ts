@@ -34,7 +34,8 @@ export class KubernetesNamespaceComponent {
 
   tabLinks = [
     { link: 'pods', label: 'Pods', icon: 'adjust' },
-    { link: 'services', label: 'Services', icon: 'service', iconFont: 'stratos-icons' }
+    { link: 'services', label: 'Services', icon: 'service', iconFont: 'stratos-icons' },
+    { link: 'analysis', label: 'Analysis', icon: 'assignment' },
   ];
 
   public breadcrumbs$: Observable<IHeaderBreadcrumb[]>;

@@ -100,6 +100,7 @@ import { ResourceAlertPreviewComponent } from './analysis-report-viewer/resource
 import { ResourceAlertViewComponent } from './analysis-report-viewer/resource-alert-preview/resource-alert-view/resource-alert-view.component';
 import { KubeScoreReportViewerComponent } from './analysis-report-viewer/kube-score-report-viewer/kube-score-report-viewer.component';
 import { AnalysisStatusCellComponent } from './list-types/analysis-status-cell/analysis-status-cell.component';
+import { KubernetesNamespaceAnalysisReportComponent } from './kubernetes-namespace/kubernetes-namespace-analysis-report/kubernetes-namespace-analysis-report.component';
 
 /* tslint:enable */
 
@@ -166,6 +167,7 @@ import { AnalysisStatusCellComponent } from './list-types/analysis-status-cell/a
     ResourceAlertViewComponent,
     KubeScoreReportViewerComponent,
     AnalysisStatusCellComponent,
+    KubernetesNamespaceAnalysisReportComponent,
   ],
   providers: [
     KubernetesService,

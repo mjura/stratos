@@ -22,7 +22,7 @@ export class AnalysisReportSelectorComponent implements OnInit {
   @Input() autoSelect;
 
   @Output() selected = new EventEmitter<any>();
-  @Output() list = new EventEmitter<any>();
+  @Output() reportCount = new EventEmitter<boolean>();
 
   autoSelected = false;
 
@@ -42,7 +42,7 @@ export class AnalysisReportSelectorComponent implements OnInit {
           c.title = `${title} (${age})`;
           res.push(c);
         });
-        this.list.emit(res);
+        this.reportCount.next(d.length);
         // Auto-select first report
         if (!this.autoSelected && this.autoSelect && res.length > 0) {
           this.onSelected(res[0]);

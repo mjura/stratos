@@ -32,7 +32,6 @@ export class KubernetesAnalysisTabComponent implements OnInit {
   ) {
     const guid = this.kubeEndpointService.baseKube.guid;
     this.infoLink = `/kubernetes/${guid}/analysis/info`;
-    console.log(this.infoLink);
    }
 
   ngOnInit() { }

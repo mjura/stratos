@@ -50,7 +50,6 @@ export class PopeyeReportHelper {
     });
 
     this.report.alerts = result;
-    console.log(result);
   }
   private convertMessageLevel(level: number): ResourceAlertLevel {
     switch (level) {

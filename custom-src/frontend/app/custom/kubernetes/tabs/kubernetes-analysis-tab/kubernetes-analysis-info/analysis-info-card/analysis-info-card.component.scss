@@ -10,10 +10,13 @@
   }
 
   &__card-icon {
+    flex: 0 0 140px;
+    width: 140px;
     &>img {
       max-width: 120px;
     }
     margin-right: 10px;
+    text-align: center;
   }
 
   &__card-text {

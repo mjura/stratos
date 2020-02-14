@@ -13,6 +13,7 @@ import { ClearPaginationOfType } from 'frontend/packages/store/src/actions/pagin
 import { map, catchError } from 'rxjs/operators';
 import { PopeyeReportHelper } from './popeye-report.helper';
 import { KubeScoreReportHelper } from './kubescore-report.helper';
+import { RouterNav } from '../../../../../store/src/actions/router.actions';
 
 export interface KubernetesAnalysisType {
   name: string;
@@ -44,6 +45,7 @@ export class KubernetesAnalysisService {
         id: 'popeye',
         namespaceAware: true,
         iconUrl: '/core/assets/custom/popeye.png',
+        iconWidth: '80',
         descriptionUrl: '/core/assets/custom/popeye.md'
       },
       {
@@ -51,13 +53,15 @@ export class KubernetesAnalysisService {
         id: 'kube-score',
         namespaceAware: true,
         iconUrl: '/core/assets/custom/kubescore.png',
+        iconWidth: '120',
         descriptionUrl: '/core/assets/custom/kubescore.md'
       },
       {
         name: 'Sonobuoy',
         id: 'sonobuoy',
         namespaceAware: false,
-        iconUrl: '/core/assets/custom/sonobuoy.svg',
+        iconUrl: '/core/assets/custom/sonobuoy.png',
+        iconWidth: '70',
         descriptionUrl: '/core/assets/custom/sonobuoy.md'
       }
     ]);
@@ -89,8 +93,6 @@ export class KubernetesAnalysisService {
 
     const del = this.http.delete(url, requestArgs);
     del.subscribe(d => {
-      console.log('... deleted');
-      console.log(d);
       const action = new GetAnalysisReports(this.kubeEndpointService.baseKube.guid);
 
       this.store.dispatch(new ClearPaginationOfType(action));
@@ -108,11 +110,7 @@ export class KubernetesAnalysisService {
   }
 
   public run(id: string, endpointID: string, namespace?: string, app?: string) {
-    console.log('Run analysis ...');
     const proxyAPIVersion = environment.proxyAPIVersion;
-
-    //const endpointID = this.kubeEndpointService.baseKube.guid;
-
     const body = {
       namespace,
       app,
@@ -127,8 +125,6 @@ export class KubernetesAnalysisService {
 
     const start = this.http.post(url, body, requestArgs).pipe(
       map(response => {
-        console.log('-- response --');
-        console.log(response);
         return response;
       }),
       catchError((e, c) => {
@@ -140,15 +136,24 @@ export class KubernetesAnalysisService {
     );
 
     start.subscribe(a => {
+      const type = id.charAt(0).toUpperCase() + id.substring(1);
+      let msg;
+      if (app) {
+        msg = `${type} analysis started for workload '${app}'`;
+      } else if (namespace) {
+        msg = `${type} analysis started for namespace '${namespace}'`;
+      } else {
+        msg = `${type} analysis started for the Kubernetes cluster`;
+      }
+      const ref = this.snackBar.open(msg, 'View', { duration: 5000 });
+      ref.onAction().subscribe(() => {
+        this.store.dispatch(new RouterNav({ path: ['kubernetes', endpointID, 'analysis'] }));
+      });
       this.refresh();
-      this.snackBar.open(`Analysis is running`, 'Dismiss', { duration: 3000 });
-      // const ref = this.snackBar.open('Application deployment complete', 'View', { duration: 5000 });
-      // ref.onAction().subscribe(() => { this.goToAppSummary(); });
     });
   }
 
   public getLatestCheck(endpointID: string, path: string): Observable<boolean> {
-    console.log('getLatestCheck');
     return this.getLatestObservable(endpointID, path, true).pipe(
       map(response => response !== false),
     );
@@ -157,8 +162,6 @@ export class KubernetesAnalysisService {
 
     const start = this.getLatestObservable(endpointID, path, false).pipe(
       map(response => {
-        console.log('-- response --');
-        console.log(response);
         this.processReport(response);
         return response;
       }),

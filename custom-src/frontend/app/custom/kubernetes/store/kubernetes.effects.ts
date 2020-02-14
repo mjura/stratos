@@ -120,12 +120,9 @@ export class KubernetesEffects {
       const url = `/pp/${this.proxyAPIVersion}/analysis/reports`;
       const entityConfig = entityCatalog.getEntity(KUBERNETES_ENDPOINT_TYPE, analysisReportEntityType);
       const entityKey = entityCatalog.getEntityKey(action);
-      console.log(entityConfig);
-      console.log(entityKey);
       return this.http
         .get(url, requestArgs)
         .pipe(mergeMap(response => {
-          console.log(response);
           const res = {
             entities: { [entityKey]: {} },
             result: []

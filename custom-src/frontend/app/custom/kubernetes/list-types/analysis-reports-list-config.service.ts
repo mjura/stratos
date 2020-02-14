@@ -41,7 +41,7 @@ export class AnalysisReportsListConfig implements IListConfig<AnalysisReport> {
       columnId: 'type',
       headerCell: () => 'Type',
       cellDefinition: {
-        getValue: (row: AnalysisReport) => row.type
+        getValue: (row: AnalysisReport) => row.type.charAt(0).toUpperCase() + row.type.substring(1)
       },
       sort: {
         type: 'sort',

@@ -7,11 +7,13 @@ echo $@
 
 echo "Running report..."
 
+# Run the report and wait
 sonobuoy run --wait
 
+# Retrieve the report
 
-kubectl api-resources --verbs=list --namespaced -o name \
-  | xargs -n1 -I{} bash -c "kubectl get {} $ARGS -oyaml && echo ---" \
-  | kube-score score -o json - > report.json
+# Teardown sonobuoy
+
+# Unpack the report and copy the junit report to report.json at the top-level
 
 exit 0

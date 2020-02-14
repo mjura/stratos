@@ -56,7 +56,7 @@ export class HelmReleaseResourceGraphComponent implements OnInit, OnDestroy {
 
   constructor(
     private componentFactoryResolver: ComponentFactoryResolver,
-    private helper: HelmReleaseHelperService,
+    public helper: HelmReleaseHelperService,
     private previewPanel: SidePanelService,
     public analyzerService: KubernetesAnalysisService,
     ) {
