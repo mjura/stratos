@@ -159,6 +159,13 @@ export class HelmReleaseSummaryTabComponent implements OnDestroy {
       map(([chartData, resources]) => !!chartData && !!resources)
     );
 
+    this.hasAllResources$ = combineLatest([
+      this.resources$,
+      this.hasResources$
+    ]).pipe(
+      map(([resources, hasSome]) => hasSome && resources && resources.length > 0)
+    );
+
     this.deleteReleaseConfirmation = new ConfirmationDialogConfig(
       `Delete Workload`,
       {
