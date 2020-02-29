@@ -233,6 +233,7 @@ import { CardProgressOverlayComponent } from './components/card-progress-overlay
     TileSelectorTileComponent,
     SidepanelPreviewComponent,
     TableCellSidePanelComponent,
+    TableCellSidePanelComponent,
     CardProgressOverlayComponent,
   ],
   exports: [
