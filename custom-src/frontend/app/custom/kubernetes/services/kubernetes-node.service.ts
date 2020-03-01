@@ -6,11 +6,11 @@ import { filter, first, map, shareReplay } from 'rxjs/operators';
 
 import { MetricQueryConfig, MetricsAction } from '../../../../../store/src/actions/metrics.actions';
 import { AppState } from '../../../../../store/src/app-state';
+import { EntityServiceFactory } from '../../../../../store/src/entity-service-factory.service';
+import { EntityMonitorFactory } from '../../../../../store/src/monitors/entity-monitor.factory.service';
+import { PaginationMonitorFactory } from '../../../../../store/src/monitors/pagination-monitor.factory';
 import { EntityInfo } from '../../../../../store/src/types/api.types';
-import { EntityServiceFactory } from '../../../core/entity-service-factory.service';
 import { getIdFromRoute } from '../../../core/utils.service';
-import { EntityMonitorFactory } from '../../../shared/monitors/entity-monitor.factory.service';
-import { PaginationMonitorFactory } from '../../../shared/monitors/pagination-monitor.factory';
 import { MetricQueryType } from '../../../shared/services/metrics-range-selector.types';
 import { KubernetesNode, MetricStatistic } from '../store/kube.types';
 import { FetchKubernetesMetricsAction, GetKubernetesNode } from '../store/kubernetes.actions';
@@ -59,8 +59,8 @@ export class KubernetesNodeService {
 
 
   public setupMetricObservable(metric: KubeNodeMetric, metricStatistic: MetricStatistic) {
-
-    const query = `${metricStatistic}(${metricStatistic}_over_time(${metric}{kubernetes_io_hostname="${this.nodeName}"}[1h]))`;
+    const containerFilter = ',container_name!="POD", container_name!=""';
+    const query = `${metricStatistic}(${metricStatistic}_over_time(${metric}{kubernetes_io_hostname="${this.nodeName}"${containerFilter}}[1h]))`;
     const metricsAction = new FetchKubernetesMetricsAction(this.nodeName, this.kubeGuid, query);
     const metricsId = MetricsAction.buildMetricKey(this.nodeName, new MetricQueryConfig(query), true, MetricQueryType.QUERY);
     const metricsMonitor = this.entityMonitorFactory.create<any>(metricsId, metricsAction);
