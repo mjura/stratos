@@ -184,7 +184,7 @@ export class PageHeaderComponent implements OnDestroy, AfterViewInit {
     );
 
     this.allowGravatar$ = this.store.select(selectDashboardState).pipe(
-      map(dashboardState => dashboardState.gravatarEabled)
+      map(dashboardState => dashboardState.gravatarEnabled)
     );
   }
 
