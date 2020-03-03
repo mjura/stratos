@@ -34,7 +34,12 @@ spec:
         imagePullPolicy: {{.Values.imagePullPolicy}}
         ports:
         - name: api
-          containerPort: 8080
+          containerPort: 8090
+        env:
+        - name: ANALYSIS_SCRIPTS_DIR
+          value: "/scripts"
+        - name: ANALYSIS_REPORTS_DIR
+          value: "/reports"
 ---
 apiVersion: v1
 kind: Service
@@ -50,8 +55,8 @@ spec:
   type: ClusterIP
   ports:
   - name: analyzers
-    port: 8080
-    targetPort: 8080
+    port: 8090
+    targetPort: 8090
   selector:
     app: "{{ .Release.Name }}"
     app.kubernetes.io/component: "stratos-analyzers"

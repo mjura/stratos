@@ -49,6 +49,9 @@ FROM splatform/stratos-bk-base:leap15_1
 COPY --from=builder /home/stratos/analysis /usr/bin
 COPY --from=builder /home/stratos/go/src/stratos-analyzers /stratos-analyzers
 COPY --chown=stratos:users ./scripts /scripts
+RUN mkdir /reports && \
+    chown stratos /reports && \
+    chgrop users /reports
 
 USER 1001
 CMD ["/stratos-analyzers"]
