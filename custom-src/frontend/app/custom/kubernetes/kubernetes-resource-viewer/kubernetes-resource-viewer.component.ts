@@ -65,7 +65,9 @@ export class KubernetesResourceViewerComponent implements PreviewableComponent {
 
         resource.jsonView = newItem;
 
-        const ts = item.metadata ? item.metadata.creationTimestamp : item._metadata.creationTimestamp;
+        const fallback = item._metadata ? item._metadata : {};
+
+        const ts = item.metadata ? item.metadata.creationTimestamp : fallback.creationTimestamp;
         resource.age = moment(ts).fromNow(true);
         resource.creationTimestamp = ts;
 
@@ -89,8 +91,8 @@ export class KubernetesResourceViewerComponent implements PreviewableComponent {
           });
         }
 
-        resource.kind = item.kind || item._metadata.kind || props.resourceKind;
-        resource.apiVersion = item.apiVersion || item._metadata.apiVersion || this.getVersionFromSelfLink(item.metadata.selfLink);
+        resource.kind = item.kind || fallback.kind || props.resourceKind;
+        resource.apiVersion = item.apiVersion || fallback.apiVersion || this.getVersionFromSelfLink(item.metadata.selfLink);
 
         // Apply analysis if there is one - if this is a k8s resource (i.e. not a container)
         if (item.metadata) {
