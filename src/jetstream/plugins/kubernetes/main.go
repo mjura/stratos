@@ -33,6 +33,12 @@ type KubeStatus struct {
 	Code       int         `json:"code"`
 }
 
+type kubeErrorStatus struct {
+	Type    string `json:"type"`
+	Status  string `json:"status"`
+	Message string `json:"message"`
+}
+
 type KubeAPIVersions struct {
 	Kind                       string        `json:"kind"`
 	Versions                   []string      `json:"versions"`
@@ -84,7 +90,10 @@ func (c *KubernetesSpecification) Validate(userGUID string, cnsiRecord interface
 	}
 
 	if response.StatusCode >= 400 {
-		return fmt.Errorf("Unable to connect to endpoint: %s", response.Error.Error())
+		if response.Error != nil {
+			return fmt.Errorf("Unable to connect to endpoint: %s", response.Error.Error())
+		}
+		return fmt.Errorf("Unable to connect to endpoint: %d => %s", response.StatusCode, response.Status)
 	}
 
 	return nil
@@ -189,16 +198,10 @@ func (c *KubernetesSpecification) Info(apiEndpoint string, skipSSLValidation boo
 		if apiVersions.Kind != "APIVersions" {
 			return newCNSI, nil, fmt.Errorf("Failed to parse output as kube kind APIVersions: %+v", apiVersions)
 		}
-	} else if res.StatusCode == 403 {
-		// Expect an auth failed response - KubeStatus
-		log.Debug("Kube API Versions Failed (403)")
-		kubeStatus := KubeStatus{}
-		err := json.Unmarshal(body, &kubeStatus)
+	} else if res.StatusCode == 403 || res.StatusCode == 401 {
+		err := parseErrorResponse(body)
 		if err != nil {
-			return newCNSI, nil, fmt.Errorf("Failed to parse 403 output as kube kind status: %+v", err)
-		}
-		if kubeStatus.Kind != "Status" {
-			return newCNSI, nil, fmt.Errorf("Failed to parse 403 output as kube kind status: %+v", kubeStatus)
+			return newCNSI, nil, fmt.Errorf("Failed to parse output as kube kind status: %+v", err)
 		}
 	} else {
 		return newCNSI, nil, fmt.Errorf("Dissallowed response code from `/api` call: %+v", res.StatusCode)
@@ -209,6 +212,32 @@ func (c *KubernetesSpecification) Info(apiEndpoint string, skipSSLValidation boo
 	newCNSI.AuthorizationEndpoint = apiEndpoint
 
 	return newCNSI, v2InfoResponse, nil
+}
+
+func parseErrorResponse(body []byte) error {
+	kubeStatus := KubeStatus{}
+	err := json.Unmarshal(body, &kubeStatus)
+	if err == nil {
+		// Expect a json message with a status
+		if kubeStatus.Kind == "Status" {
+			return nil
+		}
+	}
+
+	// Try the other format
+	errorStatus := kubeErrorStatus{}
+	err = json.Unmarshal(body, &errorStatus)
+	if err == nil {
+		// Expect the type to be error
+		if errorStatus.Type == "error" {
+			return nil
+		}
+	}
+
+	// Not one of the types we recognise
+
+	log.Debug(string(body))
+	return errors.New("Could not understand response from Kubernetes endpoint")
 }
 
 func (c *KubernetesSpecification) UpdateMetadata(info *interfaces.Info, userGUID string, echoContext echo.Context) {

@@ -2,7 +2,12 @@ package monocular
 
 import (
 	"errors"
+	"fmt"
+	"math/rand"
 	"net/http"
+	"os"
+	"os/exec"
+	"path/filepath"
 	"strings"
 
 	"github.com/cloudfoundry-incubator/stratos/src/jetstream/repository/interfaces"
@@ -17,24 +22,23 @@ const (
 	helmEndpointType      = "helm"
 	prefix                = "/pp/v1/chartsvc/"
 	kubeReleaseNameEnvVar = "STRATOS_HELM_RELEASE"
-	foundationDBURLEnvVar = "HELM_FDB_URL"
-	syncServerURLEnvVar   = "HELM_SYNC_SERVER_URL"
-	// e.g. MY_CONSOLE_FDBDOCLAYER_FDBDOCLAYER_PORT=tcp://10.105.215.71:27016
-	fdbHostPortEnvVar = "FDBDOCLAYER_PORT"
-	//MY_CONSOLE_CHARTREPO_PORT=tcp://10.108.171.246:8080
-	syncServerHostPortEnvVar = "CHARTREPO_PORT"
-	caCertEnvVar             = "MONOCULAR_CA_CRT_PATH"
-	tlsKeyEnvVar             = "MONOCULAR_KEY_PATH"
-	TLSCertEnvVar            = "MONOCULAR_CRT_PATH"
+	foundationDBURLEnvVar = "FDB_URL"
+	syncServerURLEnvVar   = "SYNC_SERVER_URL"
+	caCertEnvVar          = "MONOCULAR_CA_CRT_PATH"
+	tlsKeyEnvVar          = "MONOCULAR_KEY_PATH"
+	tLSCertEnvVar         = "MONOCULAR_CRT_PATH"
+	localDevEnvVar        = "FDB_LOCAL_DEV"
+	chartSyncBasePort     = 45000
 )
 
 // Monocular is a plugin for Monocular
 type Monocular struct {
 	portalProxy     interfaces.PortalProxy
 	chartSvcRoutes  http.Handler
-	RepoQueryStore  chartsvc.ChartSvcDatastore
+	RepoQueryStore  *chartsvc.ChartSvcDatastore
 	FoundationDBURL string
 	SyncServiceURL  string
+	devSyncPID      int
 }
 
 // Init creates a new Monocular
@@ -42,7 +46,8 @@ func Init(portalProxy interfaces.PortalProxy) (interfaces.StratosPlugin, error) 
 	return &Monocular{portalProxy: portalProxy}, nil
 }
 
-func (m *Monocular) GetChartStore() chartsvc.ChartSvcDatastore {
+// GetChartStore gets the chart store
+func (m *Monocular) GetChartStore() *chartsvc.ChartSvcDatastore {
 	return m.RepoQueryStore
 }
 
@@ -57,7 +62,7 @@ func (m *Monocular) Init() error {
 	fDB := "monocular-plugin"
 	debug := false
 	caCertPath, _ := m.portalProxy.Env().Lookup(caCertEnvVar)
-	TLSCertPath, _ := m.portalProxy.Env().Lookup(TLSCertEnvVar)
+	TLSCertPath, _ := m.portalProxy.Env().Lookup(tLSCertEnvVar)
 	tlsKeyPath, _ := m.portalProxy.Env().Lookup(tlsKeyEnvVar)
 	m.ConfigureChartSVC(&fdbURL, &fDB, caCertPath, TLSCertPath, tlsKeyPath, &debug)
 	m.chartSvcRoutes = chartsvc.SetupRoutes()
@@ -66,11 +71,48 @@ func (m *Monocular) Init() error {
 	return nil
 }
 
+// Destroy does any cleanup for the plugin on exit
+func (m *Monocular) Destroy() {
+	log.Debug("Monocular plugin .. destroy")
+	if m.devSyncPID != 0 {
+		log.Info("... Stopping chart sync tool")
+		if p, err := os.FindProcess(m.devSyncPID); err == nil {
+			p.Kill()
+		} else {
+			log.Error("Could not find process for the chart sync tool")
+		}
+	}
+}
+
 func (m *Monocular) configure() error {
 
 	// Env var lookup for Monocular services
 	m.FoundationDBURL = m.portalProxy.Env().String(foundationDBURLEnvVar, "")
 	m.SyncServiceURL = m.portalProxy.Env().String(syncServerURLEnvVar, "")
+
+	if fdbPort, isLocal := m.portalProxy.Env().Lookup(localDevEnvVar); isLocal {
+		// Create a random port to use for the chart sync service
+		devSyncPort := chartSyncBasePort + rand.Intn(5000)
+		m.FoundationDBURL = fmt.Sprintf("mongodb://127.0.0.1:%s", fdbPort)
+		m.SyncServiceURL = fmt.Sprintf("http://127.0.0.1:%d", devSyncPort)
+
+		// Run the chartrepo tool
+		dir, err := filepath.Abs(filepath.Dir(os.Args[0]))
+		if err != nil {
+			log.Error("Can not get folder of current process")
+		}
+		chartSyncTool := filepath.Join(dir, "plugins", "monocular", "chart-repo", "chartrepo")
+		cmd := exec.Command(chartSyncTool, "serve", fmt.Sprintf("--doclayer-url=%s", m.FoundationDBURL))
+		cmd.Env = make([]string, 1)
+		cmd.Stdout = os.Stdout
+		cmd.Stderr = os.Stderr
+		cmd.Env[0] = fmt.Sprintf("PORT=%d", devSyncPort)
+		if err = cmd.Start(); err != nil {
+			log.Fatalf("Error starting chart sync tool: %+v", err)
+		} else {
+			m.devSyncPID = cmd.Process.Pid
+		}
+	}
 
 	log.Debugf("Foundation DB : %s", m.FoundationDBURL)
 	log.Debugf("Sync Server   : %s", m.SyncServiceURL)
@@ -147,7 +189,8 @@ func (m *Monocular) ConfigureChartSVC(fdbURL *string, fDB *string, cACertFile st
 	if !(tlsEnabled || (cACertFile == "" && keyFile == "" && certFile == "")) {
 		return errors.New("To enable TLS, all 3 TLS cert paths must be set.")
 	}
-	chartsvc.InitFDBDocLayerConnection(fdbURL, fDB, &tlsEnabled, cACertFile, certFile, keyFile, debug)
+	m.RepoQueryStore = chartsvc.InitFDBDocLayerConnection(fdbURL, fDB, &tlsEnabled, cACertFile, certFile, keyFile, debug)
+
 	return nil
 }
 
@@ -182,6 +225,8 @@ func (m *Monocular) AddSessionGroupRoutes(echoGroup *echo.Group) {
 	// API for Helm Chart Repositories
 	echoGroup.GET("/chartrepos", m.ListRepos)
 	echoGroup.Any("/chartsvc/*", m.handleAPI)
+	echoGroup.POST("/chartrepos/status", m.GetRepoStatuses)
+	echoGroup.POST("/chartrepos/:guid", m.SyncRepo)
 }
 
 // Forward requests to the Chart Service API
