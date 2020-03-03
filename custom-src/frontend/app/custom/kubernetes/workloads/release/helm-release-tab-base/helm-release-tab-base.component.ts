@@ -86,8 +86,6 @@ export class HelmReleaseTabBaseComponent implements OnDestroy {
       { link: 'services', label: 'Services', icon: 'service', iconFont: 'stratos-icons' }
     ];
 
-    this.analysisService.ifNotEnabled(() => this.tabLinks = this.tabLinks.filter(tab => tab.link !== 'analysis'));
-
     const releaseRef = this.helmReleaseHelper.guidAsUrlFragment();
     const host = window.location.host;
     const protocol = window.location.protocol === 'https:' ? 'wss' : 'ws';
