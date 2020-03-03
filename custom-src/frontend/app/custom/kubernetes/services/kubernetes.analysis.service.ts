@@ -1,5 +1,5 @@
 import { MatSnackBar } from '@angular/material';
-import { Observable, of } from 'rxjs';
+import { Observable, of, combineLatest } from 'rxjs';
 
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
@@ -10,7 +10,7 @@ import { KubernetesEndpointService } from './kubernetes-endpoint.service';
 import { environment } from '../../../environments/environment';
 import { GetAnalysisReports } from '../store/kubernetes.actions';
 import { ClearPaginationOfType } from 'frontend/packages/store/src/actions/pagination.actions';
-import { map, catchError } from 'rxjs/operators';
+import { map, catchError, first, tap, startWith } from 'rxjs/operators';
 import { PopeyeReportHelper } from './popeye-report.helper';
 import { KubeScoreReportHelper } from './kubescore-report.helper';
 import { RouterNav } from '../../../../../store/src/actions/router.actions';
@@ -30,6 +30,9 @@ export class KubernetesAnalysisService {
   public analyzers$: Observable<KubernetesAnalysisType[]>;
   public namespaceAnalyzers$: Observable<KubernetesAnalysisType[]>;
 
+  public enabled$: Observable<boolean>;
+  public hideAnalysis$: Observable<boolean>;
+
   constructor(
     public kubeEndpointService: KubernetesEndpointService,
     public activatedRoute: ActivatedRoute,
@@ -38,6 +41,16 @@ export class KubernetesAnalysisService {
     private snackBar: MatSnackBar,
   ) {
     this.kubeGuid = kubeEndpointService.kubeGuid;
+
+    // Is the backend plugin available?
+    this.enabled$ = this.store.select('auth').pipe(
+      map(auth => auth.sessionData.plugins && auth.sessionData.plugins.analysis)
+    );
+
+    this.hideAnalysis$ = this.enabled$.pipe(
+      startWith(true),
+      map(ok => !ok)
+    );
 
     this.analyzers$ = of([
       {
@@ -66,14 +79,20 @@ export class KubernetesAnalysisService {
       // }
     ]);
 
-    this.namespaceAnalyzers$ = this.analyzers$.pipe(
-      map(a => {
+    this.namespaceAnalyzers$ = combineLatest(
+      this.analyzers$,
+      this.enabled$
+    ).pipe(
+      map(([a, enabled]) => {
+        if (!enabled) {
+          return null;
+        }
         return a.filter(v => v.namespaceAware);
       })
     );
   }
 
-  public delete(item) {
+    public delete(item) {
     if (!Array.isArray(item)) {
       item = [item];
     }

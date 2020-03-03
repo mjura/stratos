@@ -74,21 +74,19 @@ export class HelmReleaseTabBaseComponent implements OnDestroy {
     this.title = this.helmReleaseHelper.releaseTitle;
 
     const path = `${this.helmReleaseHelper.namespace}/${this.title}`;
-    const hideAnalysisTab$ = this.analysisService.getLatestCheck(this.helmReleaseHelper.endpointGuid, path).pipe(
-      startWith(true),
-      map(can => !can)
-    );
 
     this.tabLinks = [
       { link: 'summary', label: 'Summary', icon: 'helm', iconFont: 'stratos-icons' },
       { link: 'notes', label: 'Notes', icon: 'subject' },
       { link: 'values', label: 'Values', icon: 'list' },
-      { link: 'analysis', label: 'Analysis', icon: 'assignment', hidden$: hideAnalysisTab$ },
+      { link: 'analysis', label: 'Analysis', icon: 'assignment', hidden$: this.analysisService.hideAnalysis$ },
       { link: '-', label: 'Resources' },
       { link: 'graph', label: 'Overview', icon: 'share' },
       { link: 'pods', label: 'Pods', icon: 'adjust' },
       { link: 'services', label: 'Services', icon: 'service', iconFont: 'stratos-icons' }
     ];
+
+    this.analysisService.ifNotEnabled(() => this.tabLinks = this.tabLinks.filter(tab => tab.link !== 'analysis'));
 
     const releaseRef = this.helmReleaseHelper.guidAsUrlFragment();
     const host = window.location.host;

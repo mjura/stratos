@@ -8,7 +8,7 @@
     <span>Toggle Layout</span>
   </button> -->
 
-  <app-analysis-report-selector (selected)="analysisChanged($event)" [endpoint]="helper.endpointGuid" [path]="path"></app-analysis-report-selector>
+  <app-analysis-report-selector *ngIf="analyzerService.enabled$ | async" (selected)="analysisChanged($event)" [endpoint]="helper.endpointGuid" [path]="path"></app-analysis-report-selector>
 </app-page-sub-nav>
 
 <ngx-graph *ngIf="nodes && nodes.length" class="chart-container" [links]="links" [nodes]="nodes" [update$]="update$"

@@ -20,7 +20,7 @@
     </button>
   </div>
 
-  <app-analysis-report-selector (selected)="analysisChanged($event)" [endpoint]="helmReleaseHelper.endpointGuid" [path]="path"></app-analysis-report-selector>
+  <app-analysis-report-selector *ngIf="analyzerService.enabled$ | async" (selected)="analysisChanged($event)" [endpoint]="helmReleaseHelper.endpointGuid" [path]="path"></app-analysis-report-selector>
 </app-page-sub-nav>
 
 <app-loading-page [isLoading]="isBusy$" [text]="loadingMessage">
