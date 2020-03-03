@@ -1,3 +1,4 @@
+import { ResourceAlert } from './../../../../services/analysis-report.types';
 import { HttpClient } from '@angular/common/http';
 import { Component, OnDestroy, ComponentFactoryResolver } from '@angular/core';
 import { Store } from '@ngrx/store';
@@ -189,8 +190,8 @@ export class HelmReleaseSummaryTabComponent implements OnDestroy {
       this.analysisReportUpdated.next('');
     } else {
         this.analyzerService.getByID(report.id).subscribe(results => {
-        this.analysisReport = results;
-        this.analysisReportUpdated.next(report.id);
+          this.analysisReport = results;
+          this.analysisReportUpdated.next(report.id);
       });
     }
   }
@@ -278,14 +279,19 @@ export class HelmReleaseSummaryTabComponent implements OnDestroy {
   }
 
   private applyAnalysis(resources, report) {
+    // Clear out existing alerts for all resources
+    Object.values(resources).forEach((resource: any) => resource.alerts = []);
+
     if (report && Object.keys(resources).length > 0) {
-      Object.values(report.alerts).forEach((group: any) => {
+      Object.values(report.alerts).forEach((group: ResourceAlert[]) => {
         group.forEach(alert => {
           // Can we find a corresponding group in the resources?
           const res = Object.keys(resources).find((i) => i.toLowerCase() === alert.kind);
           if (res) {
             const resItem = resources[res];
-            resItem.alerts = group;
+            if (resItem) {
+              resItem.alerts.push(alert);
+            }
           }
         });
       });

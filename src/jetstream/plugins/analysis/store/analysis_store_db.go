@@ -15,8 +15,9 @@ var (
 	getReport                  = `SELECT id, endpoint_type, endpoint, user, name, path, type, format, created, read, status, duration, result FROM analysis WHERE user = $1 AND id=$2`
 	deleteReport               = `DELETE FROM analysis WHERE user = $1 AND id = $2`
 	saveReport                 = `INSERT INTO analysis (id, user, endpoint_type, endpoint, name, path, type, format, created, read, status, duration, result) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13)`
-	updateReport               = `UPDATE analysis SET read = $1, status = $2, duration = $3, result = $4 WHERE user = $5 AND id = $6`
+	updateReport               = `UPDATE analysis SET type = $1, format = $2, read = $3, status = $4, duration = $5, result = $6, name = $7, path = $8, result = $9 WHERE user = $10 AND id = $11`
 	getLatestReport            = `SELECT id, endpoint_type, endpoint, user, name, path, type, format, created, read, status, duration, result FROM analysis WHERE status = 'completed' AND user = $1 AND endpoint = $2 AND path = $3 ORDER BY created DESC`
+	listRunningReports         = `SELECT id, endpoint_type, endpoint, user, name, path, type, format, created, read, status, duration, result FROM analysis WHERE status = 'running' ORDER BY created DESC`
 
 	// TODO: Delete for endpoint when endpoint is removed?
 )
@@ -31,6 +32,7 @@ func InitRepositoryProvider(databaseProvider string) {
 	saveReport = datastore.ModifySQLStatement(saveReport, databaseProvider)
 	updateReport = datastore.ModifySQLStatement(updateReport, databaseProvider)
 	getLatestReport = datastore.ModifySQLStatement(getLatestReport, databaseProvider)
+	listRunningReports = datastore.ModifySQLStatement(listRunningReports, databaseProvider)
 }
 
 // AnalysisDBStore is a DB-backed Analysis Reports repository
@@ -56,8 +58,19 @@ func (p *AnalysisDBStore) List(userGUID string) ([]*AnalysisRecord, error) {
 }
 
 func (p *AnalysisDBStore) ListCompletedByPath(userGUID, endpointID, path string) ([]*AnalysisRecord, error) {
-	log.Debug("List")
+	log.Debug("ListCompletedByPath")
 	rows, err := p.db.Query(listCompletedReportsByPath, userGUID, endpointID, path)
+	if err != nil {
+		return nil, fmt.Errorf("Unable to retrieve Analysis Reports records: %v", err)
+	}
+	defer rows.Close()
+
+	return list(rows)
+}
+
+func (p *AnalysisDBStore) ListRunning() ([]*AnalysisRecord, error) {
+	log.Debug("ListRunning")
+	rows, err := p.db.Query(listRunningReports)
 	if err != nil {
 		return nil, fmt.Errorf("Unable to retrieve Analysis Reports records: %v", err)
 	}
@@ -127,7 +140,7 @@ func (p *AnalysisDBStore) Delete(userGUID string, id string) error {
 
 // UpdateReport will update the dynamic fields of the Analysis Record in thedatastore
 func (p *AnalysisDBStore) UpdateReport(userGUID string, report *AnalysisRecord) error {
-	if _, err := p.db.Exec(updateReport, report.Read, report.Status, report.Duration, report.Result, userGUID, report.ID); err != nil {
+	if _, err := p.db.Exec(updateReport, report.Type, report.Format, report.Read, report.Status, report.Duration, report.Result, report.Name, report.Path, report.Result, userGUID, report.ID); err != nil {
 		return fmt.Errorf("Unable to update Analysis Report record: %v", err)
 	}
 	return nil

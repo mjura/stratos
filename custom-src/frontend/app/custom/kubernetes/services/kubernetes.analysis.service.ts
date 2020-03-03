@@ -56,14 +56,14 @@ export class KubernetesAnalysisService {
         iconWidth: '120',
         descriptionUrl: '/core/assets/custom/kubescore.md'
       },
-      {
-        name: 'Sonobuoy',
-        id: 'sonobuoy',
-        namespaceAware: false,
-        iconUrl: '/core/assets/custom/sonobuoy.png',
-        iconWidth: '70',
-        descriptionUrl: '/core/assets/custom/sonobuoy.md'
-      }
+      // {
+      //   name: 'Sonobuoy',
+      //   id: 'sonobuoy',
+      //   namespaceAware: false,
+      //   iconUrl: '/core/assets/custom/sonobuoy.png',
+      //   iconWidth: '70',
+      //   descriptionUrl: '/core/assets/custom/sonobuoy.md'
+      // }
     ]);
 
     this.namespaceAnalyzers$ = this.analyzers$.pipe(

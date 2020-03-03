@@ -9,8 +9,9 @@ import (
 	"errors"
 	"fmt"
 	"io/ioutil"
-	"path/filepath"
+	"net/http"
 	"strings"
+	"time"
 
 	"github.com/cloudfoundry-incubator/stratos/src/jetstream/plugins/analysis/store"
 
@@ -87,6 +88,13 @@ func (c *Analysis) getReportsByPath(ec echo.Context) error {
 	return ec.JSON(200, reports)
 }
 
+func populateSummary(report *store.AnalysisRecord) {
+	if len(report.Result) > 0 {
+		data := []byte(report.Result)
+		report.Summary = (*json.RawMessage)(&data)
+	}
+}
+
 func (c *Analysis) getLatestReport(ec echo.Context) error {
 	log.Debug("getLatestReport")
 	var p = c.portalProxy
@@ -118,9 +126,8 @@ func (c *Analysis) getLatestReport(ec echo.Context) error {
 		return nil
 	}
 
-	// Must be a GET request, so send the report and the contents
-	file := filepath.Join(c.reportsDir, report.UserID, report.EndpointID, report.ID, "report.json")
-	bytes, err := ioutil.ReadFile(file)
+	// Get the report contents from the analysis server
+	bytes, err := c.getReportFile(report.UserID, report.EndpointID, report.ID)
 	if err != nil {
 		return err
 	}
@@ -148,9 +155,8 @@ func (c *Analysis) getReport(ec echo.Context) error {
 		return err
 	}
 
-	// Must be a GET request, so send the report and the contents
-	file := filepath.Join(c.reportsDir, report.UserID, report.EndpointID, report.ID, "report.json")
-	bytes, err := ioutil.ReadFile(file)
+	// Get the report contents from the analysis server
+	bytes, err := c.getReportFile(report.UserID, report.EndpointID, report.ID)
 	if err != nil {
 		return err
 	}
@@ -164,7 +170,6 @@ func (c *Analysis) deleteReports(ec echo.Context) error {
 	var p = c.portalProxy
 
 	// Need to get a config object for the target endpoint
-	// endpointGUID := ec.Param("endpoint")
 	userID := ec.Get("user_id").(string)
 
 	defer ec.Request().Body.Close()
@@ -175,7 +180,6 @@ func (c *Analysis) deleteReports(ec echo.Context) error {
 
 	var ids []string
 	ids = make([]string, 0)
-
 	if err = json.Unmarshal(body, &ids); err != nil {
 		return err
 	}
@@ -185,12 +189,44 @@ func (c *Analysis) deleteReports(ec echo.Context) error {
 		return err
 	}
 
-	log.Errorf("%+v", ids)
-
 	for _, id := range ids {
-		log.Warn(id)
+		// Look up the report to get the endpoint ID
+		if job, err := dbStore.Get(userID, id); err == nil {
+			deleteURL := fmt.Sprintf("%s/api/v1/report/%s/%s/%s", c.analysisServer, job.UserID, job.EndpointID, job.ID)
+			r, _ := http.NewRequest(http.MethodDelete, deleteURL, nil)
+			client := &http.Client{Timeout: 30 * time.Second}
+			rsp, err := client.Do(r)
+			if err != nil {
+				log.Warnf("Could not delete analysis report for: %s", job.ID)
+			}
+			if rsp.StatusCode != http.StatusOK {
+				log.Warnf("Could not delete analysis report for: %s", job.ID)
+			}
+		}
 		dbStore.Delete(userID, id)
 	}
 
 	return ec.JSON(200, ids)
+}
+
+func (c *Analysis) getReportFile(userID, endpointID, ID string) ([]byte, error) {
+	// Make request to get report
+	statusURL := fmt.Sprintf("%s/api/v1/report/%s/%s/%s", c.analysisServer, userID, endpointID, ID)
+	r, _ := http.NewRequest(http.MethodGet, statusURL, nil)
+	client := &http.Client{Timeout: 30 * time.Second}
+	rsp, err := client.Do(r)
+	if err != nil {
+		return nil, fmt.Errorf("Failed getting report from Analyzer service: %v", err)
+	}
+	if rsp.StatusCode != http.StatusOK {
+		return nil, fmt.Errorf("Failed getting report from Analyzer service: %d", rsp.StatusCode)
+	}
+
+	defer rsp.Body.Close()
+	response, err := ioutil.ReadAll(rsp.Body)
+	if err != nil {
+		return nil, fmt.Errorf("Could not read response: %v", err)
+	}
+
+	return response, nil
 }

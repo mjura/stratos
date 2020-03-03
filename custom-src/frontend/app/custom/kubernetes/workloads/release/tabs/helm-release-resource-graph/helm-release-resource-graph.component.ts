@@ -1,8 +1,9 @@
+import { Metadata } from './../../../../store/kube.types';
 import { Component, ComponentFactoryResolver, OnDestroy, OnInit } from '@angular/core';
 import { Edge, Node } from '@swimlane/ngx-graph';
 import { SidePanelService } from 'frontend/packages/core/src/shared/services/side-panel.service';
 import { BehaviorSubject, Observable, Subscription, Subject, combineLatest } from 'rxjs';
-import { filter, first, map, startWith, distinctUntilChanged } from 'rxjs/operators';
+import { filter, first, map, startWith, distinctUntilChanged, tap } from 'rxjs/operators';
 
 import {
   KubernetesResourceViewerComponent,
@@ -59,12 +60,11 @@ export class HelmReleaseResourceGraphComponent implements OnInit, OnDestroy {
     public helper: HelmReleaseHelperService,
     private previewPanel: SidePanelService,
     public analyzerService: KubernetesAnalysisService,
-    ) {
-      this.path = `${this.helper.namespace}/${this.helper.releaseTitle}`;
-    }
+  ) {
+    this.path = `${this.helper.namespace}/${this.helper.releaseTitle}`;
+  }
 
   ngOnInit() {
-
     // Listen for the graph
     const obs = combineLatest(
       this.helper.fetchReleaseGraph(),
@@ -135,7 +135,7 @@ export class HelmReleaseResourceGraphComponent implements OnInit, OnDestroy {
     this.previewPanel.show(
       KubernetesResourceViewerComponent,
       {
-        title: 'Helm Release Resource Preview',
+        title: node.label,
         resource$: this.getResource(node),
         analysis: this.analysisReport,
       },
@@ -184,7 +184,54 @@ export class HelmReleaseResourceGraphComponent implements OnInit, OnDestroy {
   private getResource(node: any): Observable<KubeAPIResource> {
     return this.helper.fetchReleaseResources().pipe(
       filter(r => !!r),
-      map((r: any[]) => Object.values(r).find((res: any) => res.metadata.name === node.label && res.metadata.kind === node.kind)),
+      map((r: any[]) => {
+        let kind = node.data.kind;
+        let name = node.label;
+
+        // If its a container its more complicated as this is not an actual k8s resource
+        if (kind === 'Container') {
+          kind = 'Pod';
+          // label and id
+          const index = node.id.indexOf(node.label);
+          if (index > 0) {
+             // Remove one extra char for the '-' seperator
+            name = node.id.substr(0, index - 1);
+          }
+          if (node.id.endsWith(node.label)) {
+            name = node.id.substr(0, node.id.length - node.label.length - 1);
+            // Remove the 'Pod-' prefix
+            name = name.substr(4);
+          }
+        }
+
+        let resource = Object.values(r).find((res: any) => {
+          if (res && res.metadata) {
+            // If its a container its more complicated as this is not an actual k8s resource
+            if (node.data.Kind === 'Container') {}
+            return res.metadata.name === name && res.kind === kind;
+          } else {
+            return false;
+          }
+        });
+
+        if (node.data.kind === 'Container') {
+          // Pull out the container from the Pod
+          const pod = resource;
+          resource = resource.spec.containers.find(c => c.name === node.label);
+
+          // Fake some metadata that we want to use in the side-panel that is not present
+          // because a container is not a first-class k8s resource
+          const res = { ...resource };
+          res._metadata = {
+            kind: 'Container',
+            apiVersion: '-',
+            creationTimestamp: pod.metadata.creationTimestamp,
+          };
+          resource = res;
+        }
+
+        return resource;
+      }),
       first(),
     );
   }

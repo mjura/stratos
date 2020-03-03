@@ -1,9 +1,14 @@
 package analysis
 
 import (
+	"bytes"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"io/ioutil"
+	"mime/multipart"
+	"net/http"
+	"net/textproto"
 	"os"
 	"path/filepath"
 	"time"
@@ -24,14 +29,14 @@ type KubeConfigExporter interface {
 	GetKubeConfigForEndpointUser(endpointID, userID string) (string, error)
 }
 
+const idHeaderName = "X-Stratos-Analaysis-ID"
+
 func (c *Analysis) runReport(ec echo.Context) error {
 	log.Debug("runReport")
 
 	analyzer := ec.Param("analyzer")
 	endpointID := ec.Param("endpoint")
 	userID := ec.Get("user_id").(string)
-
-	log.Error("Running report")
 
 	log.Warn(analyzer)
 	log.Warn(userID)
@@ -55,14 +60,8 @@ func (c *Analysis) runReport(ec echo.Context) error {
 		Created:      time.Now(),
 		Read:         false,
 		Duration:     0,
-		Status:       "running",
+		Status:       "pending",
 		Result:       "",
-	}
-
-	// Create a folder for the output
-	folder := filepath.Join(c.reportsDir, userID, endpointID, report.ID)
-	if os.MkdirAll(folder, os.ModePerm) != nil {
-		return errors.New("Could not create folder for report output")
 	}
 
 	// Create a record in the reports datastore
@@ -71,12 +70,10 @@ func (c *Analysis) runReport(ec echo.Context) error {
 		return err
 	}
 
-	// Run the tool (TOOD: in the background)
-
-	log.Error("OK - Running analyzer ... ")
+	report.Name = fmt.Sprintf("Analysis report %s", analyzer)
+	dbStore.Save((report))
 
 	// Get Kube Config
-
 	k8s := c.portalProxy.GetPlugin("kubernetes")
 	if k8s == nil {
 		return errors.New("Could not find Kubernetes plugin")
@@ -92,36 +89,104 @@ func (c *Analysis) runReport(ec echo.Context) error {
 		return errors.New("Could not get Kube Config for the endpoint")
 	}
 
-	file := filepath.Join(folder, "kubeconfig")
-	err = ioutil.WriteFile(file, []byte(config), os.ModePerm)
-	if err != nil {
-		return errors.New("Could not write Kube Config file")
-	}
+	id := fmt.Sprintf("%s/%s/%s", userID, endpointID, report.ID)
+
+	// Create a multi-part form to send to the analyzer container
+
+	body := new(bytes.Buffer)
+	writer := multipart.NewWriter(body)
+
+	// Add kube config
+	metadataHeader := textproto.MIMEHeader{}
+	metadataHeader.Set("Content-Type", "application/yaml")
+	metadataHeader.Set("Content-ID", "kubeconfig")
+	part, _ := writer.CreatePart(metadataHeader)
+	part.Write([]byte(config))
 
 	requestBody := make([]byte, 0)
 
 	// Read body
 	defer ec.Request().Body.Close()
-	if body, err := ioutil.ReadAll((ec.Request().Body)); err == nil {
-		requestBody = body
+	if b, err := ioutil.ReadAll((ec.Request().Body)); err == nil {
+		requestBody = b
 	}
 
-	switch analyzer {
-	case "popeye":
-		runPopeye(dbStore, file, folder, report, requestBody)
-	case "kube-score":
-		runKubeScore(dbStore, file, folder, report, requestBody)
-	case "sonobuoy":
-		runSonobuoy(dbStore, file, folder, report, requestBody)
-	default:
-		return fmt.Errorf("Unkown analyzer: %s", analyzer)
+	// Content that was posted to us
+	postHeader := textproto.MIMEHeader{}
+	postHeader.Set("Content-Type", "application/json")
+	postHeader.Set("Content-ID", "body")
+	part, _ = writer.CreatePart(postHeader)
+	part.Write(requestBody)
+
+	// Report config
+	reportHeader := textproto.MIMEHeader{}
+	reportHeader.Set("Content-Type", "application/json")
+	reportHeader.Set("Content-ID", "job")
+	part, _ = writer.CreatePart(reportHeader)
+	job, err := json.Marshal(report)
+	if err != nil {
+		return errors.New("Could not serialize job")
+	}
+	part.Write(job)
+	writer.Close()
+
+	// Post this to the Analyzer API
+	contentType := fmt.Sprintf("multipart/form-data; boundary=%s", writer.Boundary())
+	uploadURL := fmt.Sprintf("%s/api/v1/run/%s", c.analysisServer, analyzer)
+	r, _ := http.NewRequest(http.MethodPost, uploadURL, bytes.NewReader(body.Bytes()))
+	r.Header.Set("Content-Type", contentType)
+	r.Header.Set(idHeaderName, id)
+	client := &http.Client{Timeout: 180 * time.Second}
+	rsp, err := client.Do(r)
+	if err != nil {
+		report.Status = "error"
+		dbStore.UpdateReport(userID, &report)
+		return errors.New("Analysis job failed - could not contact Analysis Server")
+	}
+	if rsp.StatusCode != http.StatusOK {
+		log.Debugf("Request failed with response code: %d", rsp.StatusCode)
+		report.Status = "error"
+		dbStore.UpdateReport(userID, &report)
+		return errors.New("Analysis job failed")
 	}
 
-	// It should be running in the background
+	// Job submitted okay
+	// Updated job is in the response
 
-	resp := "OK"
+	defer rsp.Body.Close()
+	response, err := ioutil.ReadAll(rsp.Body)
+	if err != nil {
+		report.Status = "error"
+		dbStore.UpdateReport(userID, &report)
+		return errors.New("Could not read response")
+	}
+	updatedJob := store.AnalysisRecord{}
+	if err = json.Unmarshal(response, &updatedJob); err != nil {
+		report.Status = "error"
+		dbStore.UpdateReport(userID, &report)
+		return errors.New("Could not read response - could not deserialize response")
+	}
 
-	return ec.JSON(200, resp)
+	report.Duration = updatedJob.Duration
+	report.Status = updatedJob.Status
+	report.Name = updatedJob.Name
+	report.Format = updatedJob.Format
+	report.Type = updatedJob.Type
+	report.Path = updatedJob.Path
+
+	log.Debug("OK => Job submitted okay")
+	log.Debug("=======================================================")
+	log.Debug("%+v", report)
+	log.Debug("=======================================================")
+
+	err = dbStore.UpdateReport(userID, &report)
+	if err != nil {
+		return errors.New("Could not save report")
+	}
+
+	log.Debug("All done - job saved")
+
+	return ec.JSON(200, report)
 }
 
 func getScriptFolder() string {

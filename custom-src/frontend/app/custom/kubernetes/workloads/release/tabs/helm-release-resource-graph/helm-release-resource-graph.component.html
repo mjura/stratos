@@ -28,3 +28,10 @@
     </svg:g>
   </ng-template>
 </ngx-graph>
+<div class="resources__loading" *ngIf="nodes && !nodes.length">
+  <div class="resources__loading__content">
+    Loading resources
+    <mat-progress-bar class="" [color]="'primary'" mode="indeterminate">
+    </mat-progress-bar>
+  </div>
+</div>

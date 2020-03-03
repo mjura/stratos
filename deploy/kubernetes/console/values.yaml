@@ -106,6 +106,7 @@ images:
   configInit: stratos-config-init
   fdbserver: stratos-fdbserver
   fdbdoclayer: stratos-fdbdoclayer
+  analyzers: stratos-analyzers
 
 # Specify which storage class should be used for PVCs
 #storageClass: default

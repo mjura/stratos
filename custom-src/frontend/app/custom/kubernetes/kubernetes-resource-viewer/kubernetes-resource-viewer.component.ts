@@ -57,24 +57,27 @@ export class KubernetesResourceViewerComponent implements PreviewableComponent {
         const newItem = {} as any;
 
         resource.raw = item;
-
         Object.keys(item || []).forEach(k => {
-          if (k !== 'endpointId' && k !== 'releaseTitle' && k !== 'expandedStatus') {
+          if (k !== 'endpointId' && k !== 'releaseTitle' && k !== 'expandedStatus' && k !== '_metadata' ) {
             newItem[k] = item[k];
           }
         });
 
         resource.jsonView = newItem;
-        resource.age = moment(item.metadata.creationTimestamp).fromNow(true);
-        resource.creationTimestamp = item.metadata.creationTimestamp;
 
-        resource.labels = [];
-        Object.keys(item.metadata.labels || []).forEach(labelName => {
-          resource.labels.push({
-            name: labelName,
-            value: item.metadata.labels[labelName]
+        const ts = item.metadata ? item.metadata.creationTimestamp : item._metadata.creationTimestamp;
+        resource.age = moment(ts).fromNow(true);
+        resource.creationTimestamp = ts;
+
+        if (item.metadata && item.metadata.labels) {
+          resource.labels = [];
+          Object.keys(item.metadata.labels || []).forEach(labelName => {
+            resource.labels.push({
+              name: labelName,
+              value: item.metadata.labels[labelName]
+            });
           });
-        });
+        }
 
         if (item.metadata && item.metadata.annotations) {
           resource.annotations = [];
@@ -86,11 +89,13 @@ export class KubernetesResourceViewerComponent implements PreviewableComponent {
           });
         }
 
-        resource.kind = item.kind || props.resourceKind;
-        resource.apiVersion = item.apiVersion || this.getVersionFromSelfLink(item.metadata.selfLink);
+        resource.kind = item.kind || item._metadata.kind || props.resourceKind;
+        resource.apiVersion = item.apiVersion || item._metadata.apiVersion || this.getVersionFromSelfLink(item.metadata.selfLink);
 
-        // Apply analsysis if there is one
-        this.applyAnalysis(resource);
+        // Apply analysis if there is one - if this is a k8s resource (i.e. not a container)
+        if (item.metadata) {
+          this.applyAnalysis(resource);
+        }
         return resource;
       }),
       publishReplay(1),

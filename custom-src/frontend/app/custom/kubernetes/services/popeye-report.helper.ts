@@ -4,6 +4,7 @@ export class PopeyeReportHelper {
 
   constructor(public report: any) {}
 
+  // Map the report to the alert format
   public map() {
     if (!this.report.report || !this.report.report.popeye) {
       return;

@@ -2,8 +2,6 @@ package analysis
 
 import (
 	"errors"
-	"os"
-	"path/filepath"
 
 	"github.com/cloudfoundry-incubator/stratos/src/jetstream/plugins/analysis/store"
 	"github.com/cloudfoundry-incubator/stratos/src/jetstream/repository/interfaces"
@@ -12,12 +10,12 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
-const reportsDirEnvVar = "ANALYSIS_REPORTS_DIR"
+const analsyisServicesAPIEnvVar = "ANALYSIS_SERVICES_API"
 
 // Analysis - Plugin to allow analysers to run over an endpoint cluster
 type Analysis struct {
-	portalProxy interfaces.PortalProxy
-	reportsDir  string
+	portalProxy    interfaces.PortalProxy
+	analysisServer string
 }
 
 // Init creates a new Analysis
@@ -27,63 +25,55 @@ func Init(portalProxy interfaces.PortalProxy) (interfaces.StratosPlugin, error) 
 }
 
 // GetMiddlewarePlugin gets the middleware plugin for this plugin
-func (Analysis *Analysis) GetMiddlewarePlugin() (interfaces.MiddlewarePlugin, error) {
+func (analysis *Analysis) GetMiddlewarePlugin() (interfaces.MiddlewarePlugin, error) {
 	return nil, errors.New("Not implemented")
 }
 
 // GetEndpointPlugin gets the endpoint plugin for this plugin
-func (Analysis *Analysis) GetEndpointPlugin() (interfaces.EndpointPlugin, error) {
+func (analysis *Analysis) GetEndpointPlugin() (interfaces.EndpointPlugin, error) {
 	return nil, errors.New("Not implemented")
 }
 
 // GetRoutePlugin gets the route plugin for this plugin
-func (Analysis *Analysis) GetRoutePlugin() (interfaces.RoutePlugin, error) {
-	return Analysis, nil
+func (analysis *Analysis) GetRoutePlugin() (interfaces.RoutePlugin, error) {
+	return analysis, nil
 }
 
 // AddAdminGroupRoutes adds the admin routes for this plugin to the Echo server
-func (Analysis *Analysis) AddAdminGroupRoutes(echoGroup *echo.Group) {
+func (analysis *Analysis) AddAdminGroupRoutes(echoGroup *echo.Group) {
 	// no-op
 }
 
 // AddSessionGroupRoutes adds the session routes for this plugin to the Echo server
-func (Analysis *Analysis) AddSessionGroupRoutes(echoGroup *echo.Group) {
-	echoGroup.GET("/analysis/reports", Analysis.listReports)
-	echoGroup.GET("/analysis/reports/:id", Analysis.getReport)
+func (analysis *Analysis) AddSessionGroupRoutes(echoGroup *echo.Group) {
+	echoGroup.GET("/analysis/reports", analysis.listReports)
+	echoGroup.GET("/analysis/reports/:id", analysis.getReport)
 
 	// Get completed reports for the given path
-	echoGroup.GET("/analysis/completed/:endpoint/*", Analysis.getReportsByPath)
+	echoGroup.GET("/analysis/completed/:endpoint/*", analysis.getReportsByPath)
 
 	// Get latest report
-	echoGroup.GET("/analysis/latest/:endpoint/*", Analysis.getLatestReport)
-	echoGroup.HEAD("/analysis/latest/:endpoint/*", Analysis.getLatestReport)
+	echoGroup.GET("/analysis/latest/:endpoint/*", analysis.getLatestReport)
+	echoGroup.HEAD("/analysis/latest/:endpoint/*", analysis.getLatestReport)
 
-	echoGroup.DELETE("/analysis/reports", Analysis.deleteReports)
+	echoGroup.DELETE("/analysis/reports", analysis.deleteReports)
 
 	// Run report
-	echoGroup.POST("/analysis/run/:analyzer/:endpoint", Analysis.runReport)
+	echoGroup.POST("/analysis/run/:analyzer/:endpoint", analysis.runReport)
 }
 
 // Init performs plugin initialization
 func (analysis *Analysis) Init() error {
 	log.Info("Analysis plugin loaded")
 
-	// Init reports directory
-	if reportsDir, ok := analysis.portalProxy.Env().Lookup(reportsDirEnvVar); ok {
-		dir, err := filepath.Abs(reportsDir)
-		if err != nil {
-			return err
-		}
-		analysis.reportsDir = dir
+	// Check env var
+	if url, ok := analysis.portalProxy.Env().Lookup(analsyisServicesAPIEnvVar); ok {
+		analysis.analysisServer = url
 
-		// Make the directory if it does not exit
-		if _, err := os.Stat(dir); os.IsNotExist(err) {
-			if os.MkdirAll(dir, os.ModePerm) != nil {
-				return errors.New("Could not create folder for analysis reports")
-			}
-		}
+		// Start background status check
+		analysis.initStatusCheck()
 		return nil
 	}
 
-	return errors.New("Analysis reports folder not configured")
+	return errors.New("Analysis services API Server not configured")
 }
