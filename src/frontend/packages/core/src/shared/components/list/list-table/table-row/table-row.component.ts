@@ -14,6 +14,7 @@ import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 
 import { RowState } from '../../data-sources-controllers/list-data-source-types';
+import { ListExpandedComponentType } from '../../list.component.types';
 import { CardCell } from '../../list.types';
 
 
@@ -25,14 +26,14 @@ import { CardCell } from '../../list.types';
   encapsulation: ViewEncapsulation.None,
   preserveWhitespaces: false
 })
-export class TableRowComponent extends CdkRow implements OnInit {
+export class TableRowComponent<T = any> extends CdkRow implements OnInit {
 
   @ViewChild('expandedComponent', { read: ViewContainerRef, static: true })
   expandedComponent: ViewContainerRef;
 
   @Input()
   rowState: Observable<RowState>;
-  @Input() expandComponent: any; // TODO: RC Typeing
+  @Input() expandComponent: ListExpandedComponentType<T>;
   @Input() row;
   @Input() height: boolean;
   @Input() inExpandedRow: boolean;

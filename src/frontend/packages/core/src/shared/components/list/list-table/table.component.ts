@@ -5,6 +5,7 @@ import { tap } from 'rxjs/operators';
 
 import { ITableListDataSource } from '../data-sources-controllers/list-data-source-types';
 import { IListPaginationController } from '../data-sources-controllers/list-pagination-controller';
+import { ListExpandedComponentType } from '../list.component.types';
 import { ListSort } from './../../../../../../store/src/actions/list.actions';
 import { TableCellActionsComponent } from './table-cell-actions/table-cell-actions.component';
 import { TableCellSelectComponent } from './table-cell-select/table-cell-select.component';
@@ -43,7 +44,7 @@ export class TableComponent<T> implements OnInit, OnDestroy {
   @Input() hideTable = false;
   @Input() addSelect = false;
   @Input() addActions = false;
-  @Input() expandComponent: any; // TODO: RC Typeing
+  @Input() expandComponent: ListExpandedComponentType<T>;
   @Input() inExpandedRow = false;
   @Input() dataSource: ITableListDataSource<T>;
   @Input() paginationController = null as IListPaginationController<T>;

@@ -95,7 +95,7 @@ export interface IListConfig<T> {
   /**
    * The component to show when expanding a row
    */
-  expandComponent?: ListExpandedComponentType<T>; // TODO: RC Typing
+  expandComponent?: ListExpandedComponentType<T>;
   /**
    * Hide the fresh button
    */
