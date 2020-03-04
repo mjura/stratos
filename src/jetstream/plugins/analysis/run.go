@@ -176,7 +176,7 @@ func (c *Analysis) runReport(ec echo.Context) error {
 
 	log.Debug("OK => Job submitted okay")
 	log.Debug("=======================================================")
-	log.Debug("%+v", report)
+	log.Debugf("%+v", report)
 	log.Debug("=======================================================")
 
 	err = dbStore.UpdateReport(userID, &report)

@@ -57,7 +57,7 @@ func (c *Analysis) checkStatus() error {
 
 	data, err := json.Marshal(ids)
 	if err != nil {
-		log.Error("Could not marshal IDs: %v", err)
+		log.Errorf("Could not marshal IDs: %v", err)
 		return fmt.Errorf("Could not marshal IDs: %v", err)
 	}
 
