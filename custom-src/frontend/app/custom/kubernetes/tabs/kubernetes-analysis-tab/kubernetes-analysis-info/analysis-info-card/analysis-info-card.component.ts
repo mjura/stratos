@@ -15,7 +15,7 @@ export class AnalysisInfoCardComponent {
   public content$: Observable<string>;
   private renderer = new markdown.Renderer();
 
-  public mAanalyzer: any;
+  public mAanalyzer = {};
 
   @Input() set analyzer(analyzer: any) {
     if (analyzer && analyzer.descriptionUrl) {

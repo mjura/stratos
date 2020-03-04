@@ -1,3 +1,4 @@
+import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { AnalysisInfoCardComponent } from './analysis-info-card.component';
@@ -8,7 +9,10 @@ describe('AnalysisInfoCardComponent', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ AnalysisInfoCardComponent ]
+      declarations: [ AnalysisInfoCardComponent ],
+      imports: [
+        HttpClientTestingModule,
+      ]
     })
     .compileComponents();
   }));

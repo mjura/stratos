@@ -22,7 +22,7 @@ export class AnalysisReportSelectorComponent implements OnInit {
   @Input() autoSelect;
 
   @Output() selected = new EventEmitter<any>();
-  @Output() reportCount = new EventEmitter<boolean>();
+  @Output() reportCount = new EventEmitter<number>();
 
   autoSelected = false;
 
@@ -46,14 +46,16 @@ export class AnalysisReportSelectorComponent implements OnInit {
         if (this.allowNone) {
           res.push({title: 'None'});
         }
-        d.forEach(r => {
-          const c = {... r};
-          const title = c.type.substr(0, 1).toUpperCase() + c.type.substr(1);
-          const age = moment(c.created).fromNow(true);
-          c.title = `${title} (${age})`;
-          res.push(c);
-        });
-        this.reportCount.next(d.length);
+        if (d) {
+          d.forEach(r => {
+            const c = {... r};
+            const title = c.type.substr(0, 1).toUpperCase() + c.type.substr(1);
+            const age = moment(c.created).fromNow(true);
+            c.title = `${title} (${age})`;
+            res.push(c);
+          });
+        }
+        this.reportCount.next(res.length);
         return res;
       })
     ).subscribe(data => {

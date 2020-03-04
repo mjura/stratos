@@ -17,7 +17,6 @@ export class KubeScoreReportViewerComponent implements OnInit, IReportViewer {
   */
 
   report: any;
-
   processed: any;
 
   constructor() { }
@@ -25,18 +24,18 @@ export class KubeScoreReportViewerComponent implements OnInit, IReportViewer {
   ngOnInit() {
     this.processed = [];
     // Turn the report into an array
-    Object.keys(this.report.report).forEach(key => {
-      const filtered = this.filter(this.report.report[key]);
-      if (filtered.length > 0) {
-        this.processed.push({
-          ...this.report.report[key],
-          _checks: filtered,
-          _name: key,
-        });
-      }
-    });
-
-    //console.log(this.processed);
+    if (this.report) {
+      Object.keys(this.report.report).forEach(key => {
+        const filtered = this.filter(this.report.report[key]);
+        if (filtered.length > 0) {
+          this.processed.push({
+            ...this.report.report[key],
+            _checks: filtered,
+            _name: key,
+          });
+        }
+      });
+    }
   }
 
   public filter(report) {

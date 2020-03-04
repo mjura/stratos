@@ -63,7 +63,7 @@ export class TabNavService {
     );
   }
 
-  public getCurrentTabHeader = (tabs: IPageSideNavTab[]) => {
+  private getCurrentTabHeader = (tabs: IPageSideNavTab[]) => {
     if (!tabs) {
       return null;
     }
@@ -74,7 +74,7 @@ export class TabNavService {
     if (!activeTab) {
       return null;
     }
-    return activeTab.label;
+    return activeTab;
   }
 
   private observeSubject(subject: Subject<any>) {

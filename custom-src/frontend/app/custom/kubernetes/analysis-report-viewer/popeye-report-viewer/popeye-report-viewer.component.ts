@@ -18,28 +18,30 @@ export class PopeyeReportViewerComponent implements OnInit, IReportViewer {
   }
 
   private apply(response) {
-    // Make the response easier to render
-    response.report.popeye.sanitizers.forEach(s => {
-      const groups = [];
-      let totalIssues = 0;
-      if (s.issues) {
-        Object.keys(s.issues).forEach(key => {
-          const issues = s.issues[key];
-          totalIssues += issues.length;
-          if (issues.length > 0) {
-            groups.push({
-              name: key,
-              issues
-            });
-          }
-        });
-        s.hide = totalIssues === 0;
-      } else {
-        s.hide = true;
-      }
-      s.groups = groups;
-    });
+    if (response) {
+      // Make the response easier to render
+      response.report.popeye.sanitizers.forEach(s => {
+        const groups = [];
+        let totalIssues = 0;
+        if (s.issues) {
+          Object.keys(s.issues).forEach(key => {
+            const issues = s.issues[key];
+            totalIssues += issues.length;
+            if (issues.length > 0) {
+              groups.push({
+                name: key,
+                issues
+              });
+            }
+          });
+          s.hide = totalIssues === 0;
+        } else {
+          s.hide = true;
+        }
+        s.groups = groups;
+      });
 
-    return response.report;
+      return response.report;
+    }
   }
 }

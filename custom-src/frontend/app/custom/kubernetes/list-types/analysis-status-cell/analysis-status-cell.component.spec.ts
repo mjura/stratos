@@ -1,6 +1,10 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
+import { MDAppModule } from './../../../../core/md.module';
 import { AnalysisStatusCellComponent } from './analysis-status-cell.component';
+import {
+  AnalysisReportSelectorComponent
+} from './../../analysis-report-viewer/analysis-report-selector/analysis-report-selector.component';
 
 describe('AnalysisStatusCellComponent', () => {
   let component: AnalysisStatusCellComponent;
@@ -8,7 +12,10 @@ describe('AnalysisStatusCellComponent', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ AnalysisStatusCellComponent ]
+      declarations: [ AnalysisStatusCellComponent, AnalysisReportSelectorComponent ],
+      imports: [
+        MDAppModule,
+      ]
     })
     .compileComponents();
   }));

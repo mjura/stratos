@@ -27,6 +27,7 @@ import { EndpointsService } from '../../../core/endpoints.service';
 import { SidePanelService } from '../../../shared/services/side-panel.service';
 import { PageHeaderService } from './../../../core/page-header-service/page-header.service';
 import { SideNavItem } from './../side-nav/side-nav.component';
+import { IPageSideNavTab } from '../page-side-nav/page-side-nav.component';
 
 
 @Component({
@@ -37,7 +38,7 @@ import { SideNavItem } from './../side-nav/side-nav.component';
 
 export class DashboardBaseComponent implements OnInit, OnDestroy, AfterViewInit {
   public activeTabLabel$: Observable<string>;
-  public subNavData$: Observable<[string, Portal<any>]>;
+  public subNavData$: Observable<[string, Portal<any>, IPageSideNavTab]>;
   public isMobile$: Observable<boolean>;
   public sideNavMode$: Observable<string>;
   public sideNavMode: string;
@@ -141,7 +142,8 @@ export class DashboardBaseComponent implements OnInit, OnDestroy, AfterViewInit 
         startWith(null)
       ),
       this.tabNavService.tabSubNav$
-    );
+    ).pipe(map(([tabNav, tabSubNav]) => [tabNav ? tabNav.label : null, tabSubNav, tabNav]));
+
     // TODO: Move cf code out to cf module #3849
     this.endpointsService.registerHealthCheck(
       new EndpointHealthCheck(CF_ENDPOINT_TYPE, (endpoint) => {
@@ -151,6 +153,11 @@ export class DashboardBaseComponent implements OnInit, OnDestroy, AfterViewInit 
     );
     this.dispatchRelations();
     this.store.dispatch(new GetUserFavoritesAction());
+
+    this.subNavData$.subscribe(subnav => {
+      console.log('== sub nav');
+      console.log(subnav);
+    });
   }
 
   ngOnDestroy() {

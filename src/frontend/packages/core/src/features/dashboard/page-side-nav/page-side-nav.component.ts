@@ -9,6 +9,7 @@ import { TabNavService } from '../../../../tab-nav.service';
 import { EntityServiceFactory } from '../../../../../store/src/entity-service-factory.service';
 import { StratosTabMetadata } from '../../../core/extension/extension-service';
 import { IBreadcrumb } from '../../../shared/components/breadcrumbs/breadcrumbs.types';
+import { map } from 'rxjs/operators';
 
 export interface IPageSideNavTab extends StratosTabMetadata {
   hidden$?: Observable<boolean>;
@@ -50,7 +51,7 @@ export class PageSideNavComponent implements OnInit {
   }
 
   ngOnInit() {
-    this.activeTab$ = this.tabNavService.getCurrentTabHeaderObservable();
+    this.activeTab$ = this.tabNavService.getCurrentTabHeaderObservable().pipe(map(item => item ? item.label : null));
   }
 
 }
