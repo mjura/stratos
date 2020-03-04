@@ -1,8 +1,13 @@
 import { TitleCasePipe } from '@angular/common';
 import { Component, Input } from '@angular/core';
+import { Store } from '@ngrx/store';
 import * as moment from 'moment';
-import { BehaviorSubject, Observable, of } from 'rxjs';
+import { of } from 'rxjs';
+import { map } from 'rxjs/operators';
 
+import { AppState } from '../../../../../../../store/src/app-state';
+import { entityCatalog } from '../../../../../../../store/src/entity-catalog/entity-catalog.service';
+import { selectEntity } from '../../../../../../../store/src/selectors/api.selectors';
 import { BooleanIndicatorType } from '../../../../../shared/components/boolean-indicator/boolean-indicator.component';
 import { ITableListDataSource } from '../../../../../shared/components/list/data-sources-controllers/list-data-source-types';
 import {
@@ -15,6 +20,7 @@ import {
 } from '../../../../../shared/components/list/list-table/table-cell-icon/table-cell-icon.component';
 import { ITableColumn } from '../../../../../shared/components/list/list-table/table.types';
 import { CardCell } from '../../../../../shared/components/list/list.types';
+import { KUBERNETES_ENDPOINT_TYPE, kubernetesPodsEntityType } from '../../../kubernetes-entity-factory';
 import { Container, ContainerState, ContainerStatus, InitContainer, KubernetesPod } from '../../../store/kube.types';
 
 export interface ContainerForTable {
@@ -33,30 +39,28 @@ export interface ContainerForTable {
 })
 export class KubernetesPodContainersComponent extends CardCell<KubernetesPod> {
 
+  private entityConfig = entityCatalog.getEntity(KUBERNETES_ENDPOINT_TYPE, kubernetesPodsEntityType);
 
   @Input()
   set row(row: KubernetesPod) {
-    if (!row) {
+    if (!row || !!this.containerDataSource) {
       return;
     }
-    const containerStatus = row.status.containerStatuses || [];
-    const initContainerStatuses = row.status.initContainerStatuses || [];
-    const containerStatusWithContainers: ContainerForTable[] = [
-      ...containerStatus.map(c => this.createContainerForTable(c, row.spec.containers)),
-      ...initContainerStatuses.map(c => this.createContainerForTable(c, row.spec.initContainers, true))
-    ];
-
-    console.log(row, containerStatusWithContainers); // TODO: RC
-
-
-    this.containerSubject.next(containerStatusWithContainers);
-
     this.containerDataSource = {
       isTableLoading$: of(false),
-      connect: () => this.containers$,
+      connect: () => this.store.select<KubernetesPod>(selectEntity(this.entityConfig.entityKey, row.metadata.uid)).pipe(
+        map(pod => this.map(pod)),
+      ),
       disconnect: () => { },
       trackBy: (index, container: ContainerForTable) => container.container.name
     };
+  }
+
+  constructor(
+    private store: Store<AppState>,
+    private titleCase: TitleCasePipe,
+  ) {
+    super();
   }
 
   private readyBoolConfig: TableCellBooleanIndicatorComponentConfig<ContainerForTable> = {
@@ -91,6 +95,8 @@ export class KubernetesPodContainersComponent extends CardCell<KubernetesPod> {
     // size: '18px'
   };
 
+  // TODO: RC sort
+
   public containerDataSource: ITableListDataSource<ContainerForTable>;
   public columns: ITableColumn<ContainerForTable>[] = [
     {
@@ -107,6 +113,11 @@ export class KubernetesPodContainersComponent extends CardCell<KubernetesPod> {
         valuePath: 'container.name'
       },
       cellFlex: '2',
+      sort: {
+        type: 'sort',
+        orderKey: 'name',
+        field: 'container.name'
+      }
     },
     {
       columnId: 'image',
@@ -184,11 +195,14 @@ export class KubernetesPodContainersComponent extends CardCell<KubernetesPod> {
     },
   ];
 
-  private containerSubject = new BehaviorSubject([]);
-  private containers$: Observable<ContainerForTable[]> = this.containerSubject.asObservable();
-
-  constructor(private titleCase: TitleCasePipe) {
-    super();
+  private map(row: KubernetesPod): ContainerForTable[] {
+    const containerStatus = row.status.containerStatuses || [];
+    const initContainerStatuses = row.status.initContainerStatuses || [];
+    const containerStatusWithContainers: ContainerForTable[] = [
+      ...containerStatus.map(c => this.createContainerForTable(c, row.spec.containers)),
+      ...initContainerStatuses.map(c => this.createContainerForTable(c, row.spec.initContainers, true))
+    ];
+    return containerStatusWithContainers;
   }
 
   private createContainerForTable(containerStatus: ContainerStatus, containers: (Container | InitContainer)[], isInit = false):
