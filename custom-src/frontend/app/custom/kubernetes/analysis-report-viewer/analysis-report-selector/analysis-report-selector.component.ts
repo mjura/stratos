@@ -1,7 +1,7 @@
-import { Observable } from 'rxjs';
+import { Observable, Subject } from 'rxjs';
 import { Component, OnInit, Input, EventEmitter, Output } from '@angular/core';
 import { KubernetesAnalysisService } from '../../services/kubernetes.analysis.service';
-import { map } from 'rxjs/operators';
+import { map, first } from 'rxjs/operators';
 import * as moment from 'moment';
 
 @Component({
@@ -13,7 +13,7 @@ export class AnalysisReportSelectorComponent implements OnInit {
 
   public selection = { title: 'None' };
 
-  public analyzers$: Observable<any>;
+  public analyzers$ = new Subject<any>();
 
   @Input() endpoint;
   @Input() path;
@@ -29,7 +29,18 @@ export class AnalysisReportSelectorComponent implements OnInit {
   constructor(public analysisService: KubernetesAnalysisService) { }
 
   ngOnInit() {
-    this.analyzers$ = this.analysisService.getByPath(this.endpoint, this.path).pipe(
+    this.analyzers$.pipe(first()).subscribe(reports => {
+      // Auto-select first report
+      if (!this.autoSelected && this.autoSelect && reports.length > 0) {
+        this.onSelected(reports[0]);
+      }
+    });
+
+    this.fetchReports();
+  }
+
+  private fetchReports() {
+    this.analysisService.getByPath(this.endpoint, this.path).pipe(
       map(d => {
         const res = [];
         if (this.allowNone) {
@@ -43,13 +54,11 @@ export class AnalysisReportSelectorComponent implements OnInit {
           res.push(c);
         });
         this.reportCount.next(d.length);
-        // Auto-select first report
-        if (!this.autoSelected && this.autoSelect && res.length > 0) {
-          this.onSelected(res[0]);
-        }
         return res;
       })
-    );
+    ).subscribe(data => {
+      this.analyzers$.next(data);
+    });
   }
 
   // Selection changed
@@ -60,6 +69,13 @@ export class AnalysisReportSelectorComponent implements OnInit {
     } else {
       this.selected.next(d);
     }
+  }
+
+  public refreshReports($event: MouseEvent) {
+    this.analysisService.refresh();
+    this.fetchReports();
+    $event.preventDefault();
+    $event.cancelBubble = true;
   }
 
 }
