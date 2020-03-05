@@ -21,7 +21,7 @@ func init() {
 		createAnalysisTabls += "type           VARCHAR(64) NOT NULL,"
 		createAnalysisTabls += "format         VARCHAR(64) NOT NULL,"
 		createAnalysisTabls += "created        TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,"
-		createAnalysisTabls += "read           BOOLEAN NOT NULL DEFAULT 0,"
+		createAnalysisTabls += "acknowledged   BOOLEAN NOT NULL DEFAULT FALSE,"
 		createAnalysisTabls += "status         VARCHAR(16) NOT NULL,"
 		createAnalysisTabls += "duration       INT NOT NULL DEFAULT 0,"
 		createAnalysisTabls += "result         VARCHAR(255) NOT NULL,"

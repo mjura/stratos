@@ -48,10 +48,8 @@ FROM splatform/stratos-bk-base:leap15_1
 # Copy tools to the /usr/bin folder so that they are in the path
 COPY --from=builder /home/stratos/analysis /usr/bin
 COPY --from=builder /home/stratos/go/src/stratos-analyzers /stratos-analyzers
-COPY --chown=stratos:users ./scripts /scripts
-RUN mkdir /reports && \
-    chown stratos /reports && \
-    chgrop users /reports
+COPY ./scripts /scripts
+RUN mkdir /reports
 
 USER 1001
 CMD ["/stratos-analyzers"]
