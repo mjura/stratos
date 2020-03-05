@@ -51,5 +51,4 @@ COPY --from=builder /home/stratos/go/src/stratos-analyzers /stratos-analyzers
 COPY ./scripts /scripts
 RUN mkdir /reports
 
-USER 1001
 CMD ["/stratos-analyzers"]

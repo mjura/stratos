@@ -29,8 +29,9 @@ DOCKER_REG_DEFAULTS="true"
 CHART_ONLY="false"
 ADD_GITHASH_TO_TAG="true"
 HAS_CUSTOM_BUILD="false"
+PACKAGE_CHART="false"
 
-while getopts ":ho:r:t:Tclb:Opcn" opt; do
+while getopts ":ho:r:t:Tclb:Opcnz" opt; do
   case $opt in
     h)
       echo
@@ -72,6 +73,9 @@ while getopts ":ho:r:t:Tclb:Opcn" opt; do
       ;;     
     n)
       ADD_GITHASH_TO_TAG="false"
+      ;;
+    z)
+      PACKAGE_CHART="true"
       ;;
     \?)
       echo "Invalid option: -${OPTARG}" >&2
@@ -215,6 +219,8 @@ if [ "${CHART_ONLY}" == "false" ]; then
   fi
 fi
 
+custom_image_build
+
 log "-- Building Helm Chart"
 
 # Don't change the chart in the repo, copy it and modify it locally
@@ -254,6 +260,18 @@ echo ${STRATOS_PATH}
 ${STRATOS_PATH}/deploy/kubernetes/imagelist-gen.sh .
 
 popd > /dev/null
+
+if [ "${PACKAGE_CHART}" ==  "true" ]; then
+  echo "Packaging Helm Chart"
+  pushd ${STRATOS_PATH}/deploy/kubernetes > /dev/null
+  PKG_DIST-FOLDER="dist/${TAG}/console"
+  rm -rf ${PKG_DIST_FOLDER}
+  mkdir -p ${PKG_DIST_FOLDER}
+  cp -R ${DEST_HELM_CHART_PATH}/* ${PKG_DIST_FOLDER}
+  helm package ${PKG_DIST_FOLDER}
+  rm -rf ${PKG_DIST_FOLDER}
+  popd > /dev/null
+fi
 
 set +e
 
