@@ -32,9 +32,9 @@
         <mat-header-row [hidden]="hideTable" class="app-table__header-row" *matHeaderRowDef="columnNames"
           [ngClass]="{'app-table__inner--has-expanded-columns': !!expandComponent}">
         </mat-header-row>
-        <app-table-row [ngClass]="{'app-table__inner--fixed-row-height': fixedRowHeight}" class="app-table__row"
-          *matRowDef="let row; columns: columnNames;" [rowState]="getRowState(row)" [row]="row"
-          [expandComponent]="expandComponent" [inExpandedRow]="inExpandedRow" [height]="fixedRowHeight">
+        <app-table-row class="app-table__row" *matRowDef="let row; columns: columnNames;" [rowState]="getRowState(row)"
+          [row]="row" [expandComponent]="expandComponent" [inExpandedRow]="inExpandedRow"
+          [customRowHeight]="customRowHeight">
         </app-table-row>
       </mat-table>
     </mat-card-content>

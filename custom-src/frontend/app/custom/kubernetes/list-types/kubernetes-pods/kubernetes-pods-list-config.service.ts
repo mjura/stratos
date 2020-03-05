@@ -142,7 +142,6 @@ export abstract class BaseKubernetesPodsListConfigService implements IListConfig
   };
   abstract getDataSource: () => IListDataSource<KubernetesPod>;
   expandComponent = KubernetesPodContainersComponent;
-  tableFixedRowHeight = true;
 
   getGlobalActions = () => null;
   getMultiActions = () => [];

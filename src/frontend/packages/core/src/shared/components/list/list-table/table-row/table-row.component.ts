@@ -34,8 +34,9 @@ export class TableRowComponent<T = any> extends CdkRow implements OnInit {
   @Input()
   rowState: Observable<RowState>;
   @Input() expandComponent: ListExpandedComponentType<T>;
-  @Input() row;
-  @Input() height: boolean;
+  @Input() row: T;
+  // TODO: RC test
+  @Input() customRowHeight = '62px';
   @Input() inExpandedRow: boolean;
 
   public inErrorState$: Observable<boolean>;
@@ -91,7 +92,7 @@ export class TableRowComponent<T = any> extends CdkRow implements OnInit {
     }
     this.expandedComponentRef = this.createComponent();
     const instance: CardCell<any> = this.expandedComponentRef.instance;
-    instance.row = this.row;
+    instance.row = this.row; // This could be set again when `row` changes above
   }
 
 }

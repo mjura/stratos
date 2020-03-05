@@ -83,7 +83,7 @@ export interface IListConfig<T> {
   /**
    * Fix the height of a table row
    */
-  tableFixedRowHeight?: boolean;
+  customRowHeight?: string;
   /**
    * Set the align-self of each cell in the row
    */

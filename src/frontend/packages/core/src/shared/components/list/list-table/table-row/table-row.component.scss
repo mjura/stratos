@@ -93,20 +93,28 @@
 
     .table-row__inner__expansion.mat-expansion-panel {
       box-shadow: none;
-      width: 100%;
       box-sizing: inherit;
-
+      width: 100%;
 
       .table-row__inner__expansion--header {
-        padding-left: 27px;
+        // TODO: RC comment
+        height: unset !important; // NASTY!
+        padding-left: 0;
         padding-right: 0;
+
+        &.has-expanded-row {
+          padding-left: 27px;
+        }
 
         &.in-expanded-row {
           padding: 0;
-
         }
+
+        .mat-expansion-indicator {
+          margin: 0 4px 0 0;
+        }
+
       }
     }
   }
 }
-

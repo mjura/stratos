@@ -52,7 +52,7 @@ export class KubernetesPodContainersComponent extends CardCell<KubernetesPod> {
         map(pod => this.map(pod)),
       ),
       disconnect: () => { },
-      trackBy: (index, container: ContainerForTable) => container.container.name
+      trackBy: (index, container: ContainerForTable) => container.container.name,
     };
   }
 
@@ -70,12 +70,12 @@ export class KubernetesPodContainersComponent extends CardCell<KubernetesPod> {
     showText: false
   };
 
-  private initBoolConfig: TableCellBooleanIndicatorComponentConfig<ContainerForTable> = {
-    isEnabled: (row: ContainerForTable) => row.isInit,
-    type: BooleanIndicatorType.yesNo,
-    subtle: true,
-    showText: false
-  };
+  // private initBoolConfig: TableCellBooleanIndicatorComponentConfig<ContainerForTable> = {
+  //   isEnabled: (row: ContainerForTable) => row.isInit,
+  //   type: BooleanIndicatorType.yesNo,
+  //   subtle: true,
+  //   showText: false
+  // };
 
   private iconConfig: TableCellIconComponentConfig<ContainerForTable> = {
     getIcon: (row: ContainerForTable) => {
@@ -95,8 +95,6 @@ export class KubernetesPodContainersComponent extends CardCell<KubernetesPod> {
     // size: '18px'
   };
 
-  // TODO: RC sort
-
   public containerDataSource: ITableListDataSource<ContainerForTable>;
   public columns: ITableColumn<ContainerForTable>[] = [
     {
@@ -104,7 +102,7 @@ export class KubernetesPodContainersComponent extends CardCell<KubernetesPod> {
       headerCell: () => '',
       cellComponent: TableCellIconComponent,
       cellConfig: this.iconConfig,
-      cellFlex: '0 0 64px',
+      cellFlex: '0 0 53px',
     },
     {
       columnId: 'name',
@@ -113,11 +111,6 @@ export class KubernetesPodContainersComponent extends CardCell<KubernetesPod> {
         valuePath: 'container.name'
       },
       cellFlex: '2',
-      sort: {
-        type: 'sort',
-        orderKey: 'name',
-        field: 'container.name'
-      }
     },
     {
       columnId: 'image',
@@ -157,20 +150,20 @@ export class KubernetesPodContainersComponent extends CardCell<KubernetesPod> {
           return this.containerStatusToString(sorted[0][0], sorted[0][1]);
         }
       },
-      cellFlex: '1'
+      cellFlex: '2'
     },
-    {
-      columnId: 'init',
-      headerCell: () => 'Is Init',
-      cellComponent: TableCellBooleanIndicatorComponent,
-      cellConfig: this.initBoolConfig,
-      cellFlex: '1',
-      sort: {
-        type: 'sort',
-        orderKey: 'init',
-        field: 'init'
-      }
-    },
+    // {
+    //   columnId: 'init',
+    //   headerCell: () => 'Is Init',
+    //   cellComponent: TableCellBooleanIndicatorComponent,
+    //   cellConfig: this.initBoolConfig,
+    //   cellFlex: '1',
+    //   sort: {
+    //     type: 'sort',
+    //     orderKey: 'init',
+    //     field: 'init'
+    //   }
+    // },
     {
       columnId: 'restarts',
       headerCell: () => 'Restarts',
@@ -202,7 +195,7 @@ export class KubernetesPodContainersComponent extends CardCell<KubernetesPod> {
       ...containerStatus.map(c => this.createContainerForTable(c, row.spec.containers)),
       ...initContainerStatuses.map(c => this.createContainerForTable(c, row.spec.initContainers, true))
     ];
-    return containerStatusWithContainers;
+    return containerStatusWithContainers.sort((a, b) => a.container.name.localeCompare(b.container.name));
   }
 
   private createContainerForTable(containerStatus: ContainerStatus, containers: (Container | InitContainer)[], isInit = false):
