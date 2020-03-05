@@ -219,8 +219,6 @@ if [ "${CHART_ONLY}" == "false" ]; then
   fi
 fi
 
-custom_image_build
-
 log "-- Building Helm Chart"
 
 # Don't change the chart in the repo, copy it and modify it locally
@@ -264,7 +262,7 @@ popd > /dev/null
 if [ "${PACKAGE_CHART}" ==  "true" ]; then
   echo "Packaging Helm Chart"
   pushd ${STRATOS_PATH}/deploy/kubernetes > /dev/null
-  PKG_DIST-FOLDER="dist/${TAG}/console"
+  PKG_DIST_FOLDER="dist/${TAG}/console"
   rm -rf ${PKG_DIST_FOLDER}
   mkdir -p ${PKG_DIST_FOLDER}
   cp -R ${DEST_HELM_CHART_PATH}/* ${PKG_DIST_FOLDER}
