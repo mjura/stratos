@@ -12,8 +12,7 @@
         (opened)="createExpandedComponent()">
         <mat-expansion-panel-header class="table-row__inner__expansion--header"
           [ngClass]="{'in-expanded-row': !!inExpandedRow, 'has-expanded-row': expandComponent}"
-          [ngStyle]="{'min-height': customRowHeight}">
-          <!-- // TODO: RC customRowHeight rename to minRowHeight -->
+          [ngStyle]="{'min-height': minRowHeight || defaultMinRowHeight }">
           <ng-container cdkCellOutlet></ng-container>
         </mat-expansion-panel-header>
         <div #expandedComponent></div>

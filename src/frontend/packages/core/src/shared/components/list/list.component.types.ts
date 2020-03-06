@@ -81,9 +81,9 @@ export interface IListConfig<T> {
    */
   enableTextFilter?: boolean;
   /**
-   * Fix the height of a table row
+   * Set a custom value for the minimum height of a table row
    */
-  customRowHeight?: string;
+  minRowHeight?: string;
   /**
    * Set the align-self of each cell in the row
    */

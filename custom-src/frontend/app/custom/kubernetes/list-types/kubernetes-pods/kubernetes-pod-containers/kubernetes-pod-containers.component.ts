@@ -70,13 +70,6 @@ export class KubernetesPodContainersComponent extends CardCell<KubernetesPod> {
     showText: false
   };
 
-  // private initBoolConfig: TableCellBooleanIndicatorComponentConfig<ContainerForTable> = {
-  //   isEnabled: (row: ContainerForTable) => row.isInit,
-  //   type: BooleanIndicatorType.yesNo,
-  //   subtle: true,
-  //   showText: false
-  // };
-
   private iconConfig: TableCellIconComponentConfig<ContainerForTable> = {
     getIcon: (row: ContainerForTable) => {
       if (row.isInit) {
@@ -152,18 +145,6 @@ export class KubernetesPodContainersComponent extends CardCell<KubernetesPod> {
       },
       cellFlex: '2'
     },
-    // {
-    //   columnId: 'init',
-    //   headerCell: () => 'Is Init',
-    //   cellComponent: TableCellBooleanIndicatorComponent,
-    //   cellConfig: this.initBoolConfig,
-    //   cellFlex: '1',
-    //   sort: {
-    //     type: 'sort',
-    //     orderKey: 'init',
-    //     field: 'init'
-    //   }
-    // },
     {
       columnId: 'restarts',
       headerCell: () => 'Restarts',

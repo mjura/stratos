@@ -33,8 +33,7 @@
           [ngClass]="{'app-table__inner--has-expanded-columns': !!expandComponent}">
         </mat-header-row>
         <app-table-row class="app-table__row" *matRowDef="let row; columns: columnNames;" [rowState]="getRowState(row)"
-          [row]="row" [expandComponent]="expandComponent" [inExpandedRow]="inExpandedRow"
-          [customRowHeight]="customRowHeight">
+          [row]="row" [expandComponent]="expandComponent" [inExpandedRow]="inExpandedRow" [minRowHeight]="minRowHeight">
         </app-table-row>
       </mat-table>
     </mat-card-content>

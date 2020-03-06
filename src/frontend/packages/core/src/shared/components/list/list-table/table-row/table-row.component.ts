@@ -31,12 +31,10 @@ export class TableRowComponent<T = any> extends CdkRow implements OnInit {
   @ViewChild('expandedComponent', { read: ViewContainerRef, static: true })
   expandedComponent: ViewContainerRef;
 
-  @Input()
-  rowState: Observable<RowState>;
+  @Input() rowState: Observable<RowState>;
   @Input() expandComponent: ListExpandedComponentType<T>;
   @Input() row: T;
-  // TODO: RC test
-  @Input() customRowHeight = '62px';
+  @Input() minRowHeight: string;
   @Input() inExpandedRow: boolean;
 
   public inErrorState$: Observable<boolean>;
@@ -45,6 +43,7 @@ export class TableRowComponent<T = any> extends CdkRow implements OnInit {
   public isBlocked$: Observable<boolean>;
   public isHighlighted$: Observable<boolean>;
   public isDeleting$: Observable<boolean>;
+  public defaultMinRowHeight = '50px';
 
   private expandedComponentRef: ComponentRef<any>;
 
