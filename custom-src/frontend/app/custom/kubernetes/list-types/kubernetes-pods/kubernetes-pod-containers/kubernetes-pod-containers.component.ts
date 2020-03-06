@@ -71,21 +71,16 @@ export class KubernetesPodContainersComponent extends CardCell<KubernetesPod> {
   };
 
   private iconConfig: TableCellIconComponentConfig<ContainerForTable> = {
-    getIcon: (row: ContainerForTable) => {
-      if (row.isInit) {
-        return {
-          icon: 'screen_rotation', // TODO: RC icon
-          font: '',
-          tooltip: 'Init Container'
-        };
-      }
-      return {
-        icon: 'sd_storage',
+    getIcon: (row: ContainerForTable) => row.isInit ?
+      {
+        icon: 'border_clear',
         font: '',
-        tooltip: 'Container' // TODO: RC icon
-      };
-    },
-    // size: '18px'
+        tooltip: 'Init Container'
+      } : {
+        icon: 'border_outer',
+        font: '',
+        tooltip: 'Container'
+      },
   };
 
   public containerDataSource: ITableListDataSource<ContainerForTable>;
