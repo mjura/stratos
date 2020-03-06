@@ -97,10 +97,6 @@
       width: 100%;
 
       .table-row__inner__expansion--header {
-        // This is the cleanest way to work around the automatic height assignment of `mat-expansion-panel-header`. This needs to be removed
-        // in order for the row min-height process to work correctly (see user roles tables)
-        // sass-lint:disable no-important
-        height: unset !important; // NASTY!
         padding-left: 0;
         padding-right: 0;
 

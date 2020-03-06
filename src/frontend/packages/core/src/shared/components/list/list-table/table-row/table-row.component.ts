@@ -72,6 +72,9 @@ export class TableRowComponent<T = any> extends CdkRow implements OnInit {
         map(state => state.deleting)
       );
     }
+    if (this.expandComponent) {
+      this.defaultMinRowHeight = '64px';
+    }
   }
 
   private getComponent() {
