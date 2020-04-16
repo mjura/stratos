@@ -3,6 +3,18 @@ entries:
   console:
   - apiVersion: v1
     appVersion: 2.0.0
+    created: "2020-04-16T21:27:06.537761781Z"
+    description: A Helm chart for deploying SUSE Stratos Console
+    digest: 9a34428be6ac6392703dc3945045ea953450485e5232921b83d50c242a8ff7cd
+    icon: https://raw.githubusercontent.com/SUSE/stratos/custom-src/deploy/kubernetes/icon.png
+    name: console
+    sources:
+    - https://github.com/SUSE/stratos
+    urls:
+    - https://github.com/SUSE/stratos/releases/download/3.1.0-rc.1/console-helm-chart-3.1.0-rc.1-0d657242b.tgz
+    version: 3.1.0-rc.1
+  - apiVersion: v1
+    appVersion: 2.0.0
     created: "2020-04-15T12:49:57.407309732+01:00"
     description: A Helm chart for deploying SUSE Stratos Console
     digest: d64bd1ac27fa7ce66c0de962f2929052f33837529276ce75d716d2927a153e98
@@ -13,4 +25,4 @@ entries:
     urls:
     - https://github.com/SUSE/stratos/releases/download/3.0.0/console-helm-chart-3.0.0-8fbc06b06.tgz
     version: 3.0.0
-generated: "2020-04-15T12:49:57.406162536+01:00"
+generated: "2020-04-16T21:27:06.530936957Z"
