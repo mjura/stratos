@@ -5,6 +5,9 @@ import { NgxChartsModule } from '@swimlane/ngx-charts';
 
 import { CoreModule } from '../../core/core.module';
 import { SharedModule } from '../../shared/shared.module';
+import {
+  KubedashConfigurationComponent,
+} from './kubernetes-dashboard/kubedash-configuration/kubedash-configuration.component';
 import { KubernetesDashboardTabComponent } from './kubernetes-dashboard/kubernetes-dashboard.component';
 import {
   KubernetesNamespacePodsComponent,
@@ -71,6 +74,9 @@ import {
 } from './list-types/kubernetes-nodes/kubernetes-node-summary/kubernetes-node-tags-card/kubernetes-node-tags-card.component';
 import { NodePodCountComponent } from './list-types/kubernetes-nodes/node-pod-count/node-pod-count.component';
 import {
+  KubernetesPodContainersComponent,
+} from './list-types/kubernetes-pods/kubernetes-pod-containers/kubernetes-pod-containers.component';
+import {
   KubernetesPodStatusComponent,
 } from './list-types/kubernetes-pods/kubernetes-pod-status/kubernetes-pod-status.component';
 import { KubernetesPodTagsComponent } from './list-types/kubernetes-pods/kubernetes-pod-tags/kubernetes-pod-tags.component';
@@ -86,7 +92,6 @@ import { KubernetesNamespacesTabComponent } from './tabs/kubernetes-namespaces-t
 import { KubernetesNodesTabComponent } from './tabs/kubernetes-nodes-tab/kubernetes-nodes-tab.component';
 import { KubernetesPodsTabComponent } from './tabs/kubernetes-pods-tab/kubernetes-pods-tab.component';
 import { KubernetesSummaryTabComponent } from './tabs/kubernetes-summary-tab/kubernetes-summary.component';
-import { KubedashConfigurationComponent } from './kubernetes-dashboard/kubedash-configuration/kubedash-configuration.component';
 import { KubernetesAnalysisTabComponent } from './tabs/kubernetes-analysis-tab/kubernetes-analysis-tab.component';
 import { KubernetesAnalysisReportComponent } from './tabs/kubernetes-analysis-tab/kubernetes-analysis-report/kubernetes-analysis-report.component';
 import { KubernetesAnalysisInfoComponent } from './tabs/kubernetes-analysis-tab/kubernetes-analysis-info/kubernetes-analysis-info.component';
@@ -155,6 +160,7 @@ import { KubernetesNamespaceAnalysisReportComponent } from './kubernetes-namespa
     KubernetesResourceViewerComponent,
     KubeServiceCardComponent,
     KubedashConfigurationComponent,
+    KubernetesPodContainersComponent,
     KubernetesAnalysisReportComponent,
     KubernetesAnalysisInfoComponent,
     AnalysisInfoCardComponent,
@@ -191,6 +197,7 @@ import { KubernetesNamespaceAnalysisReportComponent } from './kubernetes-namespa
     KubernetesPodStatusComponent,
     KubeServiceCardComponent,
     KubernetesResourceViewerComponent,
+    KubernetesPodContainersComponent,
     PopeyeReportViewerComponent,
     JUnitReportViewerComponent,
     JsonReportViewerComponent,
