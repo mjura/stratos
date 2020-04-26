@@ -1,0 +1,15 @@
+@mixin metrics-component-theme($theme, $app-theme) {
+  $background-color: map-get($app-theme, app-background-color);
+  $primary: map-get($theme, primary);
+
+  // Last item uses background color to overwrisr the side bar to make it appear
+  // like its the last item in th tree
+  .tree li:last-child:before {
+    background: $background-color;
+  }  
+
+  .metrics-tree__root {
+    background-color: mat-contrast($primary, 300);
+  }
+
+}
