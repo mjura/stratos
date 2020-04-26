@@ -138,13 +138,13 @@ export class MetricsComponent {
       } else if (Array.isArray(ep.provider.metadata.metrics_stratos)) {
         ep.provider.metadata.metrics_stratos.forEach(endp => {
           // See if we already know about this endpoint
-          const hasEndpoint = data.findIndex(i => i.url === endp.url) !== -1;
+          const hasEndpoint = data.findIndex(i => i.url === endp.url || i.url === endp.cfEndpoint) !== -1;
           if (!hasEndpoint) {
             const catalogEndpoint = entityCatalog.getEndpoint(endp.type, '');
             data.push({
               known: false,
               name: '<Unregistered Endpoint>',
-              url: endp.url,
+              url: endp.cfEndpoint || endp.url,
               type: catalogEndpoint.definition.label,
               icon: {
                 name: catalogEndpoint.definition.icon,
