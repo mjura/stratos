@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { Store } from '@ngrx/store';
-import { Observable, of as observableOf } from 'rxjs';
+import { Observable } from 'rxjs';
 import { filter, first, map } from 'rxjs/operators';
 
 import {
@@ -10,11 +10,10 @@ import {
   MetricsStratosAction,
 } from '../../../../../store/src/actions/metrics-api.actions';
 import { AppState } from '../../../../../store/src/app-state';
-import { entityCatalog } from '../../../../../store/src/entity-catalog/entity-catalog.service';
 import { getIdFromRoute } from '../../../core/utils.service';
 import { IHeaderBreadcrumb } from '../../../shared/components/page-header/page-header.types';
-import { StratosStatus } from '../../../shared/shared.types';
-import { EndpointIcon, getFullEndpointApiUrl } from '../../endpoints/endpoint-helpers';
+import { EndpointIcon } from '../../endpoints/endpoint-helpers';
+import { mapMetricsData, MetricsEndpointInfo } from '../metrics.helpers';
 import { MetricsEndpointProvider, MetricsService } from '../services/metrics-service';
 
 interface EndpointMetadata {
@@ -39,20 +38,6 @@ interface PrometheusJobs {
   [guid: string]: PrometheusJobDetail;
 }
 
-// Info for an endpoint that a metrics endpoint provides for
-interface MetricsEndpointInfo {
-  name: string;
-  icon: EndpointIcon;
-  type: string;
-  known: boolean;
-  url: string;
-  metadata: {
-    metrics_job?: string;
-    metrics_environment?: string;
-  };
-  status: Observable<StratosStatus>;
-}
-
 @Component({
   selector: 'app-metrics',
   templateUrl: './metrics.component.html',
@@ -71,7 +56,6 @@ export class MetricsComponent {
     private activatedRoute: ActivatedRoute,
     private metricsService: MetricsService,
     private store: Store<AppState>,
-
   ) {
 
     const metricsGuid = getIdFromRoute(this.activatedRoute, 'metricsId');
@@ -84,7 +68,13 @@ export class MetricsComponent {
     );
 
     // Processed endpoint data
-    this.metricsInfo$ = this.metricsEndpoint$.pipe(map((ep) => this.mapData(ep)));
+    this.metricsInfo$ = this.metricsEndpoint$.pipe(map((ep) => {
+      if (ep.provider && ep.provider.metadata && ep.provider.metadata && ep.provider.metadata.metrics_stratos
+        && (ep.provider.metadata.metrics_stratos as any).error) {
+        this.error = true;
+      }
+      return mapMetricsData(ep);
+    }));
 
     // Breadcrumbs
     this.breadcrumbs$ = this.metricsEndpoint$.pipe(
@@ -103,63 +93,5 @@ export class MetricsComponent {
         return mapped;
       }, {}))
     );
-  }
-
-  // Process the endpoint and Stratos marker file data to give a single list of endpoitns
-  // linked to this metrics endpoint, comprising those that are known in Stratos and those that are not
-  private mapData(ep: MetricsEndpointProvider): MetricsEndpointInfo[] {
-    const data: MetricsEndpointInfo[] = [];
-
-    // Add all of the known endpoints first
-    ep.endpoints.forEach(endpoint => {
-      const catalogEndpoint = entityCatalog.getEndpoint(endpoint.cnsi_type, endpoint.sub_type);
-
-      data.push({
-        known: true,
-        name: endpoint.name,
-        url: getFullEndpointApiUrl(endpoint),
-        type: catalogEndpoint.definition.label,
-        icon: {
-          name: catalogEndpoint.definition.icon,
-          font: 'stratos-icons'
-        },
-        metadata: {
-          metrics_job: endpoint.metadata ? endpoint.metadata.metrics_job : null,
-          metrics_environment: endpoint.metadata ? endpoint.metadata.metrics_environment : null
-        },
-        status: observableOf(StratosStatus.OK)
-      });
-    });
-
-    // Add all of the potentially unknown endpoints
-    if (ep.provider && ep.provider.metadata && ep.provider.metadata && ep.provider.metadata.metrics_stratos) {
-      if ((ep.provider.metadata.metrics_stratos as any).error) {
-        this.error = true;
-      } else if (Array.isArray(ep.provider.metadata.metrics_stratos)) {
-        ep.provider.metadata.metrics_stratos.forEach(endp => {
-          // See if we already know about this endpoint
-          const hasEndpoint = data.findIndex(i => i.url === endp.url || i.url === endp.cfEndpoint) !== -1;
-          if (!hasEndpoint) {
-            const catalogEndpoint = entityCatalog.getEndpoint(endp.type, '');
-            data.push({
-              known: false,
-              name: '<Unregistered Endpoint>',
-              url: endp.cfEndpoint || endp.url,
-              type: catalogEndpoint.definition.label,
-              icon: {
-                name: catalogEndpoint.definition.icon,
-                font: 'stratos-icons'
-              },
-              metadata: {
-                metrics_job: endp.job
-              },
-              status: observableOf(StratosStatus.WARNING)
-            });
-          }
-        });
-      }
-    }
-
-    return data;
   }
 }
