@@ -41,6 +41,13 @@ RUN wget https://storage.googleapis.com/kubernetes-release/release/v${KUBECTL_VE
     chmod +x kubectl && \
     mv kubectl ../analysis
 
+# klar
+ARG KLAR_VERSION=2.4.0
+RUN wget https://github.com/optiopay/klar/releases/download/v${KLAR_VERSION}/klar-${KLAR_VERSION}-linux-amd64 && \
+    mv klar-${KLAR_VERSION}-linux-amd64 klar && \
+    chmod +x klar && \
+    mv klar ../analysis
+
 # Final Container =============================================================================================================
 
 FROM splatform/stratos-bk-base:leap15_1
