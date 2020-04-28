@@ -1,6 +1,6 @@
 ARGS="--all-namespaces"
 
-CLAIR_SERVER="http://192.168.39.109:32330"
+CLAIR_SERVER="http://192.168.64.23:32077"
 
 # When running in Kubernetes get the Clair server from the environment:
 #   CLAIR_METRICS_API_SERVICE_PORT
@@ -21,17 +21,8 @@ fi
 
 # $1 is the kubeconfig file
 
-echo "Clair runner..."
 echo "Enumerating all referenced images ..."
 
-env
-echo $1
-echo $KUBECONFIG
-
-echo "trying to get all pods as a test ..."
-kubectl get pods --all-namespaces > test.log
-
-echo "-----"
 # This gives us all of the images in the cluser or in the namespace
 IMAGES=$(kubectl get pods ${ARGS} -o jsonpath="{..image}" | tr -s '[[:space:]]' '\n' | sort | uniq)
 
@@ -49,15 +40,26 @@ while IFS= read -r IMG; do
     LOGFILE="${LOGFILE/:/_}"
 
     echo "Scanning ${IMG} ..."
-    export CLAIR_ADDR=${CLAIR_SERVER}
-    export JSON_OUTPUT=true
+    export CLAIR_ADDR="${CLAIR_SERVER}"
+    export JSON_OUTPUT=false
     export CLAIR_TIMEOUT=10
-    klar ${IMG} > ${LOGFILE}.log
-
-    if [ $? -ne 0 ]; then
+    env
+    klar ${IMG} > ${LOGFILE}.log 2>&1
+    EXITCODE=$?
+    if [ $EXITCODE -ne 0 ]; then
       # Delete the logfile, so we know there is an error
       rm -f ${LOGFILE}.log
-      echo "Error scanning image ${IMG}"
+      echo "Error scanning image ${IMG} (${EXITCODE})"
+    else
+      # Now JSON format (this will be quick as Clair will have cached the image data)
+      export JSON_OUTPUT=true
+      klar ${IMG} > ${LOGFILE}.json
+      EXITCODE=$?
+      if [ $EXITCODE -ne 0 ]; then
+        # Delete the logfile, so we know there is an error
+        rm -f ${LOGFILE}.log
+        echo "Error scanning image ${IMG} (${EXITCODE})"
+      fi
     fi
   fi
 

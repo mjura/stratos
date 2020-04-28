@@ -19,10 +19,10 @@ const (
 )
 
 type klarImage struct {
-	Name string `json:"name"`
+	Name       string `json:"name"`
 	ResultFile string `json:"details"`
-	Error bool `json:"error"`
-	LayerCount int `json:"layerCount"`
+	Error      bool   `json:"error"`
+	LayerCount int    `json:"layerCount"`
 }
 
 type klarResult struct {
@@ -51,11 +51,15 @@ func runClair(job *AnalysisJob) error {
 		// Use our custom script which is a wrapper around kubescore
 		cmd := exec.Command("bash", args...)
 		cmd.Dir = job.Folder
-		cmd.Env = make([]string, 0)
+
+		// Inherit parent environment
+		cmd.Env = os.Environ()
+
+		//cmd.Env = make([]string, 0)
 		cmd.Env = append(cmd.Env, fmt.Sprintf("KUBECONFIG=%s", job.KuebConfigPath))
 
 		start := time.Now()
-		out, err := cmd.Output()
+		out, err := cmd.CombinedOutput()
 		end := time.Now()
 
 		log.Info("Completed running clar")
@@ -100,8 +104,8 @@ func klarProcess(folder string) error {
 	_, err := os.Stat(imagesFilePath)
 	if os.IsNotExist(err) {
 		log.Warn("File does not exist")
-			return err
-	}	
+		return err
+	}
 
 	// Read it
 	file, err := os.Open(imagesFilePath)
@@ -120,10 +124,9 @@ func klarProcess(folder string) error {
 		if len(name) > 0 {
 			image := klarImage{}
 			image.Name = scanner.Text()
-			result.Images = append(result.Images, image)
 
 			klarProcessImage(folder, &image)
-			log.Infof("%+v", image)
+			result.Images = append(result.Images, image)
 		}
 	}
 
@@ -144,7 +147,7 @@ func klarProcessImage(folder string, image *klarImage) {
 	// Check for the log file
 	logName := strings.ReplaceAll(image.Name, "/", "_")
 	logName = strings.ReplaceAll(logName, ":", "_")
-	image.ResultFile = logName + ".log"
+	image.ResultFile = logName + ".json"
 
 	// No log file means an error
 	logFile := filepath.Join(folder, image.ResultFile)
