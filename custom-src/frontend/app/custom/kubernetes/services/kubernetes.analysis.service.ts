@@ -1,19 +1,19 @@
-import { MatSnackBar } from '@angular/material';
-import { Observable, of, combineLatest } from 'rxjs';
-
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
+import { MatSnackBar } from '@angular/material';
 import { ActivatedRoute } from '@angular/router';
 import { Store } from '@ngrx/store';
+import { ClearPaginationOfType } from 'frontend/packages/store/src/actions/pagination.actions';
+import { combineLatest, Observable, of } from 'rxjs';
+import { catchError, map, startWith } from 'rxjs/operators';
+
+import { RouterNav } from '../../../../../store/src/actions/router.actions';
 import { AppState } from '../../../../../store/src/app-state';
-import { KubernetesEndpointService } from './kubernetes-endpoint.service';
 import { environment } from '../../../environments/environment';
 import { GetAnalysisReports } from '../store/kubernetes.actions';
-import { ClearPaginationOfType } from 'frontend/packages/store/src/actions/pagination.actions';
-import { map, catchError, first, tap, startWith } from 'rxjs/operators';
-import { PopeyeReportHelper } from './popeye-report.helper';
+import { KubernetesEndpointService } from './kubernetes-endpoint.service';
 import { KubeScoreReportHelper } from './kubescore-report.helper';
-import { RouterNav } from '../../../../../store/src/actions/router.actions';
+import { PopeyeReportHelper } from './popeye-report.helper';
 
 export interface KubernetesAnalysisType {
   name: string;
@@ -69,6 +69,15 @@ export class KubernetesAnalysisService {
         iconWidth: '120',
         descriptionUrl: '/core/assets/custom/kubescore.md'
       },
+      {
+        name: 'Clair',
+        id: 'clair',
+        namespaceAware: true,
+        iconUrl: '/core/assets/custom/sonobuoy.png',
+        iconWidth: '70',
+        descriptionUrl: '/core/assets/custom/clair.md'
+      }
+
       // {
       //   name: 'Sonobuoy',
       //   id: 'sonobuoy',
