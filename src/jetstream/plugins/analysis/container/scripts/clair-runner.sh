@@ -1,7 +1,5 @@
 ARGS="--all-namespaces"
 
-CLAIR_SERVER="http://192.168.64.23:32077"
-
 # When running in Kubernetes get the Clair server from the environment:
 #   CLAIR_METRICS_API_SERVICE_PORT
 #   CLAIR_METRICS_API_SERVICE_HOST
@@ -9,6 +7,11 @@ CLAIR_SERVER="http://192.168.64.23:32077"
 if [ -n "${CLAIR_METRICS_API_SERVICE_HOST}" ]; then
   echo "Setting CLAIR_ADDR from environment"
   CLAIR_SERVER="http://${CLAIR_METRICS_API_SERVICE_HOST}:${CLAIR_METRICS_API_SERVICE_PORT}"
+else
+  if [ -z "${CLAIR_SERVER}" ]; then
+    echo "Need CLAIR_SERVER environment variable"
+    exit 1
+  fi
 fi
 
 echo "Clair server: ${CLAIR_SERVER}"
