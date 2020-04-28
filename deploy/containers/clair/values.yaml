@@ -1,0 +1,26 @@
+
+clair:
+  imagePullPolicy: Always
+  service:
+    annotations: []
+    externalIPs: []
+    loadBalancerIP:
+    loadBalancerSourceRanges: []
+    servicePort: 443
+    #nodePort: 30000
+    type: ClusterIP
+
+    externalName:
+    ingress:
+      ## If true, Ingress will be created
+      enabled: false
+      ## Additional annotations
+      annotations: {}
+      ## Additional labels
+      extraLabels: {}
+      ## Host for the ingress
+      # Defaults to metrics.[env.Domain] if env.Domain is set and host is not
+      host:
+      # Name of secret containing TLS certificate
+      secretName:
+  
