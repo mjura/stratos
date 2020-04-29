@@ -1,10 +1,10 @@
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
-
 import { Observable, of, Subject } from 'rxjs';
+import { catchError, map, startWith } from 'rxjs/operators';
+
 import { environment } from '../../../../../environments/environment';
-import { map, catchError, startWith, tap, delay } from 'rxjs/operators';
 
 @Component({
   selector: 'app-kubernetes-analysis-report',
@@ -51,7 +51,5 @@ export class KubernetesAnalysisReportComponent implements OnInit {
       map(() => false),
       startWith(true)
     );
-
-    this.report$.subscribe(data => console.log(data));
   }
 }

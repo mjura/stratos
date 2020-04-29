@@ -25,9 +25,9 @@ import { TabNavService } from '../../../../tab-nav.service';
 import { CustomizationService } from '../../../core/customizations.types';
 import { EndpointsService } from '../../../core/endpoints.service';
 import { SidePanelService } from '../../../shared/services/side-panel.service';
+import { IPageSideNavTab } from '../page-side-nav/page-side-nav.component';
 import { PageHeaderService } from './../../../core/page-header-service/page-header.service';
 import { SideNavItem } from './../side-nav/side-nav.component';
-import { IPageSideNavTab } from '../page-side-nav/page-side-nav.component';
 
 
 @Component({
@@ -153,11 +153,6 @@ export class DashboardBaseComponent implements OnInit, OnDestroy, AfterViewInit 
     );
     this.dispatchRelations();
     this.store.dispatch(new GetUserFavoritesAction());
-
-    this.subNavData$.subscribe(subnav => {
-      console.log('== sub nav');
-      console.log(subnav);
-    });
   }
 
   ngOnDestroy() {

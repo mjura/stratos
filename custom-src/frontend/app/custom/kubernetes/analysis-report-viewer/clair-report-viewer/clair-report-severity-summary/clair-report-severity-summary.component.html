@@ -1,0 +1,7 @@
+<div class="clair-severity">
+  <div class="clair-severity__item" *ngFor="let severity of severities">
+    <mat-icon [ngClass]="iconClassNames[severity]">warning</mat-icon>
+    <div class="clair-severity__total">{{ severityTotals[severity] }}</div>
+    <div>{{ severity }}</div>
+  </div>
+</div>

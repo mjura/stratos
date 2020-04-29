@@ -102,7 +102,7 @@ func (a *Analyzer) registerRoutes(e *echo.Echo) {
 	// Get status
 	api.POST("/v1/status", a.status)
 	// Get a report
-	api.GET("/v1/report/:user/:endpoint/:id", a.report)
+	api.GET("/v1/report/:user/:endpoint/:id/:file", a.report)
 	// Delete a report
 	api.DELETE("/v1/report/:user/:endpoint/:id", a.delete)
 }

@@ -48,22 +48,11 @@ while IFS= read -r IMG; do
     export CLAIR_TIMEOUT=10
     env
     klar ${IMG} > ${LOGFILE}.log 2>&1
-    EXITCODE=$?
-    if [ $EXITCODE -ne 0 ]; then
-      # Delete the logfile, so we know there is an error
-      rm -f ${LOGFILE}.log
-      echo "Error scanning image ${IMG} (${EXITCODE})"
-    else
-      # Now JSON format (this will be quick as Clair will have cached the image data)
-      export JSON_OUTPUT=true
-      klar ${IMG} > ${LOGFILE}.json
-      EXITCODE=$?
-      if [ $EXITCODE -ne 0 ]; then
-        # Delete the logfile, so we know there is an error
-        rm -f ${LOGFILE}.log
-        echo "Error scanning image ${IMG} (${EXITCODE})"
-      fi
-    fi
+    # Now JSON format (this will be quick as Clair will have cached the image data)
+    export JSON_OUTPUT=true
+    klar ${IMG} > ${LOGFILE}.json
+
+    # TODO: need to understand exit codes
   fi
 
 done <<< "$IMAGES"

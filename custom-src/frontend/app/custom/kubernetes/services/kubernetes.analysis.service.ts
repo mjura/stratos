@@ -290,4 +290,23 @@ export class KubernetesAnalysisService {
       })
     );
   }
+
+
+  public getReportFile(id: string, file: string): Observable<any> {
+    const proxyAPIVersion = environment.proxyAPIVersion;
+    const url = `/pp/${proxyAPIVersion}/analysis/reports/${id}/${file}`;
+    const headers = new HttpHeaders({});
+    const requestArgs = {
+      headers,
+    };
+
+    return this.http.get(url, requestArgs).pipe(
+      catchError((e, c) => {
+        console.log('Error occurred');
+        console.log(e);
+        const msg = { firstLine: 'Failed to get Analysis Report'};
+        return of(false);
+      })
+    );
+  }
 }

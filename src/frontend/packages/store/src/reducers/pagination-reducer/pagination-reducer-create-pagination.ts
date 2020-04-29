@@ -1,13 +1,10 @@
+import { CreatePagination } from '../../actions/pagination.actions';
 import { entityCatalog } from '../../entity-catalog/entity-catalog.service';
 import { EntityCatalogEntityConfig } from '../../entity-catalog/entity-catalog.types';
-import { CreatePagination } from '../../actions/pagination.actions';
 import { PaginationEntityState, PaginationState } from '../../types/pagination.types';
 import { spreadClientPagination } from './pagination-reducer.helper';
 
 function getPaginationKey(entityConfig: EntityCatalogEntityConfig) {
-  console.log('getPaginationKey');
-  console.log(entityConfig);
-  console.log(entityCatalog.getEntityKey(entityConfig));
   return entityCatalog.getEntityKey(entityConfig);
 }
 /**
@@ -19,11 +16,6 @@ function getPaginationKey(entityConfig: EntityCatalogEntityConfig) {
 export function createNewPaginationSection(state: PaginationState, action: CreatePagination, defaultState: PaginationEntityState)
   : PaginationState {
   const entityKey = getPaginationKey(action.entityConfig);
-
-  console.log('createNewPaginationSection');
-  console.log(entityKey);
-  console.log(action.paginationKey);
-  console.log(state[entityKey][action.paginationKey]);
   if (state[entityKey][action.paginationKey] && !action.seed) {
     return state;
   }

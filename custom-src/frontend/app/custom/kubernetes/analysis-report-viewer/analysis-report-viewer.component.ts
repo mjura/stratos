@@ -1,9 +1,21 @@
+import {
+  Component,
+  ComponentFactoryResolver,
+  ComponentRef,
+  Input,
+  OnDestroy,
+  OnInit,
+  Type,
+  ViewChild,
+  ViewContainerRef,
+} from '@angular/core';
+
+import { ClairReportViewerComponent } from './clair-report-viewer/clair-report-viewer.component';
 import { KubeScoreReportViewerComponent } from './kube-score-report-viewer/kube-score-report-viewer.component';
 import { PopeyeReportViewerComponent } from './popeye-report-viewer/popeye-report-viewer.component';
-import { Component, OnInit, ViewContainerRef, ComponentFactoryResolver, ComponentRef, OnDestroy, ViewChild, Type, Input } from '@angular/core';
 
 export interface IReportViewer {
-  //setReport(report);
+  // setReport(report);
   report: any;
 }
 
@@ -45,7 +57,10 @@ export class AnalysisReportViewerComponent implements OnInit, OnDestroy {
       case 'kubescore':
         this.createComponent(KubeScoreReportViewerComponent, report);
         break;
-    }
+      case 'clair':
+        this.createComponent(ClairReportViewerComponent, report);
+        break;
+      }
   }
 
   // Dynamically create the component for the report type type
@@ -59,7 +74,7 @@ export class AnalysisReportViewerComponent implements OnInit, OnDestroy {
     }
     const factory = this.resolver.resolveComponentFactory<IReportViewer>(component);
     this.reportComponentRef = this.container.createComponent<IReportViewer>(factory);
-    //this.reportComponentRef.instance.setReport(report);
+    // this.reportComponentRef.instance.setReport(report);
     this.reportComponentRef.instance.report = report;
   }
 

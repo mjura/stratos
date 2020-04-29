@@ -2,7 +2,7 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: "{{ .Release.Name }}-worker"
+  name: "{{ .Release.Name }}-test"
 spec:
   replicas: 1
   strategy:
@@ -13,7 +13,7 @@ spec:
   selector:
     matchLabels:
       app.kubernetes.io/name:  "stratos-clair"
-      app.kubernetes.io/component: "stratos-clair-worker"
+      app.kubernetes.io/component: "stratos-clair-test"
       app.kubernetes.io/instance: "{{ .Release.Name }}"
   template:
     metadata:
@@ -21,10 +21,10 @@ spec:
         app.kubernetes.io/name: "stratos-clair"
         app.kubernetes.io/instance: "{{ .Release.Name }}"
         app.kubernetes.io/version: "{{ .Chart.AppVersion }}"
-        app.kubernetes.io/component: "stratos-clair-worker"
+        app.kubernetes.io/component: "stratos-clair-test"
         helm.sh/chart: "{{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}"
     spec:
       containers:
-      - image: splatform/stratos:latest
+      - image: splatform/stratos-uaa:latest
         imagePullPolicy: {{.Values.clair.imagePullPolicy}}
-        name: worker
+        name: test

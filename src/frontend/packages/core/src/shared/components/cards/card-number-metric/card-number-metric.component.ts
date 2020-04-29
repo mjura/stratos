@@ -1,4 +1,4 @@
-import { Component, Input, OnChanges, OnInit, EventEmitter, Output } from '@angular/core';
+import { Component, EventEmitter, Input, OnChanges, OnInit, Output } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { BehaviorSubject } from 'rxjs';
 
@@ -39,7 +39,6 @@ export class CardNumberMetricComponent implements OnInit, OnChanges {
   @Input('alerts')
   set alerts(alerts) {
     if (alerts) {
-      console.log('Set alerts');
       this.processAlerts(alerts);
     }
   }

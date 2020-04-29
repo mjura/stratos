@@ -48,6 +48,7 @@ func (analysis *Analysis) AddAdminGroupRoutes(echoGroup *echo.Group) {
 func (analysis *Analysis) AddSessionGroupRoutes(echoGroup *echo.Group) {
 	echoGroup.GET("/analysis/reports", analysis.listReports)
 	echoGroup.GET("/analysis/reports/:id", analysis.getReport)
+	echoGroup.GET("/analysis/reports/:id/:file", analysis.getReport)
 
 	// Get completed reports for the given path
 	echoGroup.GET("/analysis/completed/:endpoint/*", analysis.getReportsByPath)

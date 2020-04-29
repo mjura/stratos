@@ -19,10 +19,11 @@ const (
 )
 
 type klarImage struct {
-	Name       string `json:"name"`
-	ResultFile string `json:"details"`
-	Error      bool   `json:"error"`
-	LayerCount int    `json:"layerCount"`
+	Name            string         `json:"name"`
+	ResultFile      string         `json:"details"`
+	Error           bool           `json:"error"`
+	LayerCount      int            `json:"layerCount"`
+	Vulnerabilities map[string]int `json:"Vulnerabilities"`
 }
 
 type klarResult struct {
@@ -30,8 +31,8 @@ type klarResult struct {
 }
 
 type klarReport struct {
-	LayerCount int `json:"LayerCount"`
-	//Vulnerabilities `json:"Vulnerabilities"`
+	LayerCount      int                      `json:"LayerCount"`
+	Vulnerabilities map[string][]interface{} `json:"Vulnerabilities"`
 }
 
 func runClair(job *AnalysisJob) error {
@@ -124,6 +125,7 @@ func klarProcess(folder string) error {
 		if len(name) > 0 {
 			image := klarImage{}
 			image.Name = scanner.Text()
+			image.Vulnerabilities = make(map[string]int)
 
 			klarProcessImage(folder, &image)
 			result.Images = append(result.Images, image)
@@ -167,6 +169,12 @@ func klarProcessImage(folder string, image *klarImage) {
 				err = json.Unmarshal(data, &report)
 				if err == nil {
 					image.LayerCount = report.LayerCount
+
+					// Get the counts for each Vulnerabiltity
+					for severity := range report.Vulnerabilities {
+						total := len(report.Vulnerabilities[severity])
+						image.Vulnerabilities[severity] = total
+					}
 				}
 			}
 		}

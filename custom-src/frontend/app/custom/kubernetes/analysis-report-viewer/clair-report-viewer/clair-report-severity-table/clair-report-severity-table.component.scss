@@ -1,0 +1,28 @@
+.clair-severity {
+  align-items: center;
+  display: flex;
+  flex-direction: row;
+
+  mat-icon {
+    margin-right: 8px;
+  }
+
+  &__critical {
+    color: red;
+  }
+  &__high {
+    color: #ff7700
+  }
+  &__medium {
+    color: orange;
+  }
+  &__low {
+    color: #d29930;
+  }
+  &__negligible {
+    color: grey;
+  }
+  &__unknown {
+    color: #b8b8b8;
+  }
+}

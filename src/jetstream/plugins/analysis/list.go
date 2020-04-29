@@ -20,6 +20,8 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
+const mainReportFile = "report.json"
+
 // listReports will list the analysis repotrs that have run
 func (c *Analysis) listReports(ec echo.Context) error {
 	log.Debug("listReports")
@@ -127,7 +129,7 @@ func (c *Analysis) getLatestReport(ec echo.Context) error {
 	}
 
 	// Get the report contents from the analysis server
-	bytes, err := c.getReportFile(report.UserID, report.EndpointID, report.ID)
+	bytes, err := c.getReportFile(report.UserID, report.EndpointID, report.ID, mainReportFile)
 	if err != nil {
 		return err
 	}
@@ -143,6 +145,10 @@ func (c *Analysis) getReport(ec echo.Context) error {
 	// Need to get a config object for the target endpoint
 	userID := ec.Get("user_id").(string)
 	ID := ec.Param("id")
+	file := ec.Param("file")
+	if len(file) == 0 {
+		file = mainReportFile
+	}
 
 	// Create a record in the reports datastore
 	dbStore, err := store.NewAnalysisDBStore(p.GetDatabaseConnection())
@@ -156,7 +162,7 @@ func (c *Analysis) getReport(ec echo.Context) error {
 	}
 
 	// Get the report contents from the analysis server
-	bytes, err := c.getReportFile(report.UserID, report.EndpointID, report.ID)
+	bytes, err := c.getReportFile(report.UserID, report.EndpointID, report.ID, file)
 	if err != nil {
 		return err
 	}
@@ -209,9 +215,9 @@ func (c *Analysis) deleteReports(ec echo.Context) error {
 	return ec.JSON(200, ids)
 }
 
-func (c *Analysis) getReportFile(userID, endpointID, ID string) ([]byte, error) {
+func (c *Analysis) getReportFile(userID, endpointID, ID, name string) ([]byte, error) {
 	// Make request to get report
-	statusURL := fmt.Sprintf("%s/api/v1/report/%s/%s/%s", c.analysisServer, userID, endpointID, ID)
+	statusURL := fmt.Sprintf("%s/api/v1/report/%s/%s/%s/%s", c.analysisServer, userID, endpointID, ID, name)
 	r, _ := http.NewRequest(http.MethodGet, statusURL, nil)
 	client := &http.Client{Timeout: 30 * time.Second}
 	rsp, err := client.Do(r)

@@ -1,13 +1,10 @@
-import { ResourceAlertMap, ResourceAlert, ResourceAlertLevel } from './analysis-report.types';
+import { ResourceAlert, ResourceAlertLevel, ResourceAlertMap } from './analysis-report.types';
 
 export class KubeScoreReportHelper {
 
   constructor(public report: any) {}
 
   public map() {
-    console.log('MAPPTING......');
-
-    console.log(this.report);
     if (!this.report.report) {
       return;
     }
@@ -17,7 +14,6 @@ export class KubeScoreReportHelper {
     const result = {} as ResourceAlertMap;
 
     Object.keys(kubescore).forEach(key => {
-      console.log(key);
       const item = kubescore[key];
       let id = item.TypeMeta.kind.toLowerCase();
       id = `${id}/${item.ObjectMeta.namespace}/${item.ObjectMeta.name}`;
@@ -43,7 +39,6 @@ export class KubeScoreReportHelper {
       });
     });
     this.report.alerts = result;
-    console.log(result);
   }
   private convertMessageLevel(level: number): ResourceAlertLevel {
     switch (level) {
