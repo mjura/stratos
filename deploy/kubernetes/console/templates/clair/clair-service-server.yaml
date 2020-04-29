@@ -1,0 +1,29 @@
+{{- if not .Values.console.clairServer -}}
+---
+apiVersion: v1
+kind: Service
+metadata:
+{{- if .Values.console.service -}}
+{{- if .Values.console.service.annotations }}
+  annotations:
+{{ toYaml .Values.console.service.annotations | indent 4 }}
+{{- end }}
+{{- end }}  
+  name: stratos-clair-api
+  labels:
+    app.kubernetes.io/name: "stratos-clair"
+    app.kubernetes.io/instance: "{{ .Release.Name }}"
+    app.kubernetes.io/version: "{{ .Chart.AppVersion }}"
+    app.kubernetes.io/component: "stratos-clair-service"
+    helm.sh/chart: "{{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}"
+spec:
+  type: ClusterIP
+  ports:
+  - name: server
+    port: 6060
+    protocol: TCP
+    targetPort: 6060
+  selector:
+    app.kubernetes.io/name: "stratos-clair"
+    app.kubernetes.io/component: "stratos-clair-server"
+{{- end }}

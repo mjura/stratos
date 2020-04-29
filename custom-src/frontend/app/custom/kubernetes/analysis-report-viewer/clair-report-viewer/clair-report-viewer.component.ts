@@ -4,6 +4,7 @@ import { IReportViewer } from '../analysis-report-viewer.component';
 import {
   ClairSeverityOrder,
 } from './../../../../../../../../../custom-src/frontend/app/custom/kubernetes/analysis-report-viewer/clair-report-viewer/clair-report.types';
+import { getEventTarget } from '../../../../../../../src/frontend/packages/core/src/core/browser-helper';
 
 interface ImageInfo {
   name: string;
@@ -19,6 +20,8 @@ interface ImageInfoDetail {
   LayerCount: number;
   Vulnerabilities: {string: number};
 }
+
+const ShortTagSize = 24;
 
 @Component({
   selector: 'app-clair-report-viewer',
@@ -41,11 +44,15 @@ export class ClairReportViewerComponent implements OnInit, IReportViewer {
     this.images = [];
     if (this.report && this.report.report && this.report.report.images) {
       this.report.report.images.forEach(img => {
-        const imageAndTag = img.name.split(':');
+        // Take the tag
+        const tagIndex = img.name.lastIndexOf(':');
+        const tag = img.name.substr(tagIndex + 1);
+        const name = img.name.substr(0, tagIndex);
         const image = {
           name: img.name,
-          tag: imageAndTag[1],
-          image: imageAndTag[0],
+          tag,
+          shortTag: this.getShortTag(tag),
+          image: name,
           registry: '',
           info: img,
           highestSeverity: this.getHighestSeverity(img),
@@ -93,6 +100,17 @@ export class ClairReportViewerComponent implements OnInit, IReportViewer {
     }
     // Must be the same
     return 0;
+  }
+
+  private getShortTag(tag: string): string {
+
+    console.log(tag.length);
+    console.log(tag);
+
+    const i =tag.length <= ShortTagSize ? tag : tag.substr(0, ShortTagSize) + '...';
+    console.log(i);
+    return i;
+
   }
 
   private getTotal(info: ImageInfoDetail): number {

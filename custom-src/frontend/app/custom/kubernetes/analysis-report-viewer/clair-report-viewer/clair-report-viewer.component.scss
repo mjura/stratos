@@ -45,7 +45,11 @@
 
   &__imagelist-images {
     flex: 1;
-  }  
+  }
+
+  &__images {
+    overflow-y: auto;
+  }
 
   overflow: hidden;
     text-overflow: ellipsis;

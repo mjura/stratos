@@ -40,6 +40,12 @@ spec:
           value: "/scripts"
         - name: ANALYSIS_REPORTS_DIR
           value: "/reports"
+        - name: CLAIR_SERVER
+          {{- if not .Values.console.clairServer }}
+          value: "http://stratros-clair-api:6060"
+          {{- else }}
+          value: {{ .Values.console.clairServer | quote }}
+          {{- end }}
 ---
 apiVersion: v1
 kind: Service
