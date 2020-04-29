@@ -29,6 +29,7 @@ export class AnalysisReportsListConfig implements IListConfig<AnalysisReport> {
       cellDefinition: {
         getValue: (row: AnalysisReport) => row.name,
         getLink: row => `/kubernetes/${this.guid}/analysis/report/${row.id}`
+        
       },
       sort: {
         type: 'sort',
