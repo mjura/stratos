@@ -4,7 +4,6 @@ import { IReportViewer } from '../analysis-report-viewer.component';
 import {
   ClairSeverityOrder,
 } from './../../../../../../../../../custom-src/frontend/app/custom/kubernetes/analysis-report-viewer/clair-report-viewer/clair-report.types';
-import { getEventTarget } from '../../../../../../../src/frontend/packages/core/src/core/browser-helper';
 
 interface ImageInfo {
   name: string;
