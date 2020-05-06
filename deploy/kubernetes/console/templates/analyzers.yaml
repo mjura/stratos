@@ -42,7 +42,7 @@ spec:
           value: "/reports"
         - name: CLAIR_SERVER
           {{- if not .Values.console.clairServer }}
-          value: "http://stratros-clair-api:6060"
+          value: "http://stratos-clair-api:6060"
           {{- else }}
           value: {{ .Values.console.clairServer | quote }}
           {{- end }}

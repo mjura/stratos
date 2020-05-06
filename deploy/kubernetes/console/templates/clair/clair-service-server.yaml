@@ -26,4 +26,5 @@ spec:
   selector:
     app.kubernetes.io/name: "stratos-clair"
     app.kubernetes.io/component: "stratos-clair-server"
+    app.kubernetes.io/instance: "{{ .Release.Name }}"
 {{- end }}
