@@ -145,11 +145,8 @@ export class KubeConfigImportComponent implements OnDestroy {
     const mainObs$ = this.getUpdatingState(obs$).pipe(
       startWith({ busy: true, error: false, completed: false})
     );
+
     this.subs.push(mainObs$.subscribe(reg.actionState));
-    reg.actionState.subscribe(state => {
-      console.log('registering state');
-      console.log(state);
-    });
 
     const sub = reg.actionState.subscribe(progress => {
       // Not sure wha tthe status is used for?
@@ -168,7 +165,6 @@ export class KubeConfigImportComponent implements OnDestroy {
       if (progress.completed) {
         if (!progress.error) {
           // If we created okay, then guid is in the message
-          console.log('ENDPOINT REGISTERED');
           reg.cluster._guid = progress.message;
         }
         sub.unsubscribe();
@@ -193,6 +189,7 @@ export class KubeConfigImportComponent implements OnDestroy {
       // Echo obs$ to the behaviour subject
       this.subs.push(obs$.subscribe(connect.actionState));
 
+      // Debugging
       this.subs.push(connect.actionState.subscribe(status => {
         console.log('connecting status...');
         console.log(status);

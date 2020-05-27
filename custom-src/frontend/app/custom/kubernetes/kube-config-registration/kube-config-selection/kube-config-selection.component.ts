@@ -193,12 +193,6 @@ export class KubeConfigSelectionComponent implements OnInit {
     if (selectedCount === 0) {
       this.canSetIntermediate = false;
     }
-
-    // console.log('row select changed');
-    // console.log(this.dataSource.selectAllIndeterminate + ', ' +  this.dataSource.selectAllChecked);
-    // console.log(totalCount + ', ' + selectedCount);
-    // this.dataSource.selectAllIndeterminate = (totalCount > 0 && selectedCount !== totalCount);
-    // console.log(this.dataSource.selectAllIndeterminate + ', ' +  this.dataSource.selectAllChecked);
   }
 
   // Can we proceed?
