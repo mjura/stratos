@@ -44,7 +44,7 @@ export class KubeConfigAuthHelper {
     }
   }
 
-
+  // Try and parse the authentication metadata
   public parseAuth(cluster: KubeConfigFileCluster, user: KubeConfigFileUser): boolean {
 
     // Default subtype is generic Kubernetes
@@ -107,6 +107,7 @@ export class KubeConfigAuthHelper {
     return false;
   }
 
+  // Use the auto component to get the data in the correct format for connecting to the endpoint
   public getAuthDataForConnect(resolver: ComponentFactoryResolver, injector: Injector, fb: FormBuilder, user: KubeConfigFileUser)
   : ConnectEndpointData | null {
 

@@ -133,7 +133,7 @@ export class KubeConfigImportComponent implements OnDestroy {
     } else if (i.action === CONNECT_ACTION) {
       this.doConnect(i, actions);
     } else {
-      i.state.next({ message: 'Skipping action - not implemented', warning: true });
+      i.state.next({ message: 'Skipping this action due to a previous error', warning: true });
       // Do the next action
       this.processAction(actions);
     }
