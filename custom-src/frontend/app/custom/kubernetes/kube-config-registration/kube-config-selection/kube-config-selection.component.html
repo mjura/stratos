@@ -1,0 +1,14 @@
+<div class="kube-config-select__panel" *ngIf="!hasConfig">
+  <div class="kube-config-select__upload">
+    <mat-icon class="kube-config-select__icon">insert_drive_file</mat-icon>
+    <h1 class="kube-config-select__title">Upload a Kube Config file to import clusters</h1>
+    <div class="kube-config-auth__form">
+      <app-file-input placeholder="kubeconfig" (onFileData)="kubeConfigSelected($event)" buttonLabel="Select Kube Config file">
+      </app-file-input>
+    </div>
+  </div>
+</div>
+
+<div *ngIf="hasConfig" class="kube-config-select__table">
+  <app-table [dataSource]="dataSource" [columns]="columns"></app-table>
+</div>

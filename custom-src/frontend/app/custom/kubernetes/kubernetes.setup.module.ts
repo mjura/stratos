@@ -1,4 +1,3 @@
-import { KubeConfigRegistrationComponent } from './kube-config-registration/kube-config-registration.component';
 import { CommonModule } from '@angular/common';
 import { NgModule, Optional, SkipSelf } from '@angular/core';
 import { Store } from '@ngrx/store';
@@ -17,13 +16,29 @@ import {
   KubernetesConfigAuthFormComponent,
 } from './auth-forms/kubernetes-config-auth-form/kubernetes-config-auth-form.component';
 import { KubernetesGKEAuthFormComponent } from './auth-forms/kubernetes-gke-auth-form/kubernetes-gke-auth-form.component';
+import { KubeConfigImportComponent } from './kube-config-registration/kube-config-import/kube-config-import.component';
+import {
+  KubeConfigTableImportStatusComponent,
+} from './kube-config-registration/kube-config-import/kube-config-table-import-status/kube-config-table-import-status.component';
+import { KubeConfigRegistrationComponent } from './kube-config-registration/kube-config-registration.component';
+import {
+  KubeConfigSelectionComponent,
+} from './kube-config-registration/kube-config-selection/kube-config-selection.component';
+import {
+  KubeConfigTableSelectComponent,
+} from './kube-config-registration/kube-config-selection/kube-config-table-select/kube-config-table-select.component';
+import {
+  KubeConfigTableSubTypeSelectComponent,
+} from './kube-config-registration/kube-config-selection/kube-config-table-sub-type-select/kube-config-table-sub-type-select.component';
+import {
+  KubeConfigTableUserSelectComponent,
+} from './kube-config-registration/kube-config-selection/kube-config-table-user-select/kube-config-table-user-select.component';
 import { KUBERNETES_ENDPOINT_TYPE } from './kubernetes-entity-factory';
 import { generateKubernetesEntities } from './kubernetes-entity-generator';
 import { BaseKubeGuid } from './kubernetes-page.types';
 import { KubernetesStoreModule } from './kubernetes.store.module';
 import { KubernetesEndpointService } from './services/kubernetes-endpoint.service';
 import { KubeHealthCheck } from './store/kubernetes.actions';
-
 
 @NgModule({
   imports: [
@@ -39,6 +54,12 @@ import { KubeHealthCheck } from './store/kubernetes.actions';
     KubernetesConfigAuthFormComponent,
     KubernetesGKEAuthFormComponent,
     KubeConfigRegistrationComponent,
+    KubeConfigSelectionComponent,
+    KubeConfigImportComponent,
+    KubeConfigTableSelectComponent,
+    KubeConfigTableUserSelectComponent,
+    KubeConfigTableImportStatusComponent,
+    KubeConfigTableSubTypeSelectComponent,
   ],
   providers: [
     BaseKubeGuid,
@@ -50,6 +71,10 @@ import { KubeHealthCheck } from './store/kubernetes.actions';
     KubernetesConfigAuthFormComponent,
     KubernetesGKEAuthFormComponent,
     KubeConfigRegistrationComponent,
+    KubeConfigTableSelectComponent,
+    KubeConfigTableUserSelectComponent,
+    KubeConfigTableImportStatusComponent,
+    KubeConfigTableSubTypeSelectComponent,
   ]
 })
 export class KubernetesSetupModule {

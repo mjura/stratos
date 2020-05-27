@@ -59,6 +59,7 @@ export interface IStratosBaseEntityDefinition<T = EntitySchema | EntityCatalogSc
   readonly type?: string;
   readonly schema: T;
   readonly label?: string;
+  readonly labelShort?: string;
   readonly labelPlural?: string;
   readonly renderPriority?: number;
   /**

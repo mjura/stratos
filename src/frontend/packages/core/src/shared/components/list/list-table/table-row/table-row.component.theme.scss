@@ -2,6 +2,7 @@
   $status-colors: map-get($app-theme, status);
   $error-color: map-get($status-colors, danger);
   $warn-color: map-get($status-colors, warning);
+  $info-color: map-get($status-colors, info);
   $text-color: map-get($status-colors, text);
   $primary: map-get($theme, primary);
   $primary-color: mat-color($primary);
@@ -34,6 +35,11 @@
       .table-row__error {
         background-color: $warn-color;
         color: $text-color;
+      }
+    }
+    &__info {
+      .table-row__error {
+        background-color: transparentize($info-color, .9);
       }
     }
     &__highlighted {

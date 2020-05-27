@@ -16,7 +16,8 @@
     }
   }
   &__errored,
-  &__warning {
+  &__warning,
+  &__info {
     .table-row__error {
       display: flex;
     }

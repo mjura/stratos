@@ -97,6 +97,7 @@ export interface IListDataSource<T> extends ICoreListDataSource<T>, EntityCatalo
   editRow: T; // Edit items - remove once ng-content can exist in md-table
 
   selectAllChecked: boolean; // Select items - remove once ng-content can exist in md-table
+  selectAllIndeterminate?: boolean; // Select all checkox is indeterminate
   selectedRows: Map<string, T>; // Select items - remove once ng-content can exist in md-table
   selectedRows$: ReplaySubject<Map<string, T>>; // Select items - remove once ng-content can exist in md-table
   getRowUniqueId: getRowUniqueId<T>;
