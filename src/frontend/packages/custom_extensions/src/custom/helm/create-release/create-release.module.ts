@@ -1,8 +1,8 @@
 import { CommonModule } from '@angular/common';
 import { NgModule } from '@angular/core';
 
-import { CoreModule } from '../../../core/core.module';
-import { SharedModule } from '../../../shared/shared.module';
+import { CoreModule } from '../../../../../core/src/core/core.module';
+import { SharedModule } from '../../../../../core/src/shared/shared.module';
 import { CreateReleaseComponent } from './create-release.component';
 
 

@@ -1,12 +1,12 @@
 import { of } from 'rxjs';
 
-import { ListDataSource } from '../../../../shared/components/list/data-sources-controllers/list-data-source';
+import { ListDataSource } from '../../../../../../core/src/shared/components/list/data-sources-controllers/list-data-source';
 import {
   TableCellSidePanelComponent,
   TableCellSidePanelConfig,
-} from '../../../../shared/components/list/list-table/table-cell-side-panel/table-cell-side-panel.component';
-import { ITableColumn } from '../../../../shared/components/list/list-table/table.types';
-import { IListConfig, ListViewTypes } from '../../../../shared/components/list/list.component.types';
+} from '../../../../../../core/src/shared/components/list/list-table/table-cell-side-panel/table-cell-side-panel.component';
+import { ITableColumn } from '../../../../../../core/src/shared/components/list/list-table/table.types';
+import { IListConfig, ListViewTypes } from '../../../../../../core/src/shared/components/list/list.component.types';
 import {
   KubernetesResourceViewerComponent,
   KubernetesResourceViewerConfig,

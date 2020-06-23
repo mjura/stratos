@@ -1,7 +1,7 @@
 import { Store } from '@ngrx/store';
 
+import { IListConfig } from '../../../../../../core/src/shared/components/list/list.component.types';
 import { AppState } from '../../../../../../store/src/app-state';
-import { IListConfig } from '../../../../shared/components/list/list.component.types';
 import { kubeEntityCatalog } from '../../kubernetes-entity-catalog';
 import { BaseKubeGuid } from '../../kubernetes-page.types';
 import { KubeService } from '../../store/kube.types';

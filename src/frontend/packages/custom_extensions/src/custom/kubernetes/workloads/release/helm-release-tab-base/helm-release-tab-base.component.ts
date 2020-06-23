@@ -5,12 +5,12 @@ import { Observable, Subject, Subscription } from 'rxjs';
 import makeWebSocketObservable, { GetWebSocketResponses } from 'rxjs-websockets';
 import { catchError, map, share, switchMap } from 'rxjs/operators';
 
+import { LoggerService } from '../../../../../../../core/src/core/logger.service';
+import { IPageSideNavTab } from '../../../../../../../core/src/features/dashboard/page-side-nav/page-side-nav.component';
 import { HideSnackBar, ShowSnackBar } from '../../../../../../../store/src/actions/snackBar.actions';
 import { AppState } from '../../../../../../../store/src/app-state';
 import { entityCatalog } from '../../../../../../../store/src/entity-catalog/entity-catalog';
 import { EntityRequestAction, WrapperRequestActionSuccess } from '../../../../../../../store/src/types/request.types';
-import { LoggerService } from '../../../../../core/logger.service';
-import { IPageSideNavTab } from '../../../../../features/dashboard/page-side-nav/page-side-nav.component';
 import { kubeEntityCatalog } from '../../../kubernetes-entity-catalog';
 import { KubernetesPodExpandedStatusHelper } from '../../../services/kubernetes-expanded-state';
 import { KubernetesPod, KubeService } from '../../../store/kube.types';

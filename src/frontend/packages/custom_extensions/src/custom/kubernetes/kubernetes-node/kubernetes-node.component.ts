@@ -3,8 +3,8 @@ import { ActivatedRoute } from '@angular/router';
 import { Observable } from 'rxjs';
 import { first, map, tap } from 'rxjs/operators';
 
-import { EndpointsService } from '../../../core/endpoints.service';
-import { IHeaderBreadcrumb } from '../../../shared/components/page-header/page-header.types';
+import { EndpointsService } from '../../../../../core/src/core/endpoints.service';
+import { IHeaderBreadcrumb } from '../../../../../core/src/shared/components/page-header/page-header.types';
 import { BaseKubeGuid } from '../kubernetes-page.types';
 import { KubernetesEndpointService } from '../services/kubernetes-endpoint.service';
 import { KubernetesNodeService } from '../services/kubernetes-node.service';

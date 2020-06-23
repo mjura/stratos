@@ -1,6 +1,7 @@
-import { Component, Input, OnInit, OnDestroy } from '@angular/core';
-import { Observable, of as observableOf, Subscription, observable } from 'rxjs';
-import { KubernetesNodeService, KubeNodeMetric } from '../../../services/kubernetes-node.service';
+import { Component, Input, OnDestroy, OnInit } from '@angular/core';
+import { Observable, Subscription } from 'rxjs';
+
+import { KubeNodeMetric, KubernetesNodeService } from '../../../services/kubernetes-node.service';
 import { MetricStatistic } from '../../../store/kube.types';
 
 @Component({
@@ -27,7 +28,7 @@ export class KubernetesNodeMetricStatsCardComponent implements OnInit, OnDestroy
   subscriptions: Subscription[] = [];
   constructor(
     public kubeNodeService: KubernetesNodeService
-  ) {}
+  ) { }
 
   ngOnInit() {
     const maxMetric = this.kubeNodeService.setupMetricObservable(this.metric, MetricStatistic.MAXIMUM);

@@ -4,11 +4,15 @@ import { Store } from '@ngrx/store';
 import { BehaviorSubject, Observable, of as observableOf } from 'rxjs';
 import { filter, map } from 'rxjs/operators';
 
+import { EndpointsService } from '../../../../../core/src/core/endpoints.service';
+import { ITableColumn } from '../../../../../core/src/shared/components/list/list-table/table.types';
+import {
+  IListConfig,
+  IListMultiFilterConfig,
+  ListViewTypes,
+} from '../../../../../core/src/shared/components/list/list.component.types';
 import { ListView } from '../../../../../store/src/actions/list.actions';
 import { AppState } from '../../../../../store/src/app-state';
-import { EndpointsService } from '../../../core/endpoints.service';
-import { ITableColumn } from '../../../shared/components/list/list-table/table.types';
-import { IListConfig, IListMultiFilterConfig, ListViewTypes } from '../../../shared/components/list/list.component.types';
 import { defaultHelmKubeListPageSize } from '../../kubernetes/list-types/kube-helm-list-types';
 import { MonocularChart } from '../store/helm.types';
 import { MonocularChartCardComponent } from './monocular-chart-card/monocular-chart-card.component';

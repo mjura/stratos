@@ -1,6 +1,7 @@
-import { Component, OnInit, Input } from '@angular/core';
-import { IAuthForm } from '../../../../core/extension/extension-types';
+import { Component, Input } from '@angular/core';
 import { FormGroup } from '@angular/forms';
+
+import { IAuthForm } from '../../../../../../core/src/core/extension/extension-types';
 
 @Component({
   selector: 'app-kubernetes-aws-auth-form',

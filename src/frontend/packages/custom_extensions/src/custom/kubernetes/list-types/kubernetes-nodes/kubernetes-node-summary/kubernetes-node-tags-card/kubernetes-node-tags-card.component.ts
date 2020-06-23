@@ -1,8 +1,9 @@
-import { Component, OnInit, Input } from '@angular/core';
+import { Component, Input, OnInit } from '@angular/core';
 import { Observable } from 'rxjs';
-import { AppChip } from '../../../../../../shared/components/chips/chips.component';
+import { map } from 'rxjs/operators';
+
+import { AppChip } from '../../../../../../../../core/src/shared/components/chips/chips.component';
 import { KubernetesNodeService } from '../../../../services/kubernetes-node.service';
-import { map, tap } from 'rxjs/operators';
 
 @Component({
   selector: 'app-kubernetes-node-tags-card',

@@ -1,10 +1,9 @@
-/* tslint:disable:max-line-length */
 import { CommonModule } from '@angular/common';
 import { NgModule } from '@angular/core';
 import { NgxChartsModule } from '@swimlane/ngx-charts';
 
-import { CoreModule } from '../../core/core.module';
-import { SharedModule } from '../../shared/shared.module';
+import { CoreModule } from '../../../../core/src/core/core.module';
+import { SharedModule } from '../../../../core/src/shared/shared.module';
 import {
   KubedashConfigurationComponent,
 } from './kubernetes-dashboard/kubedash-configuration/kubedash-configuration.component';
@@ -93,6 +92,7 @@ import { KubernetesNodesTabComponent } from './tabs/kubernetes-nodes-tab/kuberne
 import { KubernetesPodsTabComponent } from './tabs/kubernetes-pods-tab/kubernetes-pods-tab.component';
 import { KubernetesSummaryTabComponent } from './tabs/kubernetes-summary-tab/kubernetes-summary.component';
 
+/* tslint:disable:max-line-length */
 
 /* tslint:enable */
 

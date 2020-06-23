@@ -1,7 +1,7 @@
 import { DatePipe } from '@angular/common';
 import { Component, Input } from '@angular/core';
 
-import { CardCell } from '../../../../../shared/components/list/list.types';
+import { CardCell } from '../../../../../../../core/src/shared/components/list/list.types';
 import { HelmRelease } from '../../workload.types';
 
 @Component({

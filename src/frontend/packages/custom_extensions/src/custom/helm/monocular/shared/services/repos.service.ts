@@ -1,11 +1,11 @@
+import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable, throwError } from 'rxjs';
 import { catchError, map } from 'rxjs/operators';
 
-import { LoggerService } from '../../../../../core/logger.service';
+import { LoggerService } from '../../../../../../../core/src/core/logger.service';
 import { RepoAttributes } from '../models/repo';
 import { ConfigService } from './config.service';
-import { HttpClient } from '@angular/common/http';
 
 
 

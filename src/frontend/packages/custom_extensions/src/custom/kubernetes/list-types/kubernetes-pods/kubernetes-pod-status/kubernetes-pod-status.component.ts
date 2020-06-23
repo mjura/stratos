@@ -1,6 +1,6 @@
 import { Component, Input } from '@angular/core';
 
-import { TableCellCustom } from '../../../../../shared/components/list/list.types';
+import { TableCellCustom } from '../../../../../../../core/src/shared/components/list/list.types';
 import { KubernetesPodExpandedStatusTypes } from '../../../services/kubernetes-expanded-state';
 import { KubernetesPod } from '../../../store/kube.types';
 

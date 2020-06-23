@@ -4,18 +4,22 @@ import * as moment from 'moment';
 import { of } from 'rxjs';
 import { filter, map } from 'rxjs/operators';
 
-import { BooleanIndicatorType } from '../../../../../shared/components/boolean-indicator/boolean-indicator.component';
-import { ITableListDataSource } from '../../../../../shared/components/list/data-sources-controllers/list-data-source-types';
+import {
+  BooleanIndicatorType,
+} from '../../../../../../../core/src/shared/components/boolean-indicator/boolean-indicator.component';
+import {
+  ITableListDataSource,
+} from '../../../../../../../core/src/shared/components/list/data-sources-controllers/list-data-source-types';
 import {
   TableCellBooleanIndicatorComponent,
   TableCellBooleanIndicatorComponentConfig,
-} from '../../../../../shared/components/list/list-table/table-cell-boolean-indicator/table-cell-boolean-indicator.component';
+} from '../../../../../../../core/src/shared/components/list/list-table/table-cell-boolean-indicator/table-cell-boolean-indicator.component';
 import {
   TableCellIconComponent,
   TableCellIconComponentConfig,
-} from '../../../../../shared/components/list/list-table/table-cell-icon/table-cell-icon.component';
-import { ITableColumn } from '../../../../../shared/components/list/list-table/table.types';
-import { CardCell } from '../../../../../shared/components/list/list.types';
+} from '../../../../../../../core/src/shared/components/list/list-table/table-cell-icon/table-cell-icon.component';
+import { ITableColumn } from '../../../../../../../core/src/shared/components/list/list-table/table.types';
+import { CardCell } from '../../../../../../../core/src/shared/components/list/list.types';
 import { kubeEntityCatalog } from '../../../kubernetes-entity-catalog';
 import { Container, ContainerState, ContainerStatus, InitContainer, KubernetesPod } from '../../../store/kube.types';
 

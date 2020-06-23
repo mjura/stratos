@@ -1,10 +1,10 @@
 import { NgModule } from '@angular/core';
 import { Router } from '@angular/router';
 
-import { CoreModule } from '../core/core.module';
-import { CustomizationService, CustomizationsMetadata } from '../core/customizations.types';
-import { MDAppModule } from '../core/md.module';
-import { SharedModule } from '../shared/shared.module';
+import { CoreModule } from '../../../core/src/core/core.module';
+import { CustomizationService, CustomizationsMetadata } from '../../../core/src/core/customizations.types';
+import { MDAppModule } from '../../../core/src/core/md.module';
+import { SharedModule } from '../../../core/src/shared/shared.module';
 import { DemoHelperComponent } from './demo/demo-helper/demo-helper.component';
 import { HelmSetupModule } from './helm/helm.setup.module';
 import { KubernetesSetupModule } from './kubernetes/kubernetes.setup.module';

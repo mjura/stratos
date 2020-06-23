@@ -4,11 +4,13 @@ import { ActivatedRoute } from '@angular/router';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 
-import { IHeaderBreadcrumb } from '../../../shared/components/page-header/page-header.types';
+import {
+  EndpointMissingMessageParts,
+} from '../../../../../core/src/shared/components/endpoints-missing/endpoints-missing.component';
+import { IHeaderBreadcrumb } from '../../../../../core/src/shared/components/page-header/page-header.types';
 import { BaseKubeGuid } from '../kubernetes-page.types';
 import { KubernetesEndpointService } from '../services/kubernetes-endpoint.service';
 import { KubernetesService } from '../services/kubernetes.service';
-import { EndpointMissingMessageParts } from '../../../shared/components/endpoints-missing/endpoints-missing.component';
 
 @Component({
   selector: 'app-kubernetes-dashboard',
@@ -100,7 +102,7 @@ export class KubernetesDashboardTabComponent implements OnInit {
       hasLoaded = true;
       this.errorMsg$.next({
         firstLine: errMsg,
-        secondLine: { text: ''}
+        secondLine: { text: '' }
       });
       this.hasError$.next(true);
     }

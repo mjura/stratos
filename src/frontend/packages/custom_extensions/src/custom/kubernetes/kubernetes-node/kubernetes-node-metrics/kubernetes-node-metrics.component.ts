@@ -1,12 +1,16 @@
 import { Component, OnInit } from '@angular/core';
-import { KubernetesNodeService, KubeNodeMetric } from '../../services/kubernetes-node.service';
-import { MetricsLineChartConfig } from '../../../../shared/components/metrics-chart/metrics-chart.types';
-import { MetricsConfig } from '../../../../shared/components/metrics-chart/metrics-chart.component';
-import { IMetricMatrixResult, ChartSeries } from '../../../../../../store/src/types/base-metric.types';
+
+import { MetricsConfig } from '../../../../../../core/src/shared/components/metrics-chart/metrics-chart.component';
+import { MetricsLineChartConfig } from '../../../../../../core/src/shared/components/metrics-chart/metrics-chart.types';
+import {
+  ChartDataTypes,
+  getMetricsChartConfigBuilder,
+} from '../../../../../../core/src/shared/components/metrics-chart/metrics.component.helpers';
+import { ChartSeries, IMetricMatrixResult } from '../../../../../../store/src/types/base-metric.types';
 import { IMetricApplication } from '../../../../../../store/src/types/metric.types';
+import { formatAxisCPUTime, formatCPUTime } from '../../kubernetes-metrics.helpers';
+import { KubeNodeMetric, KubernetesNodeService } from '../../services/kubernetes-node.service';
 import { FetchKubernetesChartMetricsAction } from '../../store/kubernetes.actions';
-import { ChartDataTypes, getMetricsChartConfigBuilder } from '../../../../shared/components/metrics-chart/metrics.component.helpers';
-import { formatCPUTime, formatAxisCPUTime } from '../../kubernetes-metrics.helpers';
 
 @Component({
   selector: 'app-kubernetes-node-metrics',

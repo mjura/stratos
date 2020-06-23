@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 
-import { TableCellCustom } from '../../../../../shared/components/list/list.types';
+import { TableCellCustom } from '../../../../../../../core/src/shared/components/list/list.types';
 import { KubernetesEndpointService } from '../../../services/kubernetes-endpoint.service';
 import { KubernetesNode } from '../../../store/kube.types';
 

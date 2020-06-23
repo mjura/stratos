@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 
-import { ListConfig } from '../../../../shared/components/list/list.component.types';
+import { ListConfig } from '../../../../../../core/src/shared/components/list/list.component.types';
 import {
   KubernetesNamespaceServicesListConfig,
 } from '../../list-types/kubernetes-namespace-services/kubernetes-namespace-services-list-config.service';

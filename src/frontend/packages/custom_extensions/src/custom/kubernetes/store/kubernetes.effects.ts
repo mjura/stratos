@@ -8,6 +8,8 @@ import { connectedEndpointsOfTypesSelector } from 'frontend/packages/store/src/s
 import { of } from 'rxjs';
 import { catchError, first, flatMap, map, mergeMap, switchMap } from 'rxjs/operators';
 
+import { environment } from '../../../../../core/src/environments/environment';
+import { isJetstreamError } from '../../../../../core/src/jetstream.helpers';
 import { AppState } from '../../../../../store/src/app-state';
 import { entityCatalog } from '../../../../../store/src/entity-catalog/entity-catalog';
 import { NormalizedResponse } from '../../../../../store/src/types/api.types';
@@ -16,8 +18,6 @@ import {
   WrapperRequestActionFailed,
   WrapperRequestActionSuccess,
 } from '../../../../../store/src/types/request.types';
-import { environment } from '../../../environments/environment';
-import { isJetstreamError } from '../../../jetstream.helpers';
 import {
   KUBERNETES_ENDPOINT_TYPE,
   kubernetesDashboardEntityType,

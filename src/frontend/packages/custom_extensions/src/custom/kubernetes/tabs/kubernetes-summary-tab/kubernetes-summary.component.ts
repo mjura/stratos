@@ -6,16 +6,16 @@ import { Store } from '@ngrx/store';
 import { combineLatest, interval, Observable, Subscription } from 'rxjs';
 import { first, map, startWith } from 'rxjs/operators';
 
+import { safeUnsubscribe } from '../../../../../../core/src/core/utils.service';
+import {
+  IChartThresholds,
+  ISimpleUsageChartData,
+} from '../../../../../../core/src/shared/components/simple-usage-chart/simple-usage-chart.types';
 import { AppState } from '../../../../../../store/src/app-state';
 import { entityCatalog } from '../../../../../../store/src/entity-catalog/entity-catalog';
 import { PaginationMonitorFactory } from '../../../../../../store/src/monitors/pagination-monitor.factory';
 import { getCurrentPageRequestInfo } from '../../../../../../store/src/reducers/pagination-reducer/pagination-reducer.types';
 import { PaginatedAction, PaginationEntityState } from '../../../../../../store/src/types/pagination.types';
-import { safeUnsubscribe } from '../../../../core/utils.service';
-import {
-  IChartThresholds,
-  ISimpleUsageChartData,
-} from '../../../../shared/components/simple-usage-chart/simple-usage-chart.types';
 import { kubeEntityCatalog } from '../../kubernetes-entity-catalog';
 import { KubernetesEndpointService } from '../../services/kubernetes-endpoint.service';
 

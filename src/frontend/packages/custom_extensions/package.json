@@ -7,6 +7,6 @@
   },
   "stratos": {
     "module": "CustomModule",
-    "_routingModule": "CustomRoutingModule"
+    "routingModule": "CustomRoutingModule"
   }
 }

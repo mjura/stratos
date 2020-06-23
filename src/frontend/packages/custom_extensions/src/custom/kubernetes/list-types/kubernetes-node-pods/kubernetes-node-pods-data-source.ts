@@ -1,8 +1,8 @@
 import { Store } from '@ngrx/store';
 
+import { ListDataSource } from '../../../../../../core/src/shared/components/list/data-sources-controllers/list-data-source';
+import { IListConfig } from '../../../../../../core/src/shared/components/list/list.component.types';
 import { AppState } from '../../../../../../store/src/app-state';
-import { ListDataSource } from '../../../../shared/components/list/data-sources-controllers/list-data-source';
-import { IListConfig } from '../../../../shared/components/list/list.component.types';
 import { kubeEntityCatalog } from '../../kubernetes-entity-catalog';
 import { BaseKubeGuid } from '../../kubernetes-page.types';
 import { KubernetesNodeService } from '../../services/kubernetes-node.service';

@@ -1,6 +1,7 @@
-import { Component, OnInit, ViewEncapsulation } from '@angular/core';
+import { Component, ViewEncapsulation } from '@angular/core';
 
-import { TableCellCustom } from '../../../../../shared/components/list/list.types';
+import { TableCellCustom } from '../../../../../../../core/src/shared/components/list/list.types';
+
 
 @Component({
   selector: 'app-kubernetes-node-capacity',

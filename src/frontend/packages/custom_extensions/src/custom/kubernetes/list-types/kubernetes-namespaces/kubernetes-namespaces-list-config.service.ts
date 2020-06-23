@@ -3,9 +3,9 @@ import { Store } from '@ngrx/store';
 import { Observable } from 'rxjs';
 import { filter, first, map, tap } from 'rxjs/operators';
 
+import { ITableColumn } from '../../../../../../core/src/shared/components/list/list-table/table.types';
+import { IListConfig, ListViewTypes } from '../../../../../../core/src/shared/components/list/list.component.types';
 import { AppState } from '../../../../../../store/src/app-state';
-import { ITableColumn } from '../../../../shared/components/list/list-table/table.types';
-import { IListConfig, ListViewTypes } from '../../../../shared/components/list/list.component.types';
 import { KubernetesNamespace } from '../../../kubernetes/store/kube.types';
 import { BaseKubeGuid } from '../../kubernetes-page.types';
 import { KubernetesEndpointService } from '../../services/kubernetes-endpoint.service';

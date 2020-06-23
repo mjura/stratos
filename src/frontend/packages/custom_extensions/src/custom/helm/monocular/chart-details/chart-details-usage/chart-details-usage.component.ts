@@ -3,7 +3,7 @@ import { MatIconRegistry } from '@angular/material/icon';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { DomSanitizer } from '@angular/platform-browser';
 
-import { EndpointsService } from '../../../../../core/endpoints.service';
+import { EndpointsService } from '../../../../../../../core/src/core/endpoints.service';
 import { Chart } from '../../shared/models/chart';
 
 @Component({

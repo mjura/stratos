@@ -5,7 +5,7 @@ import { endpointOfTypeSelector } from 'frontend/packages/store/src/selectors/en
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 
-import { ListConfig } from '../../../../shared/components/list/list.component.types';
+import { ListConfig } from '../../../../../../core/src/shared/components/list/list.component.types';
 import { HELM_ENDPOINT_TYPE } from '../../../helm/helm-entity-factory';
 import { HelmReleasesListConfig } from '../list-types/helm-releases-list-config.service';
 import { KubernetesNamespacesFilterService } from '../list-types/kube-namespaces-filter-config.service';

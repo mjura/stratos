@@ -6,12 +6,12 @@ import { ActivatedRoute } from '@angular/router';
 import { BehaviorSubject, combineLatest, Observable, of, Subscription } from 'rxjs';
 import { distinctUntilChanged, filter, first, map, pairwise, startWith, switchMap } from 'rxjs/operators';
 
+import { EndpointsService } from '../../../../../core/src/core/endpoints.service';
+import { safeUnsubscribe } from '../../../../../core/src/core/utils.service';
+import { ConfirmationDialogConfig } from '../../../../../core/src/shared/components/confirmation-dialog.config';
+import { ConfirmationDialogService } from '../../../../../core/src/shared/components/confirmation-dialog.service';
+import { StepOnNextFunction, StepOnNextResult } from '../../../../../core/src/shared/components/stepper/step/step.component';
 import { RequestInfoState } from '../../../../../store/src/reducers/api-request-reducer/types';
-import { EndpointsService } from '../../../core/endpoints.service';
-import { safeUnsubscribe } from '../../../core/utils.service';
-import { ConfirmationDialogConfig } from '../../../shared/components/confirmation-dialog.config';
-import { ConfirmationDialogService } from '../../../shared/components/confirmation-dialog.service';
-import { StepOnNextFunction, StepOnNextResult } from '../../../shared/components/stepper/step/step.component';
 import { kubeEntityCatalog } from '../../kubernetes/kubernetes-entity-catalog';
 import { KUBERNETES_ENDPOINT_TYPE } from '../../kubernetes/kubernetes-entity-factory';
 import { KubernetesNamespace } from '../../kubernetes/store/kube.types';

@@ -5,13 +5,13 @@ import { ActivatedRoute } from '@angular/router';
 import { BehaviorSubject, Observable, Subscription } from 'rxjs';
 import { distinctUntilChanged, filter, map } from 'rxjs/operators';
 
-import { ConfirmationDialogConfig } from '../../../../shared/components/confirmation-dialog.config';
-import { ConfirmationDialogService } from '../../../../shared/components/confirmation-dialog.service';
+import { ConfirmationDialogConfig } from '../../../../../../core/src/shared/components/confirmation-dialog.config';
+import { ConfirmationDialogService } from '../../../../../../core/src/shared/components/confirmation-dialog.service';
+import { IHeaderBreadcrumb } from '../../../../../../core/src/shared/components/page-header/page-header.types';
 import { BaseKubeGuid } from '../../kubernetes-page.types';
 import { KubernetesEndpointService } from '../../services/kubernetes-endpoint.service';
 import { KubernetesService } from '../../services/kubernetes.service';
 import { KubeDashboardStatus } from '../../store/kubernetes.effects';
-import { IHeaderBreadcrumb } from './../../../../shared/components/page-header/page-header.types';
 
 type MessageUpdater = (msg: string) => void;
 

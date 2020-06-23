@@ -1,10 +1,12 @@
 import { Component, Input, OnInit } from '@angular/core';
 
-import { MetricsConfig } from '../../../../../shared/components/metrics-chart/metrics-chart.component';
-import { MetricsLineChartConfig } from '../../../../../shared/components/metrics-chart/metrics-chart.types';
+import { MetricsConfig } from '../../../../../../../core/src/shared/components/metrics-chart/metrics-chart.component';
+import { MetricsLineChartConfig } from '../../../../../../../core/src/shared/components/metrics-chart/metrics-chart.types';
+import {
+  MetricsChartHelpers,
+} from '../../../../../../../core/src/shared/components/metrics-chart/metrics.component.helpers';
 import { IMetricMatrixResult } from '../../../../../../../store/src/types/base-metric.types';
 import { IMetricApplication } from '../../../../../../../store/src/types/metric.types';
-import { MetricsChartHelpers } from '../../../../../shared/components/metrics-chart/metrics.component.helpers';
 import { FetchKubernetesMetricsAction } from '../../../store/kubernetes.actions';
 
 @Component({

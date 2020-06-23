@@ -2,8 +2,8 @@ import { CommonModule } from '@angular/common';
 import { NgModule } from '@angular/core';
 import { NgxGraphModule } from '@swimlane/ngx-graph';
 
-import { CoreModule } from '../../../core/core.module';
-import { SharedModule } from '../../../shared/shared.module';
+import { CoreModule } from '../../../../../core/src/core/core.module';
+import { SharedModule } from '../../../../../core/src/shared/shared.module';
 import { KubernetesModule } from '../kubernetes.module';
 import { HelmReleaseCardComponent } from './list-types/helm-release-card/helm-release-card.component';
 import { HelmReleaseTabBaseComponent } from './release/helm-release-tab-base/helm-release-tab-base.component';

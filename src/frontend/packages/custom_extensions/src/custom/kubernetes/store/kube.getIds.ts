@@ -1,4 +1,4 @@
-import { environment } from '../../../environments/environment';
+import { environment } from '../../../../../core/src/environments/environment';
 import {
   BasicKubeAPIResource,
   KubernetesDeployment,

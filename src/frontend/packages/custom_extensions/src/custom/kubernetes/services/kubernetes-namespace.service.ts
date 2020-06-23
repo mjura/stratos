@@ -3,7 +3,7 @@ import { ActivatedRoute } from '@angular/router';
 import { Observable } from 'rxjs';
 import { filter, first, map, publishReplay } from 'rxjs/operators';
 
-import { getIdFromRoute } from '../../../core/utils.service';
+import { getIdFromRoute } from '../../../../../core/src/core/utils.service';
 import { kubeEntityCatalog } from '../kubernetes-entity-catalog';
 import { KubernetesNamespace } from '../store/kube.types';
 import { KubernetesEndpointService } from './kubernetes-endpoint.service';

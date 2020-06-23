@@ -1,7 +1,8 @@
 import { Component, OnInit } from '@angular/core';
-import { TableCellCustom } from '../../../../../shared/components/list/list.types';
-import { AppChip } from '../../../../../shared/components/chips/chips.component';
-import { PodLabel, KubeAPIResource } from '../../../store/kube.types';
+
+import { AppChip } from '../../../../../../../core/src/shared/components/chips/chips.component';
+import { TableCellCustom } from '../../../../../../../core/src/shared/components/list/list.types';
+import { KubeAPIResource, PodLabel } from '../../../store/kube.types';
 
 @Component({
   selector: 'app-kubernetes-pod-tags',

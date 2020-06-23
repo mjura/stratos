@@ -3,10 +3,12 @@ import { Store } from '@ngrx/store';
 import { Observable } from 'rxjs';
 import { filter, first, map } from 'rxjs/operators';
 
+import {
+  EndpointListHelper,
+} from '../../../../../core/src/shared/components/list/list-types/endpoint/endpoint-list.helpers';
+import { ListConfig } from '../../../../../core/src/shared/components/list/list.component.types';
 import { RouterNav } from '../../../../../store/src/actions/router.actions';
 import { AppState } from '../../../../../store/src/app-state';
-import { EndpointListHelper } from '../../../shared/components/list/list-types/endpoint/endpoint-list.helpers';
-import { ListConfig } from '../../../shared/components/list/list.component.types';
 import {
   KubernetesEndpointsListConfigService,
 } from '../list-types/kubernetes-endpoints/kubernetes-endpoints-list-config.service';

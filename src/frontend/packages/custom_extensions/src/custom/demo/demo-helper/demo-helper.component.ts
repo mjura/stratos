@@ -3,8 +3,8 @@ import { Component } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { map } from 'rxjs/operators';
 
+import { StratosAction, StratosActionType } from '../../../../../core/src/core/extension/extension-service';
 import { AppState } from '../../../../../store/src/app-state';
-import { StratosAction, StratosActionType } from '../../../core/extension/extension-service';
 
 
 @StratosAction({

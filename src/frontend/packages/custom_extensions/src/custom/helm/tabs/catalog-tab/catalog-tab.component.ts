@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 
-import { ListConfig } from '../../../../shared/components/list/list.component.types';
+import { ListConfig } from '../../../../../../core/src/shared/components/list/list.component.types';
 import { MonocularChartsListConfig } from './../../list-types/monocular-charts-list-config.service';
 
 @Component({

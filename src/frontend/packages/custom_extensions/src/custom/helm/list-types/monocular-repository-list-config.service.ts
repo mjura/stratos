@@ -10,26 +10,30 @@ import { selectDeletionInfo } from 'frontend/packages/store/src/selectors/api.se
 import { of as observableOf } from 'rxjs';
 import { pairwise } from 'rxjs/operators';
 
+import { STRATOS_ENDPOINT_TYPE } from '../../../../../core/src/base-entity-schemas';
+import { CurrentUserPermissionsService } from '../../../../../core/src/core/permissions/current-user-permissions.service';
+import { StratosCurrentUserPermissions } from '../../../../../core/src/core/permissions/stratos-user-permissions.checker';
+import { environment } from '../../../../../core/src/environments/environment';
+import { getFullEndpointApiUrl } from '../../../../../core/src/features/endpoints/endpoint-helpers';
+import { ConfirmationDialogConfig } from '../../../../../core/src/shared/components/confirmation-dialog.config';
+import { ConfirmationDialogService } from '../../../../../core/src/shared/components/confirmation-dialog.service';
+import { ITableColumn } from '../../../../../core/src/shared/components/list/list-table/table.types';
+import {
+  EndpointCardComponent,
+} from '../../../../../core/src/shared/components/list/list-types/endpoint/endpoint-card/endpoint-card.component';
+import {
+  TableCellEndpointStatusComponent,
+} from '../../../../../core/src/shared/components/list/list-types/endpoint/table-cell-endpoint-status/table-cell-endpoint-status.component';
+import {
+  IListAction,
+  IListConfig,
+  ListViewTypes,
+} from '../../../../../core/src/shared/components/list/list.component.types';
 import { AppState } from '../../../../../store/src/app-state';
 import { EntityMonitorFactory } from '../../../../../store/src/monitors/entity-monitor.factory.service';
 import { InternalEventMonitorFactory } from '../../../../../store/src/monitors/internal-event-monitor.factory';
 import { PaginationMonitorFactory } from '../../../../../store/src/monitors/pagination-monitor.factory';
 import { EndpointModel } from '../../../../../store/src/types/endpoint.types';
-import { STRATOS_ENDPOINT_TYPE } from '../../../base-entity-schemas';
-import { CurrentUserPermissionsService } from '../../../core/permissions/current-user-permissions.service';
-import { StratosCurrentUserPermissions } from '../../../core/permissions/stratos-user-permissions.checker';
-import { environment } from '../../../environments/environment';
-import { getFullEndpointApiUrl } from '../../../features/endpoints/endpoint-helpers';
-import { ConfirmationDialogConfig } from '../../../shared/components/confirmation-dialog.config';
-import { ConfirmationDialogService } from '../../../shared/components/confirmation-dialog.service';
-import { ITableColumn } from '../../../shared/components/list/list-table/table.types';
-import {
-  EndpointCardComponent,
-} from '../../../shared/components/list/list-types/endpoint/endpoint-card/endpoint-card.component';
-import {
-  TableCellEndpointStatusComponent,
-} from '../../../shared/components/list/list-types/endpoint/table-cell-endpoint-status/table-cell-endpoint-status.component';
-import { IListAction, IListConfig, ListViewTypes } from '../../../shared/components/list/list.component.types';
 import { defaultHelmKubeListPageSize } from '../../kubernetes/list-types/kube-helm-list-types';
 import { MonocularRepositoryDataSource } from './monocular-repository-list-source';
 

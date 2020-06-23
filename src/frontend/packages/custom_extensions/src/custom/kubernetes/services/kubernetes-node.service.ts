@@ -4,12 +4,12 @@ import { Store } from '@ngrx/store';
 import { Observable } from 'rxjs';
 import { filter, first, map, shareReplay } from 'rxjs/operators';
 
+import { getIdFromRoute } from '../../../../../core/src/core/utils.service';
+import { MetricQueryType } from '../../../../../core/src/shared/services/metrics-range-selector.types';
 import { MetricQueryConfig, MetricsAction } from '../../../../../store/src/actions/metrics.actions';
 import { AppState } from '../../../../../store/src/app-state';
 import { EntityMonitorFactory } from '../../../../../store/src/monitors/entity-monitor.factory.service';
 import { EntityInfo } from '../../../../../store/src/types/api.types';
-import { getIdFromRoute } from '../../../core/utils.service';
-import { MetricQueryType } from '../../../shared/services/metrics-range-selector.types';
 import { kubeEntityCatalog } from '../kubernetes-entity-catalog';
 import { KubernetesNode, MetricStatistic } from '../store/kube.types';
 import { FetchKubernetesMetricsAction } from '../store/kubernetes.actions';

@@ -3,17 +3,17 @@ import { ActivatedRoute } from '@angular/router';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 
-import { EntityInfo } from '../../../../../store/src/types/api.types';
-import { ChartSeries, IMetricMatrixResult } from '../../../../../store/src/types/base-metric.types';
-import { IMetricApplication } from '../../../../../store/src/types/metric.types';
-import { getIdFromRoute } from '../../../core/utils.service';
-import { MetricsConfig } from '../../../shared/components/metrics-chart/metrics-chart.component';
-import { MetricsLineChartConfig } from '../../../shared/components/metrics-chart/metrics-chart.types';
+import { getIdFromRoute } from '../../../../../core/src/core/utils.service';
+import { MetricsConfig } from '../../../../../core/src/shared/components/metrics-chart/metrics-chart.component';
+import { MetricsLineChartConfig } from '../../../../../core/src/shared/components/metrics-chart/metrics-chart.types';
 import {
   ChartDataTypes,
   getMetricsChartConfigBuilder,
-} from '../../../shared/components/metrics-chart/metrics.component.helpers';
-import { IHeaderBreadcrumb } from '../../../shared/components/page-header/page-header.types';
+} from '../../../../../core/src/shared/components/metrics-chart/metrics.component.helpers';
+import { IHeaderBreadcrumb } from '../../../../../core/src/shared/components/page-header/page-header.types';
+import { EntityInfo } from '../../../../../store/src/types/api.types';
+import { ChartSeries, IMetricMatrixResult } from '../../../../../store/src/types/base-metric.types';
+import { IMetricApplication } from '../../../../../store/src/types/metric.types';
 import { kubeEntityCatalog } from '../kubernetes-entity-catalog';
 import { formatAxisCPUTime, formatCPUTime } from '../kubernetes-metrics.helpers';
 import { BaseKubeGuid } from '../kubernetes-page.types';

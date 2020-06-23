@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 
-import { ListConfig } from '../../../../shared/components/list/list.component.types';
+import { ListConfig } from '../../../../../../core/src/shared/components/list/list.component.types';
 import {
   KubernetesNamespacePodsListConfigService,
 } from '../../list-types/kubernetes-namespace-pods/kubernetes-namespace-pods-list-config.service';
@@ -14,4 +14,4 @@ import {
     useClass: KubernetesNamespacePodsListConfigService,
   }]
 })
-export class KubernetesNamespacePodsComponent {}
+export class KubernetesNamespacePodsComponent { }

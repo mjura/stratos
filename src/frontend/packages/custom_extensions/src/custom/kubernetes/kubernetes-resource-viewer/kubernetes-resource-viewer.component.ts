@@ -3,8 +3,8 @@ import * as moment from 'moment';
 import { Observable, of } from 'rxjs';
 import { filter, first, map, publishReplay, refCount, switchMap } from 'rxjs/operators';
 
-import { EndpointsService } from '../../../core/endpoints.service';
-import { PreviewableComponent } from '../../../shared/previewable-component';
+import { EndpointsService } from '../../../../../core/src/core/endpoints.service';
+import { PreviewableComponent } from '../../../../../core/src/shared/previewable-component';
 import { KubernetesEndpointService } from '../services/kubernetes-endpoint.service';
 import { BasicKubeAPIResource, KubeAPIResource } from '../store/kube.types';
 

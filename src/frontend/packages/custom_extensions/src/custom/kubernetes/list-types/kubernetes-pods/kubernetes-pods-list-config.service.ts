@@ -5,13 +5,13 @@ import {
 } from 'frontend/packages/core/src/shared/components/list/data-sources-controllers/list-data-source-types';
 import { of } from 'rxjs';
 
-import { AppState } from '../../../../../../store/src/app-state';
 import {
   TableCellSidePanelComponent,
   TableCellSidePanelConfig,
-} from '../../../../shared/components/list/list-table/table-cell-side-panel/table-cell-side-panel.component';
-import { ITableColumn } from '../../../../shared/components/list/list-table/table.types';
-import { IListConfig, ListViewTypes } from '../../../../shared/components/list/list.component.types';
+} from '../../../../../../core/src/shared/components/list/list-table/table-cell-side-panel/table-cell-side-panel.component';
+import { ITableColumn } from '../../../../../../core/src/shared/components/list/list-table/table.types';
+import { IListConfig, ListViewTypes } from '../../../../../../core/src/shared/components/list/list.component.types';
+import { AppState } from '../../../../../../store/src/app-state';
 import { BaseKubeGuid } from '../../kubernetes-page.types';
 import {
   KubernetesResourceViewerComponent,

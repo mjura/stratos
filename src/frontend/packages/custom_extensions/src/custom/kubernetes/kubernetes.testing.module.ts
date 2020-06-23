@@ -3,13 +3,13 @@ import { NgModule } from '@angular/core';
 import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 import { RouterTestingModule } from '@angular/router/testing';
 
+import { generateStratosEntities } from '../../../../core/src/base-entity-types';
+import { CoreModule } from '../../../../core/src/core/core.module';
+import { SharedModule } from '../../../../core/src/shared/shared.module';
+import { AppTestModule } from '../../../../core/test-framework/core-test.helper';
 import { CATALOGUE_ENTITIES, EntityCatalogFeatureModule } from '../../../../store/src/entity-catalog.module';
 import { entityCatalog, TestEntityCatalog } from '../../../../store/src/entity-catalog/entity-catalog';
 import { createBasicStoreModule } from '../../../../store/testing/public-api';
-import { AppTestModule } from '../../../test-framework/core-test.helper';
-import { generateStratosEntities } from '../../base-entity-types';
-import { CoreModule } from '../../core/core.module';
-import { SharedModule } from '../../shared/shared.module';
 import { HelmReleaseActivatedRouteMock, HelmReleaseGuidMock } from '../helm/helm-testing.module';
 import { generateKubernetesEntities } from './kubernetes-entity-generator';
 import { BaseKubeGuid } from './kubernetes-page.types';
