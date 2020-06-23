@@ -8,7 +8,7 @@ set -o pipefail
 # Script folder
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null && pwd )"
 STRATOS="`cd "${DIR}/../../..";pwd`"
-CUSTOM="${STRATOS}/examples/custom-src"
+CUSTOM="${STRATOS}/custom-src"
 TEMPLATES=${DIR}/templates
 
 STRATOS_YML=${STRATOS}/stratos.yaml
@@ -149,7 +149,7 @@ fi
 
 migrateTitle
 migrateTheme
-#migrateExtensions
+migrateExtensions
 
 popd > /dev/null
 
