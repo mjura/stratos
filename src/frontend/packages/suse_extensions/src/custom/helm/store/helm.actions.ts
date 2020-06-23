@@ -1,3 +1,4 @@
+import { PaginatedAction } from '../../../../../store/src/types/pagination.types';
 import { EntityRequestAction } from '../../../../../store/src/types/request.types';
 import {
   HELM_ENDPOINT_TYPE,
@@ -5,7 +6,6 @@ import {
   helmVersionsEntityType,
   monocularChartsEntityType,
 } from '../helm-entity-factory';
-import { PaginatedAction } from './../../../../../store/src/types/pagination.types';
 import { HelmInstallValues } from './helm.types';
 
 export const GET_MONOCULAR_CHARTS = '[Monocular] Get Charts';

@@ -1,7 +1,7 @@
 import { Component, Input } from '@angular/core';
 
 import { CardCell } from '../../../../../../core/src/shared/components/list/list.types';
-import { KubeService } from '../../../kubernetes/store/kube.types';
+import { KubeService } from '../../store/kube.types';
 
 @Component({
   selector: 'app-kubernetes-service-ports',

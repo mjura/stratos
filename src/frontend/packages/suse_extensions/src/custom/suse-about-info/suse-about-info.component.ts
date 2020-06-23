@@ -5,7 +5,7 @@ import { filter, map } from 'rxjs/operators';
 
 import { AppState } from '../../../../store/src/app-state';
 import { AuthState } from '../../../../store/src/reducers/auth.reducer';
-import { SessionData } from './../../../../store/src/types/auth.types';
+import { SessionData } from '../../../../store/src/types/auth.types';
 
 @Component({
   selector: 'app-suse-about-info',

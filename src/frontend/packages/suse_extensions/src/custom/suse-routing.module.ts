@@ -54,4 +54,4 @@ const customRoutes: Routes = [
   ],
   declarations: []
 })
-export class CustomRoutingModule { }
+export class SuseRoutingModule { }

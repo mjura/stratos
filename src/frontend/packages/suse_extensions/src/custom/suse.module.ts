@@ -42,7 +42,7 @@ const SuseCustomizations: CustomizationsMetadata = {
     DemoHelperComponent,
   ]
 })
-export class CustomModule {
+export class SuseModule {
 
   static init = false;
 
@@ -50,13 +50,13 @@ export class CustomModule {
     cs.set(SuseCustomizations);
 
     // Only update the routes once
-    if (!CustomModule.init) {
+    if (!SuseModule.init) {
       // Override the component used for the login route
       const routeConfig = [...router.config];
       const loginRoute = routeConfig.find(r => r.path === 'login') || {};
       loginRoute.component = SuseLoginComponent;
       router.resetConfig(routeConfig);
-      CustomModule.init = true;
+      SuseModule.init = true;
     }
   }
 }
