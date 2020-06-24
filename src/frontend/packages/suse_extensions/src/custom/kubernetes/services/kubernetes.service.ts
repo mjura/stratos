@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { map, shareReplay } from 'rxjs/operators';
 
-import { endpointEntitySchema } from '../../../../../core/src/base-entity-schemas';
+import { endpointEntityType, stratosEntityFactory } from '../../../../../store/src/helpers/stratos-entity-factory';
 import { PaginationMonitor } from '../../../../../store/src/monitors/pagination-monitor';
 import { PaginationMonitorFactory } from '../../../../../store/src/monitors/pagination-monitor.factory';
 import { APIResource, EntityInfo } from '../../../../../store/src/types/api.types';
@@ -17,9 +17,10 @@ export class KubernetesService {
   constructor(
     private paginationMonitorFactory: PaginationMonitorFactory
   ) {
+    // TODO: RC update with stratos entity catalog
     this.kubeEndpointsMonitor = this.paginationMonitorFactory.create(
       endpointListKey,
-      endpointEntitySchema,
+      stratosEntityFactory(endpointEntityType),
       true
     );
 

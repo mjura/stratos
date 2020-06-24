@@ -3,7 +3,7 @@ import { ActivatedRoute } from '@angular/router';
 import { Observable } from 'rxjs';
 import { first, map, startWith } from 'rxjs/operators';
 
-import { FavoritesConfigMapper } from '../../../../../core/src/shared/components/favorites-meta-card/favorite-config-mapper';
+import { FavoritesConfigMapper } from '../../../../../store/src/favorite-config-mapper';
 import { UserFavoriteEndpoint } from '../../../../../store/src/types/user-favorites.types';
 import { BaseKubeGuid } from '../kubernetes-page.types';
 import { KubernetesEndpointService } from '../services/kubernetes-endpoint.service';

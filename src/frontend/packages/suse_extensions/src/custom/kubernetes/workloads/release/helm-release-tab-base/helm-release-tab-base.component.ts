@@ -7,7 +7,7 @@ import { catchError, map, share, switchMap } from 'rxjs/operators';
 
 import { LoggerService } from '../../../../../../../core/src/core/logger.service';
 import { IPageSideNavTab } from '../../../../../../../core/src/features/dashboard/page-side-nav/page-side-nav.component';
-import { HideSnackBar, ShowSnackBar } from '../../../../../../../store/src/actions/snackBar.actions';
+import { SnackBarService } from '../../../../../../../core/src/shared/services/snackbar.service';
 import { AppState } from '../../../../../../../store/src/app-state';
 import { entityCatalog } from '../../../../../../../store/src/entity-catalog/entity-catalog';
 import { EntityRequestAction, WrapperRequestActionSuccess } from '../../../../../../../store/src/types/request.types';
@@ -65,7 +65,8 @@ export class HelmReleaseTabBaseComponent implements OnDestroy {
   constructor(
     public helmReleaseHelper: HelmReleaseHelperService,
     private store: Store<AppState>,
-    private logService: LoggerService
+    private logService: LoggerService,
+    private snackbarService: SnackBarService
   ) {
     this.title = this.helmReleaseHelper.releaseTitle;
 
@@ -145,9 +146,7 @@ export class HelmReleaseTabBaseComponent implements OnDestroy {
           this.addResource(releaseResourceAction, resources);
         } else if (messageObj.kind === 'ManifestErrors') {
           if (messageObj.data) {
-            this.store.dispatch(
-              new ShowSnackBar('Errors were found when parsing this workload. Not all resources may be shown', 'Dismiss')
-            );
+            this.snackbarService.show('Errors were found when parsing this workload. Not all resources may be shown', 'Dismiss')
           }
         }
       }
@@ -196,6 +195,6 @@ export class HelmReleaseTabBaseComponent implements OnDestroy {
 
   ngOnDestroy() {
     this.sub.unsubscribe();
-    this.store.dispatch(new HideSnackBar());
+    this.snackbarService.hide();
   }
 }

@@ -5,16 +5,13 @@ import { ActivatedRoute } from '@angular/router';
 import { Store } from '@ngrx/store';
 import { UnregisterEndpoint } from 'frontend/packages/store/src/actions/endpoint.actions';
 import { entityCatalog } from 'frontend/packages/store/src/entity-catalog/entity-catalog';
-import { endpointSchemaKey } from 'frontend/packages/store/src/helpers/entity-factory';
 import { selectDeletionInfo } from 'frontend/packages/store/src/selectors/api.selectors';
 import { of as observableOf } from 'rxjs';
 import { pairwise } from 'rxjs/operators';
 
-import { STRATOS_ENDPOINT_TYPE } from '../../../../../core/src/base-entity-schemas';
 import { CurrentUserPermissionsService } from '../../../../../core/src/core/permissions/current-user-permissions.service';
 import { StratosCurrentUserPermissions } from '../../../../../core/src/core/permissions/stratos-user-permissions.checker';
 import { environment } from '../../../../../core/src/environments/environment';
-import { getFullEndpointApiUrl } from '../../../../../core/src/features/endpoints/endpoint-helpers';
 import { ConfirmationDialogConfig } from '../../../../../core/src/shared/components/confirmation-dialog.config';
 import { ConfirmationDialogService } from '../../../../../core/src/shared/components/confirmation-dialog.service';
 import { ITableColumn } from '../../../../../core/src/shared/components/list/list-table/table.types';
@@ -30,6 +27,8 @@ import {
   ListViewTypes,
 } from '../../../../../core/src/shared/components/list/list.component.types';
 import { AppState } from '../../../../../store/src/app-state';
+import { getFullEndpointApiUrl } from '../../../../../store/src/endpoint-utils';
+import { endpointEntityType, STRATOS_ENDPOINT_TYPE } from '../../../../../store/src/helpers/stratos-entity-factory';
 import { EntityMonitorFactory } from '../../../../../store/src/monitors/entity-monitor.factory.service';
 import { InternalEventMonitorFactory } from '../../../../../store/src/monitors/internal-event-monitor.factory';
 import { PaginationMonitorFactory } from '../../../../../store/src/monitors/pagination-monitor.factory';
@@ -88,7 +87,7 @@ export class MonocularRepositoryListConfig implements IListConfig<EndpointModel>
     },
   ];
 
-  private endpointEntityKey = entityCatalog.getEntityKey(STRATOS_ENDPOINT_TYPE, endpointSchemaKey);
+  private endpointEntityKey = entityCatalog.getEntityKey(STRATOS_ENDPOINT_TYPE, endpointEntityType);
 
   private listActionSyncRepository: IListAction<EndpointModel> = {
     action: (item: EndpointModel) => {

@@ -6,11 +6,11 @@ import { ConfirmationDialogConfig } from 'frontend/packages/core/src/shared/comp
 import { ConfirmationDialogService } from 'frontend/packages/core/src/shared/components/confirmation-dialog.service';
 import { ClearPaginationOfType } from 'frontend/packages/store/src/actions/pagination.actions';
 import { RouterNav } from 'frontend/packages/store/src/actions/router.actions';
-import { HideSnackBar, ShowSnackBar } from 'frontend/packages/store/src/actions/snackBar.actions';
 import { AppState } from 'frontend/packages/store/src/app-state';
 import { combineLatest, Observable, ReplaySubject } from 'rxjs';
 import { distinctUntilChanged, filter, first, map, publishReplay, refCount, startWith } from 'rxjs/operators';
 
+import { SnackBarService } from '../../../../../../../../core/src/shared/services/snackbar.service';
 import { endpointsEntityRequestDataSelector } from '../../../../../../../../store/src/selectors/endpoint.selectors';
 import { HelmReleaseChartData, HelmReleaseResource } from '../../../workload.types';
 import { workloadsEntityCatalog } from '../../../workloads-entity-catalog';
@@ -95,7 +95,8 @@ export class HelmReleaseSummaryTabComponent implements OnDestroy {
     private store: Store<AppState>,
     private confirmDialog: ConfirmationDialogService,
     private httpClient: HttpClient,
-    private logService: LoggerService
+    private logService: LoggerService,
+    private snackbarService: SnackBarService
   ) {
 
     this.isBusy$ = combineLatest([
@@ -197,7 +198,7 @@ export class HelmReleaseSummaryTabComponent implements OnDestroy {
       this.httpClient.delete(`/pp/v1/helm/releases/${endpointAndName}`).subscribe({
         error: (err: any) => {
           this.endDelete();
-          this.store.dispatch(new ShowSnackBar('Failed to delete release', 'Close'));
+          this.snackbarService.show('Failed to delete release', 'Close');
           this.logService.error('Failed to delete release: ', err);
         },
         complete: () => {
@@ -212,7 +213,7 @@ export class HelmReleaseSummaryTabComponent implements OnDestroy {
 
   ngOnDestroy() {
     if (this.deleted) {
-      this.store.dispatch(new HideSnackBar());
+      this.snackbarService.hide();
     }
   }
 

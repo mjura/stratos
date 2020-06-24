@@ -1,11 +1,11 @@
 import { CommonModule } from '@angular/common';
 import { NgModule, Optional, SkipSelf } from '@angular/core';
 
-import { EndpointHealthCheck } from '../../../../core/endpoints-health-checks';
 import { CoreModule } from '../../../../core/src/core/core.module';
 import { EndpointsService } from '../../../../core/src/core/endpoints.service';
 import { SharedModule } from '../../../../core/src/shared/shared.module';
 import { EntityCatalogModule } from '../../../../store/src/entity-catalog.module';
+import { EndpointHealthCheck } from '../../../../store/src/entity-catalog/entity-catalog.types';
 import { KubernetesAWSAuthFormComponent } from './auth-forms/kubernetes-aws-auth-form/kubernetes-aws-auth-form.component';
 import {
   KubernetesCertsAuthFormComponent,

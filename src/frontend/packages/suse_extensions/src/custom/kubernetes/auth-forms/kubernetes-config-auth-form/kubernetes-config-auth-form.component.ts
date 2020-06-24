@@ -1,7 +1,8 @@
 import { Component, Input } from '@angular/core';
 import { FormGroup } from '@angular/forms';
 
-import { EndpointAuthValues, IEndpointAuthComponent } from '../../../../../../core/src/core/extension/extension-types';
+import { EndpointAuthValues, IEndpointAuthComponent } from '../../../../../../store/src/extension-types';
+
 
 @Component({
   selector: 'app-kubernetes-config-auth-form',

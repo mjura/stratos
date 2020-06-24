@@ -1,7 +1,5 @@
 import { Validators } from '@angular/forms';
 
-import { metricEntityType } from '../../../../core/src/base-entity-schemas';
-import { EndpointAuthTypeConfig, EndpointType } from '../../../../core/src/core/extension/extension-types';
 import {
   StratosBaseCatalogEntity,
   StratosCatalogEndpointEntity,
@@ -11,6 +9,8 @@ import {
   IStratosEntityDefinition,
   StratosEndpointExtensionDefinition,
 } from '../../../../store/src/entity-catalog/entity-catalog.types';
+import { EndpointAuthTypeConfig, EndpointType } from '../../../../store/src/extension-types';
+import { metricEntityType } from '../../../../store/src/helpers/stratos-entity-factory';
 import { IFavoriteMetadata } from '../../../../store/src/types/user-favorites.types';
 import { KubernetesAWSAuthFormComponent } from './auth-forms/kubernetes-aws-auth-form/kubernetes-aws-auth-form.component';
 import {
