@@ -6,7 +6,6 @@ import { Observable } from 'rxjs';
 import { catchError, flatMap, mergeMap } from 'rxjs/operators';
 
 import { environment } from '../../../../../core/src/environments/environment';
-import { isJetstreamError } from '../../../../../core/src/jetstream.helpers';
 import { GET_ENDPOINTS_SUCCESS, GetAllEndpointsSuccess } from '../../../../../store/src/actions/endpoint.actions';
 import { ClearPaginationOfType } from '../../../../../store/src/actions/pagination.actions';
 import { AppState } from '../../../../../store/src/app-state';
