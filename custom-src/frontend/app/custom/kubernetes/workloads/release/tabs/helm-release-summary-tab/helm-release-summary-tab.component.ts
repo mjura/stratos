@@ -10,11 +10,11 @@ import { RouterNav } from 'frontend/packages/store/src/actions/router.actions';
 import { HideSnackBar, ShowSnackBar } from 'frontend/packages/store/src/actions/snackBar.actions';
 import { AppState } from 'frontend/packages/store/src/app-state';
 import { combineLatest, Observable, ReplaySubject, Subject } from 'rxjs';
-import { filter, first, map, publishReplay, refCount, startWith, distinctUntilChanged, take } from 'rxjs/operators';
+import { distinctUntilChanged, filter, first, map, publishReplay, refCount, startWith } from 'rxjs/operators';
 
 import { endpointsEntityRequestDataSelector } from '../../../../../../../../store/src/selectors/endpoint.selectors';
-import { GetHelmReleases } from '../../../store/workloads.actions';
 import { HelmReleaseChartData, HelmReleaseResource } from '../../../workload.types';
+import { workloadsEntityCatalog } from '../../../workloads-entity-catalog';
 import { HelmReleaseHelperService } from '../helm-release-helper.service';
 import { KubernetesAnalysisService } from '../../../../services/kubernetes.analysis.service';
 import { SidePanelService } from 'frontend/packages/core/src/shared/services/side-panel.service';
@@ -43,6 +43,7 @@ export class HelmReleaseSummaryTabComponent implements OnDestroy {
   public containersChartData = [];
 
   private successChartColor = '#4DD3A7';
+  private completedChartColour = '#7aa3e5';
 
   public path: string;
 
@@ -50,6 +51,10 @@ export class HelmReleaseSummaryTabComponent implements OnDestroy {
     {
       name: 'Running',
       value: this.successChartColor
+    },
+    {
+      name: 'Completed',
+      value: this.completedChartColour
     },
   ];
 
@@ -123,7 +128,15 @@ export class HelmReleaseSummaryTabComponent implements OnDestroy {
 
     this.path = `${this.helmReleaseHelper.namespace}/${this.helmReleaseHelper.releaseTitle}`;
 
-    this.chartData$ = this.helmReleaseHelper.fetchReleaseChartStats();
+    this.chartData$ = this.helmReleaseHelper.fetchReleaseChartStats().pipe(
+      distinctUntilChanged(),
+      map(chartData => ({
+        ...chartData,
+        containersChartData: chartData.containersChartData.sort((a, b) => a.name.localeCompare(b.name)),
+        podsChartData: chartData.podsChartData.sort((a, b) => a.name.localeCompare(b.name))
+      })
+      )
+    );
 
     this.resources$ = combineLatest(
       this.helmReleaseHelper.fetchReleaseGraph(),
@@ -233,7 +246,7 @@ export class HelmReleaseSummaryTabComponent implements OnDestroy {
           this.logService.error('Failed to delete release: ', err);
         },
         complete: () => {
-          const action = new GetHelmReleases();
+          const action = workloadsEntityCatalog.release.actions.getMultiple();
           this.store.dispatch(new ClearPaginationOfType(action));
           this.completeDelete();
           this.store.dispatch(new RouterNav({ path: ['workloads'] }));
