@@ -6,7 +6,9 @@ import { MetricQueryConfig, MetricsAction, MetricsChartAction } from '../../../.
 import { getPaginationKey } from '../../../../../store/src/actions/pagination.actions';
 import { PaginatedAction, PaginationParam } from '../../../../../store/src/types/pagination.types';
 import { EntityRequestAction } from '../../../../../store/src/types/request.types';
+import { MonocularPaginationAction } from '../../helm/store/helm.actions';
 import {
+  analysisReportEntityType,
   KUBERNETES_ENDPOINT_TYPE,
   kubernetesDashboardEntityType,
   kubernetesDeploymentsEntityType,
@@ -16,7 +18,6 @@ import {
   kubernetesPodsEntityType,
   kubernetesServicesEntityType,
   kubernetesStatefulSetsEntityType,
-  analysisReportEntityType,
 } from '../kubernetes-entity-factory';
 import { getGuidFromKubeDashboard, getGuidFromKubeNamespace, getGuidFromKubeNode, getGuidFromKubePod } from './kube.getIds';
 
@@ -375,8 +376,6 @@ export class FetchKubernetesChartMetricsAction extends MetricsChartAction {
     );
   }
 }
-
-//export interface AnalysisPaginationAction extends PaginatedAction, EntityRequestAction { }
 
 // Get the analysis reports for the given endpoint ID
 export class GetAnalysisReports implements MonocularPaginationAction {
