@@ -69,15 +69,6 @@ export class KubernetesAnalysisService {
         iconWidth: '120',
         descriptionUrl: '/core/assets/custom/kubescore.md'
       },
-      {
-        name: 'Clair',
-        id: 'clair',
-        namespaceAware: true,
-        iconUrl: '/core/assets/custom/clair.png',
-        iconWidth: '70',
-        descriptionUrl: '/core/assets/custom/clair.md'
-      }
-
       // {
       //   name: 'Sonobuoy',
       //   id: 'sonobuoy',

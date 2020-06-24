@@ -67,9 +67,6 @@ console:
   # Enable/disable Tech Preview
   techPreview: false
 
-  # clair server - set if you are using your own Clair server
-  clairServer: ~
-
   ui:
     # Override the default maximum number of entities that a configured list can fetch. When a list meets this amount additional pages are not fetched 
     listMaxSize:

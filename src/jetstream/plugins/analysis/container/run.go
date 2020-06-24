@@ -116,8 +116,6 @@ func (a *Analyzer) doRun(ec echo.Context) error {
 		runPopeye(&job)
 	case "kube-score":
 		runKubeScore(&job)
-	case "clair":
-		runClair(&job)
 	// case "sonobuoy":
 	// 	runSonobuoy(dbStore, file, folder, report, requestBody)
 	default:

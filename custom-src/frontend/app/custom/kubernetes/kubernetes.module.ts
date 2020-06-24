@@ -8,16 +8,6 @@ import {
   AnalysisReportSelectorComponent,
 } from './analysis-report-viewer/analysis-report-selector/analysis-report-selector.component';
 import { AnalysisReportViewerComponent } from './analysis-report-viewer/analysis-report-viewer.component';
-import {
-  ClairReportDetailComponent,
-} from './analysis-report-viewer/clair-report-viewer/clair-report-detail/clair-report-detail.component';
-import {
-  ClairReportSeveritySummaryComponent,
-} from './analysis-report-viewer/clair-report-viewer/clair-report-severity-summary/clair-report-severity-summary.component';
-import {
-  ClairReportSeverityTableComponent,
-} from './analysis-report-viewer/clair-report-viewer/clair-report-severity-table/clair-report-severity-table.component';
-import { ClairReportViewerComponent } from './analysis-report-viewer/clair-report-viewer/clair-report-viewer.component';
 import { JsonReportViewerComponent } from './analysis-report-viewer/json-report-viewer/json-report-viewer.component';
 import { JUnitReportViewerComponent } from './analysis-report-viewer/junit-report-viewer/junit-report-viewer.component';
 import {
@@ -194,16 +184,12 @@ import { KubernetesSummaryTabComponent } from './tabs/kubernetes-summary-tab/kub
     PopeyeReportViewerComponent,
     JUnitReportViewerComponent,
     JsonReportViewerComponent,
-    ClairReportViewerComponent,
-    ClairReportDetailComponent,
     AnalysisReportSelectorComponent,
     ResourceAlertPreviewComponent,
     ResourceAlertViewComponent,
     KubeScoreReportViewerComponent,
     AnalysisStatusCellComponent,
     KubernetesNamespaceAnalysisReportComponent,
-    ClairReportSeveritySummaryComponent,
-    ClairReportSeverityTableComponent,
   ],
   providers: [
     KubernetesService,
@@ -231,14 +217,10 @@ import { KubernetesSummaryTabComponent } from './tabs/kubernetes-summary-tab/kub
     PopeyeReportViewerComponent,
     JUnitReportViewerComponent,
     JsonReportViewerComponent,
-    ClairReportViewerComponent,
-    ClairReportDetailComponent,
     KubeScoreReportViewerComponent,
     AnalysisReportSelectorComponent,
     ResourceAlertPreviewComponent,
     AnalysisStatusCellComponent,
-    ClairReportSeveritySummaryComponent,
-    ClairReportSeverityTableComponent,
   ],
   exports: [
     KubernetesResourceViewerComponent,
@@ -246,15 +228,11 @@ import { KubernetesSummaryTabComponent } from './tabs/kubernetes-summary-tab/kub
     PopeyeReportViewerComponent,
     JUnitReportViewerComponent,
     JsonReportViewerComponent,
-    ClairReportViewerComponent,
-    ClairReportDetailComponent,
     KubeScoreReportViewerComponent,
     AnalysisReportSelectorComponent,
     ResourceAlertPreviewComponent,
     ResourceAlertViewComponent,
     AnalysisStatusCellComponent,
-    ClairReportSeveritySummaryComponent,
-    ClairReportSeverityTableComponent,
   ]
 })
 export class KubernetesModule { }

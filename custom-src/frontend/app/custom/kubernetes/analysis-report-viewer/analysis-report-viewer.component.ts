@@ -9,7 +9,6 @@ import {
   ViewContainerRef,
 } from '@angular/core';
 
-import { ClairReportViewerComponent } from './clair-report-viewer/clair-report-viewer.component';
 import { KubeScoreReportViewerComponent } from './kube-score-report-viewer/kube-score-report-viewer.component';
 import { PopeyeReportViewerComponent } from './popeye-report-viewer/popeye-report-viewer.component';
 
@@ -49,9 +48,6 @@ export class AnalysisReportViewerComponent implements OnDestroy {
         break;
       case 'kubescore':
         this.createComponent(KubeScoreReportViewerComponent, report);
-        break;
-      case 'clair':
-        this.createComponent(ClairReportViewerComponent, report);
         break;
       }
   }
