@@ -1,11 +1,11 @@
-import { Component, OnInit, Input } from '@angular/core';
+import { Component, Input } from '@angular/core';
 
 @Component({
   selector: 'app-resource-alert-view',
   templateUrl: './resource-alert-view.component.html',
   styleUrls: ['./resource-alert-view.component.scss']
 })
-export class ResourceAlertViewComponent implements OnInit {
+export class ResourceAlertViewComponent {
 
   alertInfo;
 
@@ -18,10 +18,6 @@ export class ResourceAlertViewComponent implements OnInit {
   }
 
   @Input() showHeader = true;
-
-  constructor() { }
-
-  ngOnInit() { }
 
   normalize(data) {
     // Normalize the alerts into groups

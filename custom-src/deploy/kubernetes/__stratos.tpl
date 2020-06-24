@@ -12,4 +12,6 @@
   value: "mongodb://{{ .Release.Name }}-fdbdoclayer:27016"
 - name: SYNC_SERVER_URL
   value: "http://{{ .Release.Name }}-chartsync:8080"
+- name: ANALYSIS_SERVICES_API
+  value: "http://{{ .Release.Name }}-analyzers:8090"
 {{- end }}

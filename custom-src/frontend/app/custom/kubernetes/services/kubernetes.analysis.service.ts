@@ -1,6 +1,6 @@
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { MatSnackBar } from '@angular/material';
+import { MatSnackBar } from '@angular/material/snack-bar';
 import { ActivatedRoute } from '@angular/router';
 import { Store } from '@ngrx/store';
 import { ClearPaginationOfType } from 'frontend/packages/store/src/actions/pagination.actions';
@@ -122,10 +122,8 @@ export class KubernetesAnalysisService {
     const del = this.http.delete(url, requestArgs);
     del.subscribe(d => {
       const action = new GetAnalysisReports(this.kubeEndpointService.baseKube.guid);
-
       this.store.dispatch(new ClearPaginationOfType(action));
       this.store.dispatch(action);
-
     });
 
     return del;
@@ -267,6 +265,8 @@ export class KubernetesAnalysisService {
       catchError((e, c) => {
         console.log('Error occurred');
         console.log(e);
+        // TODO: msg not used?
+
         const msg = { firstLine: 'Failed to get Analysis Report'};
         return of(false);
       })
@@ -285,6 +285,7 @@ export class KubernetesAnalysisService {
       catchError((e, c) => {
         console.log('Error occurred');
         console.log(e);
+        // TODO: msg not used?
         const msg = { firstLine: 'Failed to get Analysis Reports by path'};
         return of(false);
       })
@@ -304,6 +305,7 @@ export class KubernetesAnalysisService {
       catchError((e, c) => {
         console.log('Error occurred');
         console.log(e);
+        // TODO: msg not used?
         const msg = { firstLine: 'Failed to get Analysis Report'};
         return of(false);
       })

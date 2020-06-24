@@ -1,15 +1,15 @@
-import { interval } from 'rxjs';
 import { NgZone } from '@angular/core';
 import { Store } from '@ngrx/store';
+import { interval } from 'rxjs';
 
 import { AppState } from '../../../../../store/src/app-state';
+import { safeUnsubscribe } from '../../../core/utils.service';
 import { ListDataSource } from '../../../shared/components/list/data-sources-controllers/list-data-source';
 import { IListConfig } from '../../../shared/components/list/list.component.types';
-import { AnalysisReport } from '../store/kube.types';
 import { analysisReportEntityType, kubernetesEntityFactory } from '../kubernetes-entity-factory';
-import { GetAnalysisReports } from '../store/kubernetes.actions';
 import { KubernetesEndpointService } from '../services/kubernetes-endpoint.service';
-import { safeUnsubscribe } from '../../../core/utils.service';
+import { AnalysisReport } from '../store/kube.types';
+import { GetAnalysisReports } from '../store/kubernetes.actions';
 
 export class AnalysisReportsDataSource extends ListDataSource<AnalysisReport> {
 
@@ -30,13 +30,6 @@ export class AnalysisReportsDataSource extends ListDataSource<AnalysisReport> {
       paginationKey: action.paginationKey,
       isLocal: true,
       listConfig,
-      //transformEntities: [{ type: 'filter', field: 'name' },
-      // (entities: AnalysisReport[], paginationState: PaginationEntityState) => {
-      //   const repository = paginationState.clientPagination.filter.items.repository;
-      //   return entities.filter(e => {
-      //     return !(repository && repository !== e.attributes.repo.name);
-      //   });
-      // ]
     });
 
     this.polls = [];

@@ -6,7 +6,7 @@ export enum ResourceAlertLevel {
   Unknown,
 }
 
-// We er-map an analysis reprot into a map of resource alerts that is better for us
+// We re-map an analysis reprot into a map of resource alerts that is better for us
 // to overlay in the UI to show issues from reports
 export interface ResourceAlert {
   apiVersion?: string;

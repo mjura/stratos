@@ -1,4 +1,3 @@
-import { AnalysisReportsDataSource } from './analysis-reports-list-source';
 import { Injectable, NgZone } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { Store } from '@ngrx/store';
@@ -8,11 +7,17 @@ import { of } from 'rxjs';
 import { ListView } from '../../../../../store/src/actions/list.actions';
 import { AppState } from '../../../../../store/src/app-state';
 import { ITableColumn } from '../../../shared/components/list/list-table/table.types';
-import { IListConfig, IListMultiFilterConfig, ListViewTypes, IListAction } from '../../../shared/components/list/list.component.types';
+import {
+  IListAction,
+  IListConfig,
+  IListMultiFilterConfig,
+  ListViewTypes,
+} from '../../../shared/components/list/list.component.types';
 import { defaultHelmKubeListPageSize } from '../../kubernetes/list-types/kube-helm-list-types';
-import { AnalysisReport } from '../store/kube.types';
 import { KubernetesEndpointService } from '../services/kubernetes-endpoint.service';
 import { KubernetesAnalysisService } from '../services/kubernetes.analysis.service';
+import { AnalysisReport } from '../store/kube.types';
+import { AnalysisReportsDataSource } from './analysis-reports-list-source';
 import { AnalysisStatusCellComponent } from './analysis-status-cell/analysis-status-cell.component';
 
 @Injectable()
@@ -29,7 +34,6 @@ export class AnalysisReportsListConfig implements IListConfig<AnalysisReport> {
       cellDefinition: {
         getValue: (row: AnalysisReport) => row.name,
         getLink: row => `/kubernetes/${this.guid}/analysis/report/${row.id}`
-        
       },
       sort: {
         type: 'sort',
@@ -70,9 +74,6 @@ export class AnalysisReportsListConfig implements IListConfig<AnalysisReport> {
       columnId: 'status',
       headerCell: () => 'Status',
       cellComponent: AnalysisStatusCellComponent,
-      // cellDefinition: {
-      //   getValue: (row: AnalysisReport) => row.status
-      // },
       sort: {
         type: 'sort',
         orderKey: 'status',
@@ -80,31 +81,6 @@ export class AnalysisReportsListConfig implements IListConfig<AnalysisReport> {
       },
       cellFlex: '1'
     }
-
-    // {
-    //   columnId: 'description', headerCell: () => 'Description',
-    //   cellDefinition: {
-    //     getValue: (row) => row.attributes.description,
-    //   },
-    //   sort: {
-    //     type: 'sort',
-    //     orderKey: 'description',
-    //     field: 'attributes.description'
-    //   },
-    //   cellFlex: '5',
-    // },
-    // {
-    //   columnId: 'repository', headerCell: () => 'Repository',
-    //   cellDefinition: {
-    //     getValue: (row) => row.attributes.repo.name
-    //   },
-    //   sort: {
-    //     type: 'sort',
-    //     orderKey: 'repository',
-    //     field: 'attributes.repo.name'
-    //   },
-    //   cellFlex: '2',
-    // },
   ];
 
   pageSizeOptions = defaultHelmKubeListPageSize;
@@ -136,7 +112,7 @@ export class AnalysisReportsListConfig implements IListConfig<AnalysisReport> {
     },
     label: 'Delete',
     icon: 'delete',
-    description: ``, // Description depends on console user permission
+    description: ``,
     createEnabled: row$ => of(true)
   };
 
@@ -150,30 +126,4 @@ export class AnalysisReportsListConfig implements IListConfig<AnalysisReport> {
   getColumns = () => this.columns;
   getDataSource = () => this.AppsDataSource;
   getMultiFiltersConfigs = () => [];
-  //[this.createRepositoryFilterConfig()];
-
-  // private createRepositoryFilterConfig(): IListMultiFilterConfig {
-  //   return {
-  //     key: 'repository',
-  //     label: 'Repository',
-  //     allLabel: 'All Repositories',
-  //     list$: this.helmRepositories(),
-  //     loading$: observableOf(false),
-  //     select: new BehaviorSubject(this.route.snapshot.params.repo)
-  //   };
-  // }
-
-  // private helmRepositories(): Observable<any> {
-  //   return this.endpointsService.endpoints$.pipe(
-  //     map(endpoints => {
-  //       const repos = [];
-  //       Object.values(endpoints).forEach(ep => {
-  //         if (ep.cnsi_type === 'helm') {
-  //           repos.push({ label: ep.name, item: ep.name, value: ep.name });
-  //         }
-  //       });
-  //       return repos;
-  //     })
-  //   );
-  // }
 }

@@ -282,8 +282,6 @@ spec:
           value: {{ default "false" .Values.console.ui.listAllowLoadMaxed | quote }}
         {{- end }}
         {{- include "stratosJetstreamEnv" . | indent 8 }}
-        - name: ANALYSIS_SERVICES_API
-          value: "http://{{ .Release.Name }}-analyzers:8090"
         readinessProbe:
           httpGet:
             path: /pp/v1/ping

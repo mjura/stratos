@@ -10,12 +10,9 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
+// Ping endpoint
 func (a *Analyzer) ping(ec echo.Context) error {
-
-	log.Info("PING!")
-
 	return nil
-
 }
 
 // Get a given report

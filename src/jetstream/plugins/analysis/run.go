@@ -38,12 +38,6 @@ func (c *Analysis) runReport(ec echo.Context) error {
 	endpointID := ec.Param("endpoint")
 	userID := ec.Get("user_id").(string)
 
-	log.Warn(analyzer)
-	log.Warn(userID)
-	log.Warn(endpointID)
-
-	// For now we only support Popeye
-
 	// Look up the endpoint for the user
 	var p = c.portalProxy
 	endpoint, err := p.GetCNSIRecord(endpointID)
@@ -92,7 +86,6 @@ func (c *Analysis) runReport(ec echo.Context) error {
 	id := fmt.Sprintf("%s/%s/%s", userID, endpointID, report.ID)
 
 	// Create a multi-part form to send to the analyzer container
-
 	body := new(bytes.Buffer)
 	writer := multipart.NewWriter(body)
 

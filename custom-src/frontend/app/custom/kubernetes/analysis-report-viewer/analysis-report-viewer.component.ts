@@ -4,7 +4,6 @@ import {
   ComponentRef,
   Input,
   OnDestroy,
-  OnInit,
   Type,
   ViewChild,
   ViewContainerRef,
@@ -15,7 +14,6 @@ import { KubeScoreReportViewerComponent } from './kube-score-report-viewer/kube-
 import { PopeyeReportViewerComponent } from './popeye-report-viewer/popeye-report-viewer.component';
 
 export interface IReportViewer {
-  // setReport(report);
   report: any;
 }
 
@@ -24,7 +22,7 @@ export interface IReportViewer {
   templateUrl: './analysis-report-viewer.component.html',
   styleUrls: ['./analysis-report-viewer.component.scss']
 })
-export class AnalysisReportViewerComponent implements OnInit, OnDestroy {
+export class AnalysisReportViewerComponent implements OnDestroy {
 
   // Component reference for the dynamically created auth form
   @ViewChild('reportViewer', { read: ViewContainerRef, static: true })
@@ -42,12 +40,7 @@ export class AnalysisReportViewerComponent implements OnInit, OnDestroy {
     this.updateReport(report);
   }
 
-  constructor(
-    private resolver: ComponentFactoryResolver,
-  ) { }
-
-  ngOnInit() {
-  }
+  constructor(private resolver: ComponentFactoryResolver) { }
 
   updateReport(report) {
     switch (report.format) {

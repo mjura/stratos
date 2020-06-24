@@ -1,10 +1,6 @@
 package analysis
 
 import (
-	//"errors"
-
-	//"github.com/cloudfoundry-incubator/stratos/src/jetstream/repository/interfaces"
-
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -55,18 +51,11 @@ func (c *Analysis) getReportsByPath(ec echo.Context) error {
 	var p = c.portalProxy
 
 	// Need to get a config object for the target endpoint
-	// endpointGUID := ec.Param("endpoint")
 	userID := ec.Get("user_id").(string)
 	endpointID := ec.Param("endpoint")
 
-	log.Info("getReportsByPath")
-	log.Info(ec.Request().RequestURI)
-
 	pathPrefix := fmt.Sprintf("completed/%s/", endpointID)
 	index := strings.Index(ec.Request().RequestURI, pathPrefix)
-
-	log.Info(pathPrefix)
-	log.Info(index)
 	if index < 0 {
 		return errors.New("Invalid request")
 	}

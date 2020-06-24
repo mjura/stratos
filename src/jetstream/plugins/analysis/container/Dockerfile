@@ -30,10 +30,10 @@ RUN wget https://github.com/zegl/kube-score/releases/download/v${KUBESCORE_VERSI
     mv kube-score ../analysis
 
 # Sonobuoy
-ARG SONOBUOY_VERSION=0.17.2
-RUN wget https://github.com/vmware-tanzu/sonobuoy/releases/download/v${SONOBUOY_VERSION}/sonobuoy_${SONOBUOY_VERSION}_linux_amd64.tar.gz && \
-    tar -xvf sonobuoy_${SONOBUOY_VERSION}_linux_amd64.tar.gz && \
-    mv sonobuoy ../analysis
+# ARG SONOBUOY_VERSION=0.17.2
+# RUN wget https://github.com/vmware-tanzu/sonobuoy/releases/download/v${SONOBUOY_VERSION}/sonobuoy_${SONOBUOY_VERSION}_linux_amd64.tar.gz && \
+#     tar -xvf sonobuoy_${SONOBUOY_VERSION}_linux_amd64.tar.gz && \
+#     mv sonobuoy ../analysis
 
 # Need kubectl for Kubescore - TODO: Use correct version depending on cluster
 ARG KUBECTL_VERSION=1.16.2
@@ -42,11 +42,11 @@ RUN wget https://storage.googleapis.com/kubernetes-release/release/v${KUBECTL_VE
     mv kubectl ../analysis
 
 # klar
-ARG KLAR_VERSION=2.4.0
-RUN wget https://github.com/optiopay/klar/releases/download/v${KLAR_VERSION}/klar-${KLAR_VERSION}-linux-amd64 && \
-    mv klar-${KLAR_VERSION}-linux-amd64 klar && \
-    chmod +x klar && \
-    mv klar ../analysis
+# ARG KLAR_VERSION=2.4.0
+# RUN wget https://github.com/optiopay/klar/releases/download/v${KLAR_VERSION}/klar-${KLAR_VERSION}-linux-amd64 && \
+#     mv klar-${KLAR_VERSION}-linux-amd64 klar && \
+#     chmod +x klar && \
+#     mv klar ../analysis
 
 # Final Container =============================================================================================================
 

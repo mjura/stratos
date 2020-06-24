@@ -24,10 +24,8 @@ func (c *KubernetesSpecification) GetConfigForEndpoint(masterURL string, token i
 func (c *KubernetesSpecification) GetConfigForEndpointUser(endpointID, userID string) (*restclient.Config, error) {
 
 	var p = c.portalProxy
-
 	cnsiRecord, err := p.GetCNSIRecord(endpointID)
 	if err != nil {
-		//return sendSSHError("Could not get endpoint information")
 		return nil, errors.New("Could not get endpoint information")
 	}
 
@@ -43,10 +41,8 @@ func (c *KubernetesSpecification) GetConfigForEndpointUser(endpointID, userID st
 func (c *KubernetesSpecification) GetKubeConfigForEndpointUser(endpointID, userID string) (string, error) {
 
 	var p = c.portalProxy
-
 	cnsiRecord, err := p.GetCNSIRecord(endpointID)
 	if err != nil {
-		//return sendSSHError("Could not get endpoint information")
 		return "", errors.New("Could not get endpoint information")
 	}
 

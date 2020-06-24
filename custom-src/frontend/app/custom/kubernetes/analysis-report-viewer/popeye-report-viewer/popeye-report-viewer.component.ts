@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+
 import { IReportViewer } from '../analysis-report-viewer.component';
 
 @Component({
@@ -10,8 +11,6 @@ export class PopeyeReportViewerComponent implements OnInit, IReportViewer {
 
   report: any;
   processed: any;
-
-  constructor() { }
 
   ngOnInit() {
     this.processed = this.apply(this.report);
