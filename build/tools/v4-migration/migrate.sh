@@ -66,7 +66,7 @@ function migrateTheme() {
   # Favicon
   cp -R ${CUSTOM}/frontend/favicon.ico ${THEME_DIR}/assets
 
-  # Remove lines from package.josn that are not required
+  # Remove lines from package.json that are not required
   if [ ! -f "${THEME_DIR}/assets/favicon.ico" ]; then
     sed -i.bak '/"favicon.ico"$/d' ${THEME_DIR}/package.json
   fi
