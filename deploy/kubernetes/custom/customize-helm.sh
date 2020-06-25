@@ -30,8 +30,8 @@ echo -e "${CYAN}Patching Chart.yaml${RESET}"
 sed -i.bak -e 's@https://github.com/cloudfoundry/stratos@https://github.com/SUSE/stratos@g' ${CHART_PATH}/Chart.yaml
 
 # Change the URL of the icon to be the SUSE one
-ICON_URL="https://raw.githubusercontent.com/cloudfoundry/stratos/master/deploy/kubernetes/icon.png"
-SUSE_ICON_URL="https://raw.githubusercontent.com/SUSE/stratos/custom-src/deploy/kubernetes/icon.png"
+ICON_URL="https://raw.githubusercontent.com/cloudfoundry/stratos/master/deploy/kubernetes/console/icon.png"
+SUSE_ICON_URL="https://raw.githubusercontent.com/SUSE/stratos/master/deploy/kubernetes/custom/icon.png"
 sed -i.bak -e 's@'"${ICON_URL}"'@'"${SUSE_ICON_URL}"'@g' ${CHART_PATH}/Chart.yaml
 
 SRC="A Helm chart for deploying Stratos UI Console"
