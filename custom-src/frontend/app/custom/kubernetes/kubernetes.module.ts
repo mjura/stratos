@@ -8,8 +8,6 @@ import {
   AnalysisReportSelectorComponent,
 } from './analysis-report-viewer/analysis-report-selector/analysis-report-selector.component';
 import { AnalysisReportViewerComponent } from './analysis-report-viewer/analysis-report-viewer.component';
-import { JsonReportViewerComponent } from './analysis-report-viewer/json-report-viewer/json-report-viewer.component';
-import { JUnitReportViewerComponent } from './analysis-report-viewer/junit-report-viewer/junit-report-viewer.component';
 import {
   KubeScoreReportViewerComponent,
 } from './analysis-report-viewer/kube-score-report-viewer/kube-score-report-viewer.component';
@@ -182,8 +180,6 @@ import { KubernetesSummaryTabComponent } from './tabs/kubernetes-summary-tab/kub
     AnalysisInfoCardComponent,
     AnalysisReportViewerComponent,
     PopeyeReportViewerComponent,
-    JUnitReportViewerComponent,
-    JsonReportViewerComponent,
     AnalysisReportSelectorComponent,
     ResourceAlertPreviewComponent,
     ResourceAlertViewComponent,
@@ -215,8 +211,6 @@ import { KubernetesSummaryTabComponent } from './tabs/kubernetes-summary-tab/kub
     KubernetesResourceViewerComponent,
     KubernetesPodContainersComponent,
     PopeyeReportViewerComponent,
-    JUnitReportViewerComponent,
-    JsonReportViewerComponent,
     KubeScoreReportViewerComponent,
     AnalysisReportSelectorComponent,
     ResourceAlertPreviewComponent,
@@ -226,8 +220,6 @@ import { KubernetesSummaryTabComponent } from './tabs/kubernetes-summary-tab/kub
     KubernetesResourceViewerComponent,
     AnalysisReportViewerComponent,
     PopeyeReportViewerComponent,
-    JUnitReportViewerComponent,
-    JsonReportViewerComponent,
     KubeScoreReportViewerComponent,
     AnalysisReportSelectorComponent,
     ResourceAlertPreviewComponent,
