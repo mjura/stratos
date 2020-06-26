@@ -1,5 +1,15 @@
 import { combineLatest, Observable, of, Subject, Subscription } from 'rxjs';
-import { delay, distinctUntilChanged, filter, map, pairwise, startWith, switchMap, tap } from 'rxjs/operators';
+import {
+  delay,
+  distinctUntilChanged,
+  filter,
+  map,
+  pairwise,
+  startWith,
+  switchMap,
+  tap,
+  withLatestFrom,
+} from 'rxjs/operators';
 
 import { AuthParams, ConnectEndpoint } from '../../../../store/src/actions/endpoint.actions';
 import { entityCatalog } from '../../../../store/src/entity-catalog/entity-catalog';
