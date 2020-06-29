@@ -193,8 +193,7 @@ func (c *Analysis) deleteReports(ec echo.Context) error {
 			rsp, err := client.Do(r)
 			if err != nil {
 				log.Warnf("Could not delete analysis report for: %s", job.ID)
-			}
-			if rsp.StatusCode != http.StatusOK {
+			} else if rsp.StatusCode != http.StatusOK {
 				log.Warnf("Could not delete analysis report for: %s", job.ID)
 			}
 		}
