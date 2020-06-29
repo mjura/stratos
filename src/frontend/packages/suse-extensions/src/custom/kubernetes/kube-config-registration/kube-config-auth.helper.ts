@@ -49,8 +49,8 @@ export class KubeConfigAuthHelper {
   // Try and parse the authentication metadata
   public parseAuth(cluster: KubeConfigFileCluster, user: KubeConfigFileUser): RowState {
 
-    // Default subtype is generic Kubernetes
-    cluster._subType = '';
+    // Default subtype is generic Kubernetes ('') or previously determined/selected sub type
+    cluster._subType = cluster._subType || '';
 
     // Certificate authentication first
 
