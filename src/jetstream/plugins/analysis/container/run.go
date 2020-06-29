@@ -83,12 +83,11 @@ func (a *Analyzer) doRun(ec echo.Context) error {
 			if err = json.Unmarshal(fileBytes, &params); err != nil {
 				return fmt.Errorf("Can not parse parameters: %v", err)
 			}
-			log.Info("GOT JOB configuration")
 			job.Config = &params
-			log.Infof("%+v", job.Config)
 		default:
 			fullpath := filepath.Join(folder, filename)
 			if err = ioutil.WriteFile(fullpath, fileBytes, os.ModePerm); err != nil {
+				log.Error("Could not write data for: %s", filename)
 				return fmt.Errorf("Could not write file data for: %s", filename)
 			}
 			if filename == "kubeconfig" {
@@ -98,7 +97,6 @@ func (a *Analyzer) doRun(ec echo.Context) error {
 		}
 	}
 
-	// TODO: Check we have job and params
 	if len(job.ID) == 0 {
 		return errors.New("Invalid Job metadata supplied")
 	}
@@ -113,14 +111,18 @@ func (a *Analyzer) doRun(ec echo.Context) error {
 
 	switch engine {
 	case "popeye":
-		runPopeye(&job)
+		err = runPopeye(&job)
 	case "kube-score":
-		runKubeScore(&job)
+		err = runKubeScore(&job)
 	// case "sonobuoy":
 	// 	runSonobuoy(dbStore, file, folder, report, requestBody)
 	default:
 		job.Status = "error"
 		return fmt.Errorf("Unkown analyzer: %s", engine)
+	}
+
+	if err != nil {
+		log.Error("Error running analyzer: %s", err)
 	}
 
 	return ec.JSON(http.StatusOK, job)
