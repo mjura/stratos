@@ -1,8 +1,8 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { KubernetesStatus } from '../../../../../../../../../custom-src/frontend/app/custom/kubernetes/store/kube.types';
 import { BaseTestModules } from '../../../../../test-framework/core-test.helper';
 import { KubernetesLabelsCellComponent } from './kubernetes-labels-cell.component';
+import { KubernetesStatus } from '../../store/kube.types';
 
 describe('KubernetesLabelsCellComponent', () => {
   let component: KubernetesLabelsCellComponent;

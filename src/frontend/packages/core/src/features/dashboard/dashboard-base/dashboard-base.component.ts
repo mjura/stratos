@@ -18,6 +18,7 @@ import { TabNavService } from '../../../../tab-nav.service';
 import { CustomizationService } from '../../../core/customizations.types';
 import { EndpointsService } from '../../../core/endpoints.service';
 import { SidePanelService } from '../../../shared/services/side-panel.service';
+import { IPageSideNavTab } from '../page-side-nav/page-side-nav.component';
 import { PageHeaderService } from './../../../core/page-header-service/page-header.service';
 import { SideNavItem } from './../side-nav/side-nav.component';
 
@@ -30,7 +31,7 @@ import { SideNavItem } from './../side-nav/side-nav.component';
 
 export class DashboardBaseComponent implements OnInit, OnDestroy, AfterViewInit {
   public activeTabLabel$: Observable<string>;
-  public subNavData$: Observable<[string, Portal<any>]>;
+  public subNavData$: Observable<[string, Portal<any>, IPageSideNavTab]>;
   public isMobile$: Observable<boolean>;
   public sideNavMode$: Observable<string>;
   public sideNavMode: string;
@@ -134,7 +135,7 @@ export class DashboardBaseComponent implements OnInit, OnDestroy, AfterViewInit 
         startWith(null)
       ),
       this.tabNavService.tabSubNav$
-    );
+    ).pipe(map(([tabNav, tabSubNav]) => [tabNav ? tabNav.label : null, tabSubNav, tabNav]));
 
     // Register all health checks for endpoint types that support this
     entityCatalog.getAllEndpointTypes().forEach(epType => {

@@ -1,0 +1,12 @@
+<app-page-sub-nav>
+  <app-analysis-report-selector
+    prompt="Report"
+    [allowNone]="false"
+    (selected)="analysisChanged($event)"
+    [autoSelect]="true"
+    [endpoint]="helmReleaseHelper.endpointGuid"
+    [path]="path">
+  </app-analysis-report-selector>
+</app-page-sub-nav>
+
+<app-analysis-report-viewer [report]="report$ | async"></app-analysis-report-viewer>

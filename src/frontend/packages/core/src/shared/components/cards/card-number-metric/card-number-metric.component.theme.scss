@@ -9,4 +9,16 @@
       color: $subdued;
     }
   }
+
+  .number-metric-card__alert-badge {
+    &-error {
+      background-color: red;
+    }
+    &-info {
+      background-color: #1ba5da;
+    }
+    &-warning {
+      background-color: orange;
+    }
+  }
 }

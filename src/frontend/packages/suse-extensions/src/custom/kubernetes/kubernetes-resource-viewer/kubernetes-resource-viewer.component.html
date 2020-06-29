@@ -13,7 +13,7 @@
       <app-metadata-item label="Age">{{ resource.age }}</app-metadata-item>
     </div>
 
-    <app-metadata-item class="resource-preview__labels" label="Labels">
+    <app-metadata-item class="resource-preview__labels" label="Labels" *ngIf="resource.labels">
       <div *ngFor="let label of resource.labels" class="resource-preview__label">
         <div class="resource-preview__label-name">{{ label.name }}</div>
         <div class="resource-preview__label-value">{{ label.value }}</div>
@@ -25,6 +25,10 @@
         <div class="resource-preview__label-name">{{ label.name }}</div>
         <div class="resource-preview__label-value">{{ label.value }}</div>
       </div>
+    </app-metadata-item>
+
+    <app-metadata-item class="resource-preview__labels" label="Alerts" *ngIf="alerts">
+      <app-resource-alert-view [showHeader]="false" [alerts]="alerts"></app-resource-alert-view>  
     </app-metadata-item>
 
     <app-json-viewer #viewer [json]="resource.jsonView"></app-json-viewer>

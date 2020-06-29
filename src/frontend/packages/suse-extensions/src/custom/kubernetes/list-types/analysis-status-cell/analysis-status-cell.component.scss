@@ -1,0 +1,10 @@
+.status {
+  &__running {
+    align-items: center;
+    display: flex;
+
+    &> mat-progress-spinner {
+      margin-right: 8px;
+    }
+  }
+}

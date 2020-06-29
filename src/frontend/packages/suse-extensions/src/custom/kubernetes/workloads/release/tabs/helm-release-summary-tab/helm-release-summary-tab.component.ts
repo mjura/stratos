@@ -1,5 +1,6 @@
+import { ResourceAlert } from './../../../../services/analysis-report.types';
 import { HttpClient } from '@angular/common/http';
-import { Component, OnDestroy } from '@angular/core';
+import { Component, OnDestroy, ComponentFactoryResolver } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { LoggerService } from 'frontend/packages/core/src/core/logger.service';
 import { ConfirmationDialogConfig } from 'frontend/packages/core/src/shared/components/confirmation-dialog.config';
@@ -7,7 +8,7 @@ import { ConfirmationDialogService } from 'frontend/packages/core/src/shared/com
 import { ClearPaginationOfType } from 'frontend/packages/store/src/actions/pagination.actions';
 import { RouterNav } from 'frontend/packages/store/src/actions/router.actions';
 import { AppState } from 'frontend/packages/store/src/app-state';
-import { combineLatest, Observable, ReplaySubject } from 'rxjs';
+import { combineLatest, Observable, ReplaySubject, Subject } from 'rxjs';
 import { distinctUntilChanged, filter, first, map, publishReplay, refCount, startWith } from 'rxjs/operators';
 
 import { SnackBarService } from '../../../../../../../../core/src/shared/services/snackbar.service';
@@ -15,11 +16,17 @@ import { endpointsEntityRequestDataSelector } from '../../../../../../../../stor
 import { HelmReleaseChartData, HelmReleaseResource } from '../../../workload.types';
 import { workloadsEntityCatalog } from '../../../workloads-entity-catalog';
 import { HelmReleaseHelperService } from '../helm-release-helper.service';
+import { KubernetesAnalysisService } from '../../../../services/kubernetes.analysis.service';
+import { SidePanelService } from 'frontend/packages/core/src/shared/services/side-panel.service';
+import { ResourceAlertPreviewComponent } from '../../../../analysis-report-viewer/resource-alert-preview/resource-alert-preview.component';
 
 @Component({
   selector: 'app-helm-release-summary-tab',
   templateUrl: './helm-release-summary-tab.component.html',
-  styleUrls: ['./helm-release-summary-tab.component.scss']
+  styleUrls: ['./helm-release-summary-tab.component.scss'],
+  providers: [
+    KubernetesAnalysisService,
+  ]
 })
 export class HelmReleaseSummaryTabComponent implements OnDestroy {
   // Confirmation dialogs
@@ -37,6 +44,8 @@ export class HelmReleaseSummaryTabComponent implements OnDestroy {
 
   private successChartColor = '#4DD3A7';
   private completedChartColour = '#7aa3e5';
+
+  public path: string;
 
   public podChartColors = [
     {
@@ -90,15 +99,23 @@ export class HelmReleaseSummaryTabComponent implements OnDestroy {
   public chartData$: Observable<HelmReleaseChartData>;
   public resources$: Observable<HelmReleaseResource[]>;
 
+  // Cached analysis report
+  private analysisReport;
+
+  private analysisReportUpdated = new Subject<string>();
+  private analysisReportUpdated$ = this.analysisReportUpdated.pipe(startWith(null), distinctUntilChanged());
+
   constructor(
+    private componentFactoryResolver: ComponentFactoryResolver,
     public helmReleaseHelper: HelmReleaseHelperService,
     private store: Store<AppState>,
     private confirmDialog: ConfirmationDialogService,
     private httpClient: HttpClient,
     private logService: LoggerService,
-    private snackbarService: SnackBarService
+    private snackbarService: SnackBarService,
+    public analyzerService: KubernetesAnalysisService,
+    private previewPanel: SidePanelService,
   ) {
-
     this.isBusy$ = combineLatest([
       this.helmReleaseHelper.isFetching$,
       this.busyDeletingSubject.asObservable().pipe(
@@ -108,6 +125,9 @@ export class HelmReleaseSummaryTabComponent implements OnDestroy {
       map(([isFetching, isDeleting]) => isFetching || isDeleting),
       startWith(true)
     );
+
+
+    this.path = `${this.helmReleaseHelper.namespace}/${this.helmReleaseHelper.releaseTitle}`;
 
     this.chartData$ = this.helmReleaseHelper.fetchReleaseChartStats().pipe(
       distinctUntilChanged(),
@@ -119,8 +139,11 @@ export class HelmReleaseSummaryTabComponent implements OnDestroy {
       )
     );
 
-    this.resources$ = this.helmReleaseHelper.fetchReleaseGraph().pipe(
-      map((graph: any) => {
+    this.resources$ = combineLatest(
+      this.helmReleaseHelper.fetchReleaseGraph(),
+      this.analysisReportUpdated$
+    ).pipe(
+      map(([graph, id]) => {
         const resources = {};
         // Collect the resources
         Object.values(graph.nodes).forEach((node: any) => {
@@ -136,11 +159,13 @@ export class HelmReleaseSummaryTabComponent implements OnDestroy {
           resources[node.data.kind].count++;
           resources[node.data.kind].statuses.push(node.data.status);
         });
+        this.applyAnalysis(resources, this.analysisReport);
         return Object.values(resources).sort((a: any, b: any) => a.kind.localeCompare(b.kind));
       }),
       publishReplay(1),
       refCount()
     );
+
 
     this.hasResources$ = combineLatest([
       this.chartData$,
@@ -163,6 +188,26 @@ export class HelmReleaseSummaryTabComponent implements OnDestroy {
       },
       'Delete'
     );
+
+    this.hasAllResources$ = combineLatest([
+      this.resources$,
+      this.hasResources$
+    ]).pipe(
+      map(([resources, hasSome]) => hasSome && resources && resources.length > 0)
+    );
+  }
+
+  public analysisChanged(report) {
+    if (report === null) {
+      // No report selected
+      this.analysisReport = null;
+      this.analysisReportUpdated.next('');
+    } else {
+        this.analyzerService.getByID(report.id).subscribe(results => {
+          this.analysisReport = results;
+          this.analysisReportUpdated.next(report.id);
+      });
+    }
   }
 
   private getIcon(kind: string) {
@@ -238,6 +283,43 @@ export class HelmReleaseSummaryTabComponent implements OnDestroy {
       filter(e => !!e),
       map(e => e.name),
       first()
+    );
+  }
+
+  public runAnalysis(id: string) {
+    this.helmReleaseHelper.release$.pipe(first()).subscribe(release => {
+      this.analyzerService.run(id, this.helmReleaseHelper.endpointGuid, release.namespace, release.name);
+    });
+  }
+
+  private applyAnalysis(resources, report) {
+    // Clear out existing alerts for all resources
+    Object.values(resources).forEach((resource: any) => resource.alerts = []);
+
+    if (report && Object.keys(resources).length > 0) {
+      Object.values(report.alerts).forEach((group: ResourceAlert[]) => {
+        group.forEach(alert => {
+          // Can we find a corresponding group in the resources?
+          const res = Object.keys(resources).find((i) => i.toLowerCase() === alert.kind);
+          if (res) {
+            const resItem = resources[res];
+            if (resItem) {
+              resItem.alerts.push(alert);
+            }
+          }
+        });
+      });
+    }
+  }
+
+  public showAlerts(alerts, resource) {
+    this.previewPanel.show(
+      ResourceAlertPreviewComponent,
+      {
+        resource,
+        alerts,
+      },
+      this.componentFactoryResolver
     );
   }
 }

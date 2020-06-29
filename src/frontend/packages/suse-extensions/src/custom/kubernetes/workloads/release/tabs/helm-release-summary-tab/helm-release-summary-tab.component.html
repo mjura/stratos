@@ -3,6 +3,24 @@
     <mat-icon>delete</mat-icon>
     <span>Delete</span>
   </button>
+
+  <div *ngIf="analyzerService.namespaceAnalyzers$ | async as analyzers">
+    <!-- <button *ngFor="let analyzer of analyzerService.namespaceAnalyzers$ | async" name="{{ analyzer.id }}" (click)="deleteRelease()" matTooltip="Delete">
+      <mat-icon>delete</mat-icon>
+      <span>{{ analyzer.name }}</span>
+    </button> -->
+
+    <mat-menu #appMenu="matMenu">
+      <button (click)="runAnalysis(analyzer.id)" mat-menu-item *ngFor="let analyzer of analyzerService.namespaceAnalyzers$ | async">{{ analyzer.name }}</button>
+    </mat-menu>
+    
+    <button mat-button [matMenuTriggerFor]="appMenu" *ngIf="analyzers.length > 0">
+      <span>Run Analysis</span>
+      <mat-icon>arrow_drop_down</mat-icon>
+    </button>
+  </div>
+
+  <app-analysis-report-selector *ngIf="analyzerService.enabled$ | async" (selected)="analysisChanged($event)" [endpoint]="helmReleaseHelper.endpointGuid" [path]="path"></app-analysis-report-selector>
 </app-page-sub-nav>
 
 <app-loading-page [isLoading]="isBusy$" [text]="loadingMessage">
@@ -58,8 +76,8 @@
       <app-metadata-item class="chart-details__item" label="All Resources"></app-metadata-item>
       <div *ngIf="hasAllResources$ | async; else stillLoadingResources">
         <div *ngIf="resources$ | async as resources" class="grid">
-          <app-card-number-metric *ngFor="let res of resources" label="{{ res.label }}" icon="{{ res.icon.name }}"
-            iconFont="{{ res.icon.font }}" value="{{ res.count }}">
+          <app-card-number-metric *ngFor="let res of resources" label="{{ res.label }}" icon="{{ res.icon.name }}" [alerts]="res.alerts"
+            (showAlerts)="showAlerts($event, res)" iconFont="{{ res.icon.font }}" value="{{ res.count }}">
           </app-card-number-metric>
         </div>
       </div>
@@ -76,12 +94,11 @@
     <ng-template #loadingResources>
       <div class="resources__loading">
         <div class="resources__loading__content">
-          Loading Resources
+          Loading resources
           <mat-progress-bar class="" [color]="'primary'" mode="indeterminate">
           </mat-progress-bar>
         </div>
       </div>
-
     </ng-template>
   </ng-container>
 </app-loading-page>

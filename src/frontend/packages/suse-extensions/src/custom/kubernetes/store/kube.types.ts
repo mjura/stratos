@@ -484,3 +484,18 @@ export interface HostPath {
 export interface Item {
   key: string;
 }
+
+
+// Analysis Reports
+
+export interface AnalysisReport {
+  id: string;
+  endpoint: string;
+  type: string;
+  name: string;
+  path: string;
+  created: Date;
+  read: boolean;
+  status: string;
+  duration: number;
+}

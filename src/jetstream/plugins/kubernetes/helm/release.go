@@ -235,6 +235,8 @@ func (r *HelmRelease) UpdatePods(jetstream interfaces.PortalProxy) {
 
 				podCopy := &v1.Pod{}
 				*podCopy = pod
+				podCopy.Kind = "Pod"
+				podCopy.APIVersion = "v1"
 				res.Resource = podCopy
 				pods[res.getID()] = &res
 
