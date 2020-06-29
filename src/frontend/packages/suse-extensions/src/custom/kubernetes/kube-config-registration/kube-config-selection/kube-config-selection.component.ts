@@ -3,18 +3,18 @@ import { Store } from '@ngrx/store';
 import { BehaviorSubject, combineLatest, Observable, of as observableOf, of } from 'rxjs';
 import { first, map, switchMap } from 'rxjs/operators';
 
-import { HideSnackBar, ShowSnackBar } from '../../../../../../store/src/actions/snackBar.actions';
-import { AppState } from '../../../../../../store/src/app-state';
-import {
-  TableHeaderSelectComponent,
-} from '../../../../shared/components/list/list-table/table-header-select/table-header-select.component';
-import { KubeConfigHelper } from '../kube-config.helper';
-import { KubeConfigFileCluster } from '../kube-config.types';
 import {
   ITableListDataSource,
   RowState,
-} from './../../../../shared/components/list/data-sources-controllers/list-data-source-types';
-import { ITableColumn } from './../../../../shared/components/list/list-table/table.types';
+} from '../../../../../../core/src/shared/components/list/data-sources-controllers/list-data-source-types';
+import {
+  TableHeaderSelectComponent,
+} from '../../../../../../core/src/shared/components/list/list-table/table-header-select/table-header-select.component';
+import { ITableColumn } from '../../../../../../core/src/shared/components/list/list-table/table.types';
+import { SnackBarService } from '../../../../../../core/src/shared/services/snackbar.service';
+import { AppState } from '../../../../../../store/src/app-state';
+import { KubeConfigHelper } from '../kube-config.helper';
+import { KubeConfigFileCluster } from '../kube-config.types';
 import { KubeConfigTableCertComponent } from './kube-config-table-cert/kube-config-table-cert.component';
 import { KubeConfigTableName } from './kube-config-table-name/kube-config-table-name.component';
 import { KubeConfigTableSelectComponent } from './kube-config-table-select/kube-config-table-select.component';
@@ -132,7 +132,8 @@ export class KubeConfigSelectionComponent {
 
   constructor(
     private store: Store<AppState>,
-    public helper: KubeConfigHelper
+    public helper: KubeConfigHelper,
+    private snackbarService: SnackBarService
   ) {
     this.helper.clustersChanged = () => this.clustersChanged()
   }
@@ -147,10 +148,10 @@ export class KubeConfigSelectionComponent {
   )
 
   clustersParse(cluster: string) {
-    this.store.dispatch(new HideSnackBar());
+    this.snackbarService.hide();
     this.helper.parse(cluster).pipe(first()).subscribe(errorString => {
       if (errorString) {
-        this.store.dispatch(new ShowSnackBar(`Failed to load Kube Config: ${errorString}`, 'Close'))
+        this.snackbarService.show(`Failed to load Kube Config: ${errorString}`, 'Close')
       }
     })
   }

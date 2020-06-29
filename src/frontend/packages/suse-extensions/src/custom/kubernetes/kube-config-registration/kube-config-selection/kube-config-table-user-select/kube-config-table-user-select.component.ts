@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 
-import { TableCellCustom } from '../../../../../shared/components/list/list.types';
+import { TableCellCustom } from '../../../../../../../core/src/shared/components/list/list.types';
 import { KubeConfigHelper } from '../../kube-config.helper';
 import { KubeConfigFileCluster } from '../../kube-config.types';
 

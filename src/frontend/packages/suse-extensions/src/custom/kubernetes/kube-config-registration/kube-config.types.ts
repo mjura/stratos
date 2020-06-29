@@ -1,7 +1,7 @@
 import { Observable, Subject } from 'rxjs';
 
-import { EndpointAuthTypeConfig } from '../../../core/extension/extension-types';
-import { RowState } from '../../../shared/components/list/data-sources-controllers/list-data-source-types';
+import { RowState } from '../../../../../core/src/shared/components/list/data-sources-controllers/list-data-source-types';
+import { EndpointAuthTypeConfig } from '../../../../../store/src/extension-types';
 import { ActionStatus } from './../../../../../store/src/reducers/api-request-reducer/types';
 
 // Types for a Kubernetes Configuration file
