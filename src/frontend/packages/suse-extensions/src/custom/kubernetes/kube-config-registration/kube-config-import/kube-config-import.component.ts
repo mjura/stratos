@@ -12,6 +12,9 @@ import {
   ConnectEndpointService,
 } from '../../../../../../core/src/features/endpoints/connect.service';
 import {
+  IActionMonitorComponentState,
+} from '../../../../../../core/src/shared/components/app-action-monitor-icon/app-action-monitor-icon.component';
+import {
   ITableListDataSource,
   RowState,
 } from '../../../../../../core/src/shared/components/list/data-sources-controllers/list-data-source-types';
@@ -115,7 +118,12 @@ export class KubeConfigImportComponent implements OnDestroy {
   }
 
   private doRegister(reg: KubeConfigImportAction, next: KubeConfigImportAction[]) {
-    const obs$ = this.registerEndpoint(reg.cluster.name, reg.cluster.cluster.server, reg.cluster.cluster['insecure-skip-tls-verify']);
+    const obs$ = this.registerEndpoint(
+      reg.cluster.name,
+      reg.cluster.cluster.server,
+      reg.cluster.cluster['insecure-skip-tls-verify'],
+      reg.cluster._subType
+    );
     const mainObs$ = this.getUpdatingState(obs$).pipe(
       startWith({ busy: true, error: false, completed: false })
     );
@@ -163,7 +171,7 @@ export class KubeConfigImportComponent implements OnDestroy {
 
       this.subs.push(connect.actionState.pipe(filter(status => status.completed), first()).subscribe(status => {
         if (status.error) {
-          connect.state.next({ message: status.errorMessage || status.message, error: true });
+          connect.state.next({ message: status.message, error: true });
         }
         this.processAction(next);
       }));
@@ -179,18 +187,27 @@ export class KubeConfigImportComponent implements OnDestroy {
   }
 
   // Register the endpoint
-  private registerEndpoint(name: string, url: string, skipSslValidation: boolean) {
-    // TODO: RC sub type missing
-    return stratosEntityCatalog.endpoint.api.register<ActionState>(KUBERNETES_ENDPOINT_TYPE, null, name, url, skipSslValidation, '', '', false)
-      .pipe(filter(update => !!update));
+  private registerEndpoint(name: string, url: string, skipSslValidation: boolean, subType: string) {
+    return stratosEntityCatalog.endpoint.api.register<ActionState>(
+      KUBERNETES_ENDPOINT_TYPE,
+      subType,
+      name,
+      url,
+      skipSslValidation,
+      '',
+      '',
+      false
+    ).pipe(
+      filter(update => !!update)
+    );
   }
 
   // Connect to an endpoint
-  private connectEndpoint(action: KubeConfigImportAction, pData: ConnectEndpointData) {
+  private connectEndpoint(action: KubeConfigImportAction, pData: ConnectEndpointData): Observable<IActionMonitorComponentState> {
     const config: ConnectEndpointConfig = {
       name: action.cluster.name,
       guid: action.depends.cluster._guid || action.cluster._guid,
-      type: null,
+      type: KUBERNETES_ENDPOINT_TYPE,
       subType: action.user._authData.subType,
       ssoAllowed: false
     };
@@ -200,8 +217,20 @@ export class KubeConfigImportComponent implements OnDestroy {
     }
     this.connectService = new ConnectEndpointService(this.endpointsService, config);
     this.connectService.setData(pData);
-    this.connectService.submit();
-    return this.connectService.getConnectingObservable();
+    return this.connectService.submit().pipe(
+      map(updateSection => ({
+        busy: false,
+        error: !updateSection.success,
+        completed: true,
+        message: updateSection.errorMessage
+      })),
+      startWith({
+        message: '',
+        busy: true,
+        completed: false,
+        error: false
+      })
+    );
   }
 
   // Enter the step - process the list of clusters to import

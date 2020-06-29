@@ -1,6 +1,9 @@
 import { Component, Input } from '@angular/core';
 import { Observable } from 'rxjs';
 
+import {
+  IActionMonitorComponentState,
+} from '../../../../../../../core/src/shared/components/app-action-monitor-icon/app-action-monitor-icon.component';
 import { TableCellCustom } from '../../../../../../../core/src/shared/components/list/list.types';
 import { KubeConfigFileCluster } from '../../kube-config.types';
 
@@ -11,7 +14,7 @@ import { KubeConfigFileCluster } from '../../kube-config.types';
 })
 export class KubeConfigTableImportStatusComponent extends TableCellCustom<KubeConfigFileCluster> {
 
-  public state: Observable<any>;
+  public state: Observable<IActionMonitorComponentState>;
 
   constructor() {
     super();

@@ -1,5 +1,8 @@
 import { Observable, Subject } from 'rxjs';
 
+import {
+  IActionMonitorComponentState,
+} from '../../../../../core/src/shared/components/app-action-monitor-icon/app-action-monitor-icon.component';
 import { RowState } from '../../../../../core/src/shared/components/list/data-sources-controllers/list-data-source-types';
 import { EndpointAuthTypeConfig } from '../../../../../store/src/extension-types';
 import { ActionStatus } from './../../../../../store/src/reducers/api-request-reducer/types';
@@ -75,8 +78,8 @@ export interface KubeConfigImportAction {
   user?: KubeConfigFileUser;
   status?: ActionStatus;
   state: Subject<RowState>;
-  actionState$?: Observable<any>;
-  actionState: Subject<any>;
+  actionState$?: Observable<IActionMonitorComponentState>;
+  actionState: Subject<IActionMonitorComponentState>;
   depends?: KubeConfigImportAction;
 }
 
