@@ -1,0 +1,11 @@
+// Theming for the copmponents in the Kubernetes package
+
+@import '../src/custom/kubernetes/tabs/kubernetes-analysis-tab/kubernetes-analysis-report/kubernetes-analysis-report.component.theme';
+
+@mixin apply-theme-stratos-kubernetes($stratos-theme) {
+
+  $theme: map-get($stratos-theme, theme);
+  $app-theme: map-get($stratos-theme, app-theme);
+
+  @include kube-analysis-report-theme($theme, $app-theme)
+}

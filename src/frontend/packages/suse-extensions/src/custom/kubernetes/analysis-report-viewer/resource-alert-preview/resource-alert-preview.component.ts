@@ -1,6 +1,5 @@
 import { Component } from '@angular/core';
-
-import { PreviewableComponent } from './../../../../shared/previewable-component';
+import { PreviewableComponent } from 'frontend/packages/core/src/shared/previewable-component';
 
 @Component({
   selector: 'app-resource-alert-preview',

@@ -1,18 +1,18 @@
 import { Injectable, NgZone } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { Store } from '@ngrx/store';
-import * as moment from 'moment';
-import { of } from 'rxjs';
-
-import { ListView } from '../../../../../store/src/actions/list.actions';
-import { AppState } from '../../../../../store/src/app-state';
-import { ITableColumn } from '../../../shared/components/list/list-table/table.types';
+import { ITableColumn } from 'frontend/packages/core/src/shared/components/list/list-table/table.types';
 import {
   IListAction,
   IListConfig,
   IListMultiFilterConfig,
   ListViewTypes,
-} from '../../../shared/components/list/list.component.types';
+} from 'frontend/packages/core/src/shared/components/list/list.component.types';
+import * as moment from 'moment';
+import { of } from 'rxjs';
+
+import { ListView } from '../../../../../store/src/actions/list.actions';
+import { AppState } from '../../../../../store/src/app-state';
 import { defaultHelmKubeListPageSize } from '../../kubernetes/list-types/kube-helm-list-types';
 import { KubernetesEndpointService } from '../services/kubernetes-endpoint.service';
 import { KubernetesAnalysisService } from '../services/kubernetes.analysis.service';

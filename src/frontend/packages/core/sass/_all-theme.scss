@@ -63,7 +63,6 @@
 @import '../../cloud-foundry/src/features/cloud-foundry/tabs/cloud-foundry-firehose/cloud-foundry-firehose.component.theme';
 @import '../../cloud-foundry/src/features/service-catalog/service-catalog-page/service-catalog-page.component.theme';
 @import '../../core/src/features/error-page/error-page/error-page.component.theme';
-@import '../../core/src/custom/kubernetes/tabs/kubernetes-analysis-tab/kubernetes-analysis-report/kubernetes-analysis-report.component.theme';
 @import '../../core/src/features/endpoints/backup-restore/restore-endpoints/restore-endpoints.component.theme';
 @import '../../core/src/features/metrics/metrics/metrics.component.theme';
 // Creates the app theme and applies it to the application
@@ -135,7 +134,6 @@
   @include code-block-theme($theme, $app-theme);
   @include copy-to-clipboard-theme($theme, $app-theme);
   @include app-user-avatar-theme($theme, $app-theme);
-  @include kube-analysis-report-theme($theme, $app-theme);
   @include restore-endpoints-theme($theme, $app-theme);
   @include metrics-component-theme($theme, $app-theme);
 }
