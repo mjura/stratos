@@ -1,12 +1,9 @@
-import { Component, OnInit } from '@angular/core';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { map, catchError } from 'rxjs/operators';
-import { of } from 'rxjs';
+import { Component } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
 
 import { KubernetesAnalysisService } from '../../services/kubernetes.analysis.service';
 import { ListConfig } from 'frontend/packages/core/src/shared/components/list/list.component.types';
 import { AnalysisReportsListConfig } from '../../list-types/analysis-reports-list-config.service';
-import { environment } from '../../../../environments/environment';
 import { KubernetesEndpointService } from '../../services/kubernetes-endpoint.service';
 
 @Component({
@@ -21,7 +18,7 @@ import { KubernetesEndpointService } from '../../services/kubernetes-endpoint.se
     }
   ]
 })
-export class KubernetesAnalysisTabComponent implements OnInit {
+export class KubernetesAnalysisTabComponent {
 
   infoLink: string;
 
@@ -33,8 +30,6 @@ export class KubernetesAnalysisTabComponent implements OnInit {
     const guid = this.kubeEndpointService.baseKube.guid;
     this.infoLink = `/kubernetes/${guid}/analysis/info`;
    }
-
-  ngOnInit() { }
 
   public runAnalysis(id: string) {
     this.analysisService.run(id, this.kubeEndpointService.baseKube.guid);

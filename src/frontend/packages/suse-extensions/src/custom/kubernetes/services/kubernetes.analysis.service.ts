@@ -9,11 +9,11 @@ import { catchError, map, startWith } from 'rxjs/operators';
 
 import { RouterNav } from '../../../../../store/src/actions/router.actions';
 import { AppState } from '../../../../../store/src/app-state';
-import { environment } from '../../../environments/environment';
 import { GetAnalysisReports } from '../store/kubernetes.actions';
 import { KubernetesEndpointService } from './kubernetes-endpoint.service';
 import { KubeScoreReportHelper } from './kubescore-report.helper';
 import { PopeyeReportHelper } from './popeye-report.helper';
+import { environment } from 'frontend/packages/core/src/environments/environment';
 
 export interface KubernetesAnalysisType {
   name: string;

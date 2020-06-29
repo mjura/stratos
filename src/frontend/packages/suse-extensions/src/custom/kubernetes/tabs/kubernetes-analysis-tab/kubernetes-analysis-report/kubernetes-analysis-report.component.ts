@@ -3,8 +3,7 @@ import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { Observable, of, Subject } from 'rxjs';
 import { catchError, map, startWith } from 'rxjs/operators';
-
-import { environment } from '../../../../../environments/environment';
+import { environment } from 'frontend/packages/core/src/environments/environment';
 
 @Component({
   selector: 'app-kubernetes-analysis-report',
