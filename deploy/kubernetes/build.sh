@@ -137,8 +137,8 @@ __DIRNAME="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 STRATOS_PATH=${__DIRNAME}/../../
 source "${STRATOS_PATH}/deploy/common-build.sh"
 
-if [ -f "${STRATOS_PATH}/custom-src/deploy/kubernetes/custom-build.sh" ]; then
-  source "${STRATOS_PATH}/custom-src/deploy/kubernetes/custom-build.sh"
+if [ -f "${STRATOS_PATH}/deploy/kubernetes/custom/custom-build.sh" ]; then
+  source "${STRATOS_PATH}/deploy/kubernetes/custom/custom-build.sh"
   HAS_CUSTOM_BUILD="true"
 fi
 

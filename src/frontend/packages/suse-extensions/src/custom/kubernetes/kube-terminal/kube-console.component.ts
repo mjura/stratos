@@ -1,13 +1,13 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { NEVER, Observable, Subject, Subscription } from 'rxjs';
+import { NEVER, Observable, Subject } from 'rxjs';
 import websocketConnect, { normalClosureMessage } from 'rxjs-websockets';
-import { catchError, tap, switchMap, map } from 'rxjs/operators';
+import { catchError, map, switchMap, tap } from 'rxjs/operators';
 
-import { IHeaderBreadcrumb } from '../../../shared/components/page-header/page-header.types';
-import { SshViewerComponent } from '../../../shared/components/ssh-viewer/ssh-viewer.component';
-import { KubernetesEndpointService } from '../services/kubernetes-endpoint.service';
+import { IHeaderBreadcrumb } from '../../../../../core/src/shared/components/page-header/page-header.types';
+import { SshViewerComponent } from '../../../../../core/src/shared/components/ssh-viewer/ssh-viewer.component';
 import { BaseKubeGuid } from '../kubernetes-page.types';
+import { KubernetesEndpointService } from '../services/kubernetes-endpoint.service';
 import { KubernetesService } from '../services/kubernetes.service';
 
 

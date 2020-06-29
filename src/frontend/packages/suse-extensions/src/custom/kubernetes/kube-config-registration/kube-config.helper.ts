@@ -3,11 +3,11 @@ import * as yaml from 'js-yaml';
 import { BehaviorSubject, combineLatest, Observable, of } from 'rxjs';
 import { filter, first, map, tap } from 'rxjs/operators';
 
+import { EndpointsService } from '../../../../../core/src/core/endpoints.service';
+import { createGuid } from '../../../../../core/src/core/utils.service';
+import { RowState } from '../../../../../core/src/shared/components/list/data-sources-controllers/list-data-source-types';
+import { getFullEndpointApiUrl } from '../../../../../store/src/endpoint-utils';
 import { EndpointModel } from '../../../../../store/src/types/endpoint.types';
-import { EndpointsService } from '../../../core/endpoints.service';
-import { createGuid } from '../../../core/utils.service';
-import { getFullEndpointApiUrl } from '../../../features/endpoints/endpoint-helpers';
-import { RowState } from '../../../shared/components/list/data-sources-controllers/list-data-source-types';
 import { KubeConfigAuthHelper } from './kube-config-auth.helper';
 import { KubeConfigFile, KubeConfigFileCluster } from './kube-config.types';
 

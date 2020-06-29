@@ -1,7 +1,7 @@
 import { Component, Input } from '@angular/core';
 import { Observable } from 'rxjs';
 
-import { TableCellCustom } from '../../../../../shared/components/list/list.types';
+import { TableCellCustom } from '../../../../../../../core/src/shared/components/list/list.types';
 import { KubeConfigFileCluster } from '../../kube-config.types';
 
 @Component({

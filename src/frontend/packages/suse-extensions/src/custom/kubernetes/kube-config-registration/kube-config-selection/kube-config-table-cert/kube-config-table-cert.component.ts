@@ -3,7 +3,7 @@ import { Component, Input } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
 import { timeout } from 'rxjs/operators';
 
-import { TableCellCustom } from '../../../../../shared/components/list/list.types';
+import { TableCellCustom } from '../../../../../../../core/src/shared/components/list/list.types';
 import { KubeConfigHelper } from '../../kube-config.helper';
 import { KubeConfigFileCluster } from '../../kube-config.types';
 

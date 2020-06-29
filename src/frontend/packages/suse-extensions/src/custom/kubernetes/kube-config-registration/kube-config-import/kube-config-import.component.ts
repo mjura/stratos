@@ -4,30 +4,25 @@ import { Store } from '@ngrx/store';
 import { BehaviorSubject, Observable, of as observableOf, Subscription } from 'rxjs';
 import { distinctUntilChanged, filter, first, map, pairwise, startWith, withLatestFrom } from 'rxjs/operators';
 
-import { entityCatalog } from '../../../../../../store/src/entity-catalog/entity-catalog';
-import { safeUnsubscribe } from '../../../../core/utils.service';
-import { ITableColumn } from '../../../../shared/components/list/list-table/table.types';
-import { KUBERNETES_ENDPOINT_TYPE } from '../../kubernetes-entity-factory';
-import { KubeConfigAuthHelper } from '../kube-config-auth.helper';
-import { KubeConfigFileCluster, KubeConfigImportAction, KubeImportState } from '../kube-config.types';
-import { RegisterEndpoint } from './../../../../../../store/src/actions/endpoint.actions';
-import { AppState } from './../../../../../../store/src/app-state';
-import { EndpointsEffect } from './../../../../../../store/src/effects/endpoint.effects';
-import { endpointSchemaKey } from './../../../../../../store/src/helpers/entity-factory';
-import { ActionState } from './../../../../../../store/src/reducers/api-request-reducer/types';
-import { selectUpdateInfo } from './../../../../../../store/src/selectors/api.selectors';
-import { STRATOS_ENDPOINT_TYPE } from './../../../../base-entity-schemas';
-import { EndpointsService } from './../../../../core/endpoints.service';
+import { EndpointsService } from '../../../../../../core/src/core/endpoints.service';
+import { safeUnsubscribe } from '../../../../../../core/src/core/utils.service';
 import {
   ConnectEndpointConfig,
   ConnectEndpointData,
   ConnectEndpointService,
-} from './../../../../features/endpoints/connect.service';
+} from '../../../../../../core/src/features/endpoints/connect.service';
 import {
   ITableListDataSource,
   RowState,
-} from './../../../../shared/components/list/data-sources-controllers/list-data-source-types';
-import { StepOnNextFunction } from './../../../../shared/components/stepper/step/step.component';
+} from '../../../../../../core/src/shared/components/list/data-sources-controllers/list-data-source-types';
+import { ITableColumn } from '../../../../../../core/src/shared/components/list/list-table/table.types';
+import { StepOnNextFunction } from '../../../../../../core/src/shared/components/stepper/step/step.component';
+import { AppState } from '../../../../../../store/src/app-state';
+import { ActionState } from '../../../../../../store/src/reducers/api-request-reducer/types';
+import { stratosEntityCatalog } from '../../../../../../store/src/stratos-entity-catalog';
+import { KUBERNETES_ENDPOINT_TYPE } from '../../kubernetes-entity-factory';
+import { KubeConfigAuthHelper } from '../kube-config-auth.helper';
+import { KubeConfigFileCluster, KubeConfigImportAction, KubeImportState } from '../kube-config.types';
 import {
   KubeConfigTableImportStatusComponent,
 } from './kube-config-table-import-status/kube-config-table-import-status.component';
@@ -87,7 +82,6 @@ export class KubeConfigImportComponent implements OnDestroy {
   applyStarted: boolean;
   private iteration = 0;
 
-  private endpointEntityKey = entityCatalog.getEntityKey(STRATOS_ENDPOINT_TYPE, endpointSchemaKey);
   private connectService: ConnectEndpointService;
 
   constructor(
@@ -186,12 +180,9 @@ export class KubeConfigImportComponent implements OnDestroy {
 
   // Register the endpoint
   private registerEndpoint(name: string, url: string, skipSslValidation: boolean) {
-    const action = new RegisterEndpoint(KUBERNETES_ENDPOINT_TYPE, null, name, url, skipSslValidation, '', '', false);
-    this.store.dispatch(action);
-    const update$ = this.store.select(
-      selectUpdateInfo(this.endpointEntityKey, action.guid(), EndpointsEffect.registeringKey)
-    ).pipe(filter(update => !!update));
-    return update$;
+    // TODO: RC sub type missing
+    return stratosEntityCatalog.endpoint.api.register<ActionState>(KUBERNETES_ENDPOINT_TYPE, null, name, url, skipSslValidation, '', '', false)
+      .pipe(filter(update => !!update));
   }
 
   // Connect to an endpoint
@@ -207,7 +198,7 @@ export class KubeConfigImportComponent implements OnDestroy {
     if (this.connectService) {
       this.connectService.destroy();
     }
-    this.connectService = new ConnectEndpointService(this.store, this.endpointsService, config);
+    this.connectService = new ConnectEndpointService(this.endpointsService, config);
     this.connectService.setData(pData);
     this.connectService.submit();
     return this.connectService.getConnectingObservable();
