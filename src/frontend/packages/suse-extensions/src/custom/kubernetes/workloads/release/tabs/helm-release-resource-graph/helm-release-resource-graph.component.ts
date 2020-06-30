@@ -7,6 +7,7 @@ import { filter, first, map } from 'rxjs/operators';
 import {
   KubernetesResourceViewerComponent,
 } from '../../../../kubernetes-resource-viewer/kubernetes-resource-viewer.component';
+import { KubernetesAnalysisService } from '../../../../services/kubernetes.analysis.service';
 import { KubeAPIResource } from '../../../../store/kube.types';
 import { HelmReleaseHelperService } from '../helm-release-helper.service';
 
@@ -44,9 +45,12 @@ export class HelmReleaseResourceGraphComponent implements OnInit, OnDestroy {
 
   private graph: Subscription;
 
+  private didInitialFit = false;
+
   constructor(
     private componentFactoryResolver: ComponentFactoryResolver,
     private helper: HelmReleaseHelperService,
+    public analyzerService: KubernetesAnalysisService,
     private previewPanel: SidePanelService) { }
 
   ngOnInit() {
@@ -79,6 +83,11 @@ export class HelmReleaseResourceGraphComponent implements OnInit, OnDestroy {
       });
       this.links = newLinks;
       this.update$.next(true);
+
+      // if (!this.didInitialFit) {
+      //   this.didInitialFit = true;
+      //   this.fitGraph();
+      // }
     });
   }
 
