@@ -53,7 +53,7 @@ export class KubernetesNamespaceComponent {
     );
 
     this.tabLinks = [
-      { link: 'pods', label: 'Pods', icon: 'adjust' },
+      { link: 'pods', label: 'Pods', icon: 'pod', iconFont: 'stratos-icons' },
       { link: 'services', label: 'Services', icon: 'service', iconFont: 'stratos-icons' },
       { link: 'analysis', label: 'Analysis', icon: 'assignment', hidden$: this.analysisService.hideAnalysis$ },
     ];
