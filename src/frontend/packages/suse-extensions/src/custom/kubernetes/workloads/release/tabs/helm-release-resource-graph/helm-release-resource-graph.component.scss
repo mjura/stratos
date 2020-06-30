@@ -1,19 +1,5 @@
 :host {
-  align-items: center;
   display: flex;
-  justify-content: center;  
   height: 100%;
   width: 100%;
-}
-
-.resources {
-  &__loading {
-    display: flex;
-    justify-content: center;
-    &__content {
-      mat-progress-bar {
-        margin-top: 15px;
-      }
-    }
-  }
 }

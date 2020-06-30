@@ -45,8 +45,6 @@ export class HelmReleaseTabBaseComponent implements OnDestroy {
 
   private sub: Subscription;
 
-  // private connection: Connection;
-
   public breadcrumbs = [{
     breadcrumbs: [
       { value: 'Workloads', routerLink: '/workloads' }
