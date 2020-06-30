@@ -18,15 +18,16 @@ import (
 	v1 "k8s.io/api/core/v1"
 	extv1beta1 "k8s.io/api/extensions/v1beta1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/client-go/kubernetes/scheme"
 
 	"github.com/cloudfoundry-incubator/stratos/src/jetstream/repository/interfaces"
 )
 
 var resourcesWithoutStatus = map[string]bool{
-	"RoleBinding": false,
-	"Role":        false,
+	"RoleBinding":        false,
+	"Role":               false,
+	"ClusterRole":        false,
+	"ClusterRoleBinding": false,
 }
 
 // HelmRelease represents a Helm Release deployed via Helm
@@ -45,7 +46,8 @@ type KubeResource struct {
 	Kind       string `yaml:"kind" json:"kind"`
 	APIVersion string `yaml:"apiVersion" json:"apiVersion"`
 	Metadata   struct {
-		Name string `yaml:"name" json:"name"`
+		Name      string `yaml:"name" json:"name"`
+		Namespace string `yaml:"name" json:"namespace"`
 	} `yaml:"metadata" json:"metadata"`
 	Resource interface{} `yaml:"resource"`
 	Manifest bool
@@ -56,7 +58,7 @@ func (r *KubeResource) getID() string {
 }
 
 // NewHelmRelease represents extended info about a Helm Release
-func NewHelmRelease(info *release.Release, endpoint, user string) *HelmRelease {
+func NewHelmRelease(info *release.Release, endpoint, user string, jetstream interfaces.PortalProxy) *HelmRelease {
 	r := &HelmRelease{
 		Release:  info,
 		Endpoint: endpoint,
@@ -132,31 +134,46 @@ func (r *HelmRelease) GetPods() []interface{} {
 }
 
 // process a yaml resource from the helm manifest
-func (r *HelmRelease) processResource(obj runtime.Object) {
+//func (r *HelmRelease) processResource(obj runtime.Object) {
+func (r *HelmRelease) processResource(obj interface{}) {
 	j, err := json.Marshal(obj)
 	if err == nil {
 		var t KubeResource
 		if json.Unmarshal(j, &t) == nil {
-			t.Resource = obj
-			t.Manifest = true
-			r.setResource(t)
-			log.Debugf("Got resource: %s : %s", t.Kind, t.Metadata.Name)
-			r.processController(t)
-			r.addJobForResource(t.Kind, t.APIVersion, t.Metadata.Name)
+			// If this is a List, then unpack it
+			if t.APIVersion == "v1" && t.Kind == "List" {
+				var list v1.PodList
+				err := json.Unmarshal(j, &list)
+				if err == nil {
+					for _, item := range list.Items {
+						log.Info(item.Name)
+						r.processResource(item)
+					}
+				} else {
+					log.Error("Helm Release Manifest: Could not parse List resource")
+				}
+			} else {
+				t.Resource = obj
+				t.Manifest = true
+				r.setResource(t)
+				log.Debugf("Got resource: %s : %s", t.Kind, t.Metadata.Name)
+				r.processController(t)
+				r.addJobForResource(t.Metadata.Namespace, t.Kind, t.APIVersion, t.Metadata.Name)
+			}
 		} else {
 			log.Error("Helm Release Manifest: Could not parse Kubernetes resource")
 		}
 	}
 }
 
-func (r *HelmRelease) addJobForResource(kind, apiVersion, name string) {
+func (r *HelmRelease) addJobForResource(namespace, kind, apiVersion, name string) {
 	job := KubeResourceJob{
 		ID:         fmt.Sprintf("%s-%s#Pods", kind, name),
 		Endpoint:   r.Endpoint,
 		User:       r.User,
 		Namespace:  r.Namespace,
 		Name:       name,
-		URL:        getRestURL(r.Namespace, kind, apiVersion, name),
+		URL:        getRestURL(namespace, kind, apiVersion, name),
 		APIVersion: apiVersion,
 		Kind:       kind,
 	}
@@ -270,7 +287,7 @@ func (r *HelmRelease) processPodOwners(pod v1.Pod) {
 			}
 			resource.ObjectMeta = metav1.ObjectMeta{
 				Name:      owner.Name,
-				Namespace: r.Namespace,
+				Namespace: pod.Namespace,
 			}
 			identifier := getResourceIdentifier(resource.TypeMeta, resource.ObjectMeta)
 			if _, ok := r.Resources[identifier]; !ok {
@@ -284,22 +301,13 @@ func (r *HelmRelease) processPodOwners(pod v1.Pod) {
 				res.Resource = &resource
 				r.setResource(res)
 
-				r.addJobForResource(owner.Kind, owner.APIVersion, owner.Name)
+				r.addJobForResource(pod.Namespace, owner.Kind, owner.APIVersion, owner.Name)
 			}
 		} else {
 			log.Debugf("Unexpected Pod owner kind: %s", owner.Kind)
 		}
 	}
 }
-
-// func (r *HelmRelease) getKubeResource(typeMeta metav1.TypeMeta, objectMeta metav1.ObjectMeta) KubeResource {
-// 	kres := KubeResource{
-// 		Kind:       typeMeta.Kind,
-// 		APIVersion: typeMeta.APIVersion,
-// 	}
-// 	kres.Metadata.Name = objectMeta.Name
-// 	return kres
-// }
 
 func (r *HelmRelease) UpdateResources(jetstream interfaces.PortalProxy) {
 	// This will be an array of resources
@@ -314,7 +322,7 @@ func (r *HelmRelease) UpdateResources(jetstream interfaces.PortalProxy) {
 		}
 		res.Metadata.Name = j.Name
 
-		// TODO: If the status was 404, then we should remove the resource
+		// If the status was 404, then we should remove the resource
 		if j.StatusCode == http.StatusNotFound {
 			log.Debugf("Resource has been deleted - removing: %s -> %s", j.Kind, j.Name)
 			r.deleteResource(res)
@@ -353,6 +361,13 @@ func getRestURL(namespace, kind, apiVersion, name string) string {
 			name += "/status"
 		}
 	}
-	restURL = fmt.Sprintf("/%s/%s/namespaces/%s/%ss/%s", base, apiVersion, namespace, strings.ToLower(kind), name)
+
+	if len(namespace) == 0 {
+		// This is not a namespaced resource
+		restURL = fmt.Sprintf("/%s/%s/%ss/%s", base, apiVersion, strings.ToLower(kind), name)
+	} else {
+		restURL = fmt.Sprintf("/%s/%s/namespaces/%s/%ss/%s", base, apiVersion, namespace, strings.ToLower(kind), name)
+	}
+
 	return restURL
 }

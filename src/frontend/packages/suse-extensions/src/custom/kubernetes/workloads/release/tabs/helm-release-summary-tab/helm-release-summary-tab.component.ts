@@ -1,10 +1,10 @@
-import { ResourceAlert } from './../../../../services/analysis-report.types';
 import { HttpClient } from '@angular/common/http';
-import { Component, OnDestroy, ComponentFactoryResolver } from '@angular/core';
+import { Component, ComponentFactoryResolver, OnDestroy } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { LoggerService } from 'frontend/packages/core/src/core/logger.service';
 import { ConfirmationDialogConfig } from 'frontend/packages/core/src/shared/components/confirmation-dialog.config';
 import { ConfirmationDialogService } from 'frontend/packages/core/src/shared/components/confirmation-dialog.service';
+import { SidePanelService } from 'frontend/packages/core/src/shared/services/side-panel.service';
 import { ClearPaginationOfType } from 'frontend/packages/store/src/actions/pagination.actions';
 import { RouterNav } from 'frontend/packages/store/src/actions/router.actions';
 import { AppState } from 'frontend/packages/store/src/app-state';
@@ -13,12 +13,15 @@ import { distinctUntilChanged, filter, first, map, publishReplay, refCount, star
 
 import { SnackBarService } from '../../../../../../../../core/src/shared/services/snackbar.service';
 import { endpointsEntityRequestDataSelector } from '../../../../../../../../store/src/selectors/endpoint.selectors';
+import {
+  ResourceAlertPreviewComponent,
+} from '../../../../analysis-report-viewer/resource-alert-preview/resource-alert-preview.component';
+import { KubernetesAnalysisService } from '../../../../services/kubernetes.analysis.service';
 import { HelmReleaseChartData, HelmReleaseResource } from '../../../workload.types';
 import { workloadsEntityCatalog } from '../../../workloads-entity-catalog';
+import { getIcon } from '../../icon-helper';
 import { HelmReleaseHelperService } from '../helm-release-helper.service';
-import { KubernetesAnalysisService } from '../../../../services/kubernetes.analysis.service';
-import { SidePanelService } from 'frontend/packages/core/src/shared/services/side-panel.service';
-import { ResourceAlertPreviewComponent } from '../../../../analysis-report-viewer/resource-alert-preview/resource-alert-preview.component';
+import { ResourceAlert } from './../../../../services/analysis-report.types';
 
 @Component({
   selector: 'app-helm-release-summary-tab',
@@ -68,72 +71,6 @@ export class HelmReleaseSummaryTabComponent implements OnDestroy {
       value: '#E7727D'
     }
   ];
-
-
-  public iconMappings = {
-    Namespace: {
-      name: 'namespace',
-      font: 'stratos-icons'
-    },
-    Container: {
-      name: 'container',
-      font: 'stratos-icons'
-    },
-    ClusterRole: {
-      name: 'cluster_role',
-      font: 'stratos-icons'
-    },
-    ClusterRoleBinding: {
-      name: 'cluster_role_binding',
-      font: 'stratos-icons'
-    },
-    Deployment: {
-      name: 'deployment',
-      font: 'stratos-icons'
-    },
-    ReplicaSet: {
-      name: 'replica_set',
-      font: 'stratos-icons'
-    },
-    Pod: {
-      name: 'pod',
-      font: 'stratos-icons'
-    },
-    Service: {
-      name: 'service',
-      font: 'stratos-icons'
-    },
-    Role: {
-      name: 'assignment_ind'
-    },
-    RoleBinding: {
-      name: 'role_binding',
-      font: 'stratos-icons'
-    },
-    StatefulSet: {
-      name: 'stateful_set',
-      font: 'stratos-icons'
-    },
-    Ingress: {
-      name: 'ingress',
-      font: 'stratos-icons'
-    },
-    ConfigMap: {
-      name: 'config_map',
-      font: 'stratos-icons'
-    },
-    Secret: {
-      name: 'config_map',
-      font: 'stratos-icons'
-    },
-    ServiceAccount: {
-      name: 'lock'
-    },
-    default: {
-      name: 'collocation',
-      font: 'stratos-icons'
-    }
-  };
 
   // Blue: #00B2E2
   // Yellow: #FFC107
@@ -187,6 +124,8 @@ export class HelmReleaseSummaryTabComponent implements OnDestroy {
       this.analysisReportUpdated$
     ).pipe(
       map(([graph, id]) => {
+        console.log(graph);
+        console.log(id);
         const resources = {};
         // Collect the resources
         Object.values(graph.nodes).forEach((node: any) => {
@@ -196,7 +135,7 @@ export class HelmReleaseSummaryTabComponent implements OnDestroy {
               label: `${node.data.kind}s`,
               count: 0,
               statuses: [],
-              icon: this.getIcon(node.data.kind)
+              icon: getIcon(node.data.kind)
             };
           }
           resources[node.data.kind].count++;
@@ -250,15 +189,6 @@ export class HelmReleaseSummaryTabComponent implements OnDestroy {
           this.analysisReport = results;
           this.analysisReportUpdated.next(report.id);
       });
-    }
-  }
-
-  private getIcon(kind: string) {
-    const rkind = kind || 'Pod';
-    if (this.iconMappings[rkind]) {
-      return this.iconMappings[rkind];
-    } else {
-      return this.iconMappings.default;
     }
   }
 

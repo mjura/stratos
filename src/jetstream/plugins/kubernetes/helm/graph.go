@@ -69,6 +69,8 @@ func (r *HelmReleaseGraph) ParseManifest(release *HelmRelease) {
 		node.Data.Kind = item.Kind
 		node.Data.Status = "unknown"
 
+		//log.Debugf("%s %s", item.Kind, item.APIVersion)
+
 		switch o := item.Resource.(type) {
 		case *appsv1.Deployment:
 			target := getShortResourceId(o.Kind, o.Name)
@@ -114,6 +116,9 @@ func (r *HelmReleaseGraph) ParseManifest(release *HelmRelease) {
 		case *rbacv1.RoleBinding:
 			target := getShortResourceId(item.Kind, o.Name)
 			r.ParseRoleBinding(target, o)
+		case *rbacv1.ClusterRoleBinding:
+			target := getShortResourceId(item.Kind, o.Name)
+			r.ParseClusterRoleBinding(target, o)
 		default:
 			log.Debugf("Graph: Unknown type: %s", reflect.TypeOf(o))
 		}
@@ -138,20 +143,15 @@ func (r *HelmReleaseGraph) generateTemporaryNode(id string) {
 
 	node := ReleaseNode{
 		ID:    id,
-		Label: parts[1],
+		Label: strings.Join(parts[1:], "-"),
 	}
 
 	node.Data.Kind = parts[0]
 	node.Data.Status = "missing"
-
 	r.Nodes[node.ID] = node
 }
 
 func getShortResourceId(kind, name string) string {
-	// // TODO: FIX - empty kind is a pod
-	// if len(kind) == 0 {
-	// 	kind = "Pod"
-	// }
 	return fmt.Sprintf("%s-%s", kind, name)
 }
 
@@ -178,6 +178,13 @@ func (r *HelmReleaseGraph) ProcessPod(id string, res KubeResource, spec v1.PodSp
 			ref := fmt.Sprintf("ConfigMap-%s", volume.VolumeSource.ConfigMap.Name)
 			r.AddLink(id, ref)
 		}
+	}
+
+	// Service Account
+	saName := spec.ServiceAccountName
+	if len(saName) > 0 {
+		ref := fmt.Sprintf("ServiceAccount-%s", saName)
+		r.AddLink(id, ref)
 	}
 
 	// Go through the pod and process each container
@@ -247,6 +254,17 @@ func (r *HelmReleaseGraph) ProcessServiceAccount(id string, template v1.PodTempl
 }
 
 func (r *HelmReleaseGraph) ParseRoleBinding(id string, roleBinding *rbacv1.RoleBinding) {
+	for _, subject := range roleBinding.Subjects {
+		// TODO: Only match those with the same namespace ????
+		subjectID := fmt.Sprintf("%s-%s", subject.Kind, subject.Name)
+		r.AddLink(id, subjectID)
+	}
+
+	roleRefID := fmt.Sprintf("%s-%s", roleBinding.RoleRef.Kind, roleBinding.RoleRef.Name)
+	r.AddLink(id, roleRefID)
+}
+
+func (r *HelmReleaseGraph) ParseClusterRoleBinding(id string, roleBinding *rbacv1.ClusterRoleBinding) {
 	for _, subject := range roleBinding.Subjects {
 		// TODO: Only match those with the same namespace ????
 		subjectID := fmt.Sprintf("%s-%s", subject.Kind, subject.Name)

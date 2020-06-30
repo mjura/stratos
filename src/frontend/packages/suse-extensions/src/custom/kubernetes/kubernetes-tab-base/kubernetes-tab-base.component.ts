@@ -1,14 +1,14 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { Observable } from 'rxjs';
-import { first, map, startWith, tap } from 'rxjs/operators';
+import { first, map, startWith } from 'rxjs/operators';
 
 import { FavoritesConfigMapper } from '../../../../../store/src/favorite-config-mapper';
 import { UserFavoriteEndpoint } from '../../../../../store/src/types/user-favorites.types';
 import { BaseKubeGuid } from '../kubernetes-page.types';
 import { KubernetesEndpointService } from '../services/kubernetes-endpoint.service';
-import { KubernetesService } from '../services/kubernetes.service';
 import { KubernetesAnalysisService } from '../services/kubernetes.analysis.service';
+import { KubernetesService } from '../services/kubernetes.service';
 
 @Component({
   selector: 'app-kubernetes-tab-base',
@@ -49,7 +49,7 @@ export class KubernetesTabBaseComponent implements OnInit {
       { link: 'analysis', label: 'Analysis', icon: 'assignment', hidden$: this.analysisService.hideAnalysis$ },
       { link: '-', label: 'Cluster' },
       { link: 'nodes', label: 'Nodes', icon: 'node', iconFont: 'stratos-icons' },
-      { link: 'namespaces', label: 'Namespaces', icon: 'node', iconFont: 'stratos-icons' },
+      { link: 'namespaces', label: 'Namespaces', icon: 'namespace', iconFont: 'stratos-icons' },
       { link: '-', label: 'Resources' },
       { link: 'pods', label: 'Pods', icon: 'pod', iconFont: 'stratos-icons' },
     ];

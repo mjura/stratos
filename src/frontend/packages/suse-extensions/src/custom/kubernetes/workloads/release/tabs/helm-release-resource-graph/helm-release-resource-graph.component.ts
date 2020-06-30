@@ -9,6 +9,7 @@ import {
 } from '../../../../kubernetes-resource-viewer/kubernetes-resource-viewer.component';
 import { KubernetesAnalysisService } from '../../../../services/kubernetes.analysis.service';
 import { KubeAPIResource } from '../../../../store/kube.types';
+import { getIcon } from '../../icon-helper';
 import { HelmReleaseHelperService } from '../helm-release-helper.service';
 
 
@@ -60,13 +61,19 @@ export class HelmReleaseResourceGraphComponent implements OnInit, OnDestroy {
       const newNodes = [];
       Object.values(g.nodes).forEach((node: any) => {
         const colors = this.getColor(node.data.status);
+        const icon = getIcon(node.data.kind);
+        const missing = node.data.status === 'missing';
+
         newNodes.push({
           id: node.id,
           label: node.label,
           data: {
             ...node.data,
+            missing: node.data.status === 'missing',
+            dash: missing ? 6 : 0,
             fill: colors.bg,
-            text: colors.fg
+            text: colors.fg,
+            icon: icon
           },
         });
       });
@@ -84,10 +91,10 @@ export class HelmReleaseResourceGraphComponent implements OnInit, OnDestroy {
       this.links = newLinks;
       this.update$.next(true);
 
-      // if (!this.didInitialFit) {
-      //   this.didInitialFit = true;
-      //   this.fitGraph();
-      // }
+      if (!this.didInitialFit) {
+        this.didInitialFit = true;
+        setTimeout(() => this.fitGraph(), 10);
+      }
     });
   }
 
