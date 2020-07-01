@@ -3,9 +3,10 @@ import { Injectable } from '@angular/core';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { ActivatedRoute } from '@angular/router';
 import { Store } from '@ngrx/store';
+import { environment } from 'frontend/packages/core/src/environments/environment';
 import { ClearPaginationOfType } from 'frontend/packages/store/src/actions/pagination.actions';
 import { combineLatest, Observable, of } from 'rxjs';
-import { catchError, map, startWith } from 'rxjs/operators';
+import { catchError, filter, map, startWith } from 'rxjs/operators';
 
 import { RouterNav } from '../../../../../store/src/actions/router.actions';
 import { AppState } from '../../../../../store/src/app-state';
@@ -13,7 +14,6 @@ import { GetAnalysisReports } from '../store/kubernetes.actions';
 import { KubernetesEndpointService } from './kubernetes-endpoint.service';
 import { KubeScoreReportHelper } from './kubescore-report.helper';
 import { PopeyeReportHelper } from './popeye-report.helper';
-import { environment } from 'frontend/packages/core/src/environments/environment';
 
 export interface KubernetesAnalysisType {
   name: string;
@@ -52,7 +52,8 @@ export class KubernetesAnalysisService {
       map(ok => !ok)
     );
 
-    this.analyzers$ = of([
+    const allEngines = {
+      popeye:
       {
         name: 'PopEye',
         id: 'popeye',
@@ -61,6 +62,7 @@ export class KubernetesAnalysisService {
         iconWidth: '80',
         descriptionUrl: '/core/assets/custom/popeye.md'
       },
+      'kube-score':
       {
         name: 'Kube Score',
         id: 'kube-score',
@@ -68,7 +70,7 @@ export class KubernetesAnalysisService {
         iconUrl: '/core/assets/custom/kubescore.png',
         iconWidth: '120',
         descriptionUrl: '/core/assets/custom/kubescore.md'
-      },
+      }
       // {
       //   name: 'Sonobuoy',
       //   id: 'sonobuoy',
@@ -77,7 +79,14 @@ export class KubernetesAnalysisService {
       //   iconWidth: '70',
       //   descriptionUrl: '/core/assets/custom/sonobuoy.md'
       // }
-    ]);
+    };
+
+    // Determine which analyzers are enabled
+    this.analyzers$ = this.store.select('auth').pipe(
+      filter(auth => !!auth.sessionData['plugin-config']),
+      map(auth => auth.sessionData['plugin-config'].analysisEngines),
+      map(engines => engines.split(',').map(e => allEngines[e.trim()]).filter(e => !!e))
+    );
 
     this.namespaceAnalyzers$ = combineLatest(
       this.analyzers$,

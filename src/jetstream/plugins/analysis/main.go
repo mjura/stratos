@@ -2,6 +2,7 @@ package analysis
 
 import (
 	"errors"
+	"strconv"
 
 	"github.com/cloudfoundry-incubator/stratos/src/jetstream/plugins/analysis/store"
 	"github.com/cloudfoundry-incubator/stratos/src/jetstream/repository/interfaces"
@@ -10,7 +11,18 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
-const analsyisServicesAPIEnvVar = "ANALYSIS_SERVICES_API"
+const (
+	analsyisServicesAPIEnvVar = "ANALYSIS_SERVICES_API"
+
+	// Allow specific engines to be enabled
+	analysisEnginesAPIEnvVar = "ANALYSIS_ENGINES"
+
+	// Names used to communicate settings info back to the front-end client
+	analysisEnabledPluginConfigSetting = "analysisEnabled"
+	analysisEnginesPluginConfigSetting = "analysisEngines"
+
+	defaultEngines = "popeye"
+)
 
 // Analysis - Plugin to allow analysers to run over an endpoint cluster
 type Analysis struct {
@@ -73,6 +85,16 @@ func (analysis *Analysis) Init() error {
 
 		// Start background status check
 		analysis.initStatusCheck()
+
+		// Analysis is enabled by Tech Preview mode
+		analysis.portalProxy.GetConfig().PluginConfig[analysisEnabledPluginConfigSetting] = strconv.FormatBool(analysis.portalProxy.GetConfig().EnableTechPreview)
+
+		if engines, ok := analysis.portalProxy.Env().Lookup(analysisEnginesAPIEnvVar); ok {
+			analysis.portalProxy.GetConfig().PluginConfig[analysisEnginesPluginConfigSetting] = engines
+		} else {
+			analysis.portalProxy.GetConfig().PluginConfig[analysisEnginesPluginConfigSetting] = defaultEngines
+		}
+
 		return nil
 	}
 
