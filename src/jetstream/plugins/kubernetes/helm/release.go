@@ -6,9 +6,11 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"os"
 	"reflect"
 	"strings"
 
+	"github.com/cloudfoundry-incubator/stratos/src/jetstream/repository/interfaces"
 	log "github.com/sirupsen/logrus"
 	"helm.sh/helm/v3/pkg/release"
 	appsv1 "k8s.io/api/apps/v1"
@@ -19,8 +21,7 @@ import (
 	extv1beta1 "k8s.io/api/extensions/v1beta1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes/scheme"
-
-	"github.com/cloudfoundry-incubator/stratos/src/jetstream/repository/interfaces"
+	"sigs.k8s.io/yaml"
 )
 
 var resourcesWithoutStatus = map[string]bool{
@@ -28,6 +29,7 @@ var resourcesWithoutStatus = map[string]bool{
 	"Role":               false,
 	"ClusterRole":        false,
 	"ClusterRoleBinding": false,
+	"PodSecurityPolicy":  false,
 }
 
 // HelmRelease represents a Helm Release deployed via Helm
@@ -47,7 +49,7 @@ type KubeResource struct {
 	APIVersion string `yaml:"apiVersion" json:"apiVersion"`
 	Metadata   struct {
 		Name      string `yaml:"name" json:"name"`
-		Namespace string `yaml:"name" json:"namespace"`
+		Namespace string `yaml:"namespace" json:"namespace"`
 	} `yaml:"metadata" json:"metadata"`
 	Resource interface{} `yaml:"resource"`
 	Manifest bool
@@ -76,18 +78,33 @@ func (r *HelmRelease) parseManifest() {
 	reader := bytes.NewReader([]byte(r.Manifest))
 	buffer := bufio.NewReader(reader)
 	var bufr strings.Builder
+	fe, _ := os.Create("/home/nwm/manifest_err.yaml")
+	defer fe.Close()
+	f, _ := os.Create("/home/nwm/manifest.yaml")
+	defer f.Close()
+	f.Write([]byte(r.Manifest))
 	for {
 		line, err := buffer.ReadString('\n')
-		if err != nil || (err == nil && strings.TrimSpace(line) == "---") {
+		if err != nil || (err == nil && strings.TrimRight(line, "\t \n") == "---") {
 			data := []byte(bufr.String())
 			if len(data) > 0 {
 				decode := scheme.Codecs.UniversalDeserializer().Decode
-				obj, _, err := decode([]byte(bufr.String()), nil, nil)
+				obj, _, err := decode(data, nil, nil)
 				if err != nil {
-					log.Error(fmt.Sprintf("Helm Manifest Parser: Error while decoding YAML object. Err was: %s", err))
-					r.ManifestErrors = true
+					// Custom Resource Definition
+					if strings.HasPrefix(err.Error(), "no kind") {
+						var t interface{}
+						if err := yaml.Unmarshal(data, &t); err == nil {
+							r.processYamlResource(t, data)
+						} else {
+							log.Errorf("Could not parse custom resource %s", err)
+						}
+					} else {
+						log.Error(fmt.Sprintf("Helm Manifest Parser: Error while decoding YAML object. Err was: %s", err))
+						r.ManifestErrors = true
+					}
 				} else {
-					r.processResource(obj)
+					r.processJsonResource(obj)
 				}
 
 				bufr.Reset()
@@ -98,7 +115,11 @@ func (r *HelmRelease) parseManifest() {
 		if err != nil {
 			break
 		}
-		bufr.WriteString(line)
+
+		// Ignore comments
+		if !strings.HasPrefix(strings.TrimSpace(line), "#") && !strings.HasPrefix(strings.TrimRight(line, "\t \n"), "---") {
+			bufr.WriteString(line)
+		}
 	}
 }
 
@@ -133,37 +154,51 @@ func (r *HelmRelease) GetPods() []interface{} {
 	return resources
 }
 
-// process a yaml resource from the helm manifest
-//func (r *HelmRelease) processResource(obj runtime.Object) {
-func (r *HelmRelease) processResource(obj interface{}) {
-	j, err := json.Marshal(obj)
+func (r *HelmRelease) processJsonResource(obj interface{}) {
+	data, err := json.Marshal(obj)
 	if err == nil {
 		var t KubeResource
-		if json.Unmarshal(j, &t) == nil {
+		if err := json.Unmarshal(data, &t); err == nil {
 			// If this is a List, then unpack it
 			if t.APIVersion == "v1" && t.Kind == "List" {
 				var list v1.PodList
-				err := json.Unmarshal(j, &list)
+				err := json.Unmarshal(data, &list)
 				if err == nil {
 					for _, item := range list.Items {
-						log.Info(item.Name)
-						r.processResource(item)
+						r.processJsonResource(item)
 					}
 				} else {
 					log.Error("Helm Release Manifest: Could not parse List resource")
 				}
 			} else {
-				t.Resource = obj
-				t.Manifest = true
-				r.setResource(t)
-				log.Debugf("Got resource: %s : %s", t.Kind, t.Metadata.Name)
-				r.processController(t)
-				r.addJobForResource(t.Metadata.Namespace, t.Kind, t.APIVersion, t.Metadata.Name)
+				r.processKubeResource(obj, t)
 			}
 		} else {
 			log.Error("Helm Release Manifest: Could not parse Kubernetes resource")
 		}
+	} else {
+		log.Errorf("Helm Release ManifestL Could not marshal Kubernetes resource %s", err)
 	}
+}
+
+func (r *HelmRelease) processYamlResource(obj interface{}, data []byte) {
+	var t KubeResource
+	if err := yaml.Unmarshal(data, &t); err == nil {
+		r.processKubeResource(obj, t)
+	} else {
+		log.Error("Helm Release Manifest: Could not parse Kubernetes resource")
+	}
+}
+
+// process a yaml resource from the helm manifest
+//func (r *HelmRelease) processResource(obj runtime.Object) {
+func (r *HelmRelease) processKubeResource(obj interface{}, t KubeResource) {
+	t.Resource = obj
+	t.Manifest = true
+	r.setResource(t)
+	log.Debugf("Got resource: %s : %s", t.Kind, t.Metadata.Name)
+	r.processController(t)
+	r.addJobForResource(t.Metadata.Namespace, t.Kind, t.APIVersion, t.Metadata.Name)
 }
 
 func (r *HelmRelease) addJobForResource(namespace, kind, apiVersion, name string) {
@@ -342,7 +377,14 @@ func (r *HelmRelease) UpdateResources(jetstream interfaces.PortalProxy) {
 			res.Resource = obj
 			r.setResource(res)
 		} else {
-			log.Error("Could not parse resource")
+			// Just decode from Yaml - could be a CRD
+			var obj interface{}
+			if err := yaml.Unmarshal(j.Data, &obj); err == nil {
+				res.Resource = obj
+				r.setResource(res)
+			} else {
+				log.Error("Could not parse resource")
+			}
 		}
 
 		// TODO: If the resource was a job, process the selector again
@@ -362,12 +404,21 @@ func getRestURL(namespace, kind, apiVersion, name string) string {
 		}
 	}
 
+	kindPlural := pluralize(strings.ToLower(kind))
 	if len(namespace) == 0 {
 		// This is not a namespaced resource
-		restURL = fmt.Sprintf("/%s/%s/%ss/%s", base, apiVersion, strings.ToLower(kind), name)
+		restURL = fmt.Sprintf("/%s/%s/%s/%s", base, apiVersion, kindPlural, name)
 	} else {
-		restURL = fmt.Sprintf("/%s/%s/namespaces/%s/%ss/%s", base, apiVersion, namespace, strings.ToLower(kind), name)
+		restURL = fmt.Sprintf("/%s/%s/namespaces/%s/%s/%s", base, apiVersion, namespace, kindPlural, name)
 	}
 
 	return restURL
+}
+
+func pluralize(resource string) string {
+	if strings.HasSuffix(resource, "y") {
+		return fmt.Sprintf("%sies", resource[:len(resource)-1])
+	}
+
+	return fmt.Sprintf("%ss", resource)
 }
