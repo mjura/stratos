@@ -33,7 +33,7 @@ export class AnalysisReportsListConfig implements IListConfig<AnalysisReport> {
       columnId: 'name', headerCell: () => 'Name',
       cellDefinition: {
         getValue: (row: AnalysisReport) => row.name,
-        getLink: row => `/kubernetes/${this.guid}/analysis/report/${row.id}`
+        getLink: row => row.status === 'completed' ? `/kubernetes/${this.guid}/analysis/report/${row.id}` : null
       },
       sort: {
         type: 'sort',

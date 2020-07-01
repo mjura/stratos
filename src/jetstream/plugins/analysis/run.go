@@ -67,6 +67,19 @@ func (c *Analysis) runReport(ec echo.Context) error {
 	report.Name = fmt.Sprintf("Analysis report %s", analyzer)
 	dbStore.Save((report))
 
+	err = c.doRunReport(ec, analyzer, endpointID, userID, dbStore, &report)
+	if err != nil {
+		report.Status = "error"
+		report.Result = err.Error()
+		dbStore.UpdateReport(userID, &report)
+	}
+
+	return err
+
+}
+
+func (c *Analysis) doRunReport(ec echo.Context, analyzer, endpointID, userID string, dbStore store.AnalysisStore, report *store.AnalysisRecord) error {
+
 	// Get Kube Config
 	k8s := c.portalProxy.GetPlugin("kubernetes")
 	if k8s == nil {
@@ -132,15 +145,11 @@ func (c *Analysis) runReport(ec echo.Context) error {
 	client := &http.Client{Timeout: 180 * time.Second}
 	rsp, err := client.Do(r)
 	if err != nil {
-		report.Status = "error"
-		dbStore.UpdateReport(userID, &report)
 		return errors.New("Analysis job failed - could not contact Analysis Server")
 	}
 	if rsp.StatusCode != http.StatusOK {
 		log.Debugf("Request failed with response code: %d", rsp.StatusCode)
-		report.Status = "error"
-		dbStore.UpdateReport(userID, &report)
-		return errors.New("Analysis job failed")
+		return fmt.Errorf("Analysis job failed with response code: %d", rsp.StatusCode)
 	}
 
 	// Job submitted okay
@@ -150,13 +159,11 @@ func (c *Analysis) runReport(ec echo.Context) error {
 	response, err := ioutil.ReadAll(rsp.Body)
 	if err != nil {
 		report.Status = "error"
-		dbStore.UpdateReport(userID, &report)
+		dbStore.UpdateReport(userID, report)
 		return errors.New("Could not read response")
 	}
 	updatedJob := store.AnalysisRecord{}
 	if err = json.Unmarshal(response, &updatedJob); err != nil {
-		report.Status = "error"
-		dbStore.UpdateReport(userID, &report)
 		return errors.New("Could not read response - could not deserialize response")
 	}
 
@@ -172,9 +179,9 @@ func (c *Analysis) runReport(ec echo.Context) error {
 	log.Debugf("%+v", report)
 	log.Debug("=======================================================")
 
-	err = dbStore.UpdateReport(userID, &report)
+	err = dbStore.UpdateReport(userID, report)
 	if err != nil {
-		return errors.New("Could not save report")
+		return fmt.Errorf("Could not save report %s", err)
 	}
 
 	log.Debug("All done - job saved")

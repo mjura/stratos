@@ -81,7 +81,9 @@ func (c *Analysis) getReportsByPath(ec echo.Context) error {
 }
 
 func populateSummary(report *store.AnalysisRecord) {
-	if len(report.Result) > 0 {
+	if report.Status == "error" {
+		report.Error = report.Result
+	} else if len(report.Result) > 0 {
 		data := []byte(report.Result)
 		report.Summary = (*json.RawMessage)(&data)
 	}

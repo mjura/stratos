@@ -20,6 +20,7 @@ type AnalysisRecord struct {
 	Status       string           `json:"status"`
 	Duration     int              `json:"duration"`
 	Result       string           `json:"-"`
+	Error        string           `json:"error"`
 	Summary      *json.RawMessage `json:"summary"`
 	Report       *json.RawMessage `json:"report,omitempty"`
 }
