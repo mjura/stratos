@@ -27,9 +27,6 @@ import { ResourceAlert } from './../../../../services/analysis-report.types';
   selector: 'app-helm-release-summary-tab',
   templateUrl: './helm-release-summary-tab.component.html',
   styleUrls: ['./helm-release-summary-tab.component.scss'],
-  providers: [
-    KubernetesAnalysisService,
-  ]
 })
 export class HelmReleaseSummaryTabComponent implements OnDestroy {
   // Confirmation dialogs
@@ -105,7 +102,6 @@ export class HelmReleaseSummaryTabComponent implements OnDestroy {
       map(([isFetching, isDeleting]) => isFetching || isDeleting),
       startWith(true)
     );
-
 
     this.path = `${this.helmReleaseHelper.namespace}/${this.helmReleaseHelper.releaseTitle}`;
 
@@ -183,9 +179,9 @@ export class HelmReleaseSummaryTabComponent implements OnDestroy {
       this.analysisReport = null;
       this.analysisReportUpdated.next('');
     } else {
-        this.analyzerService.getByID(this.helmReleaseHelper.endpointGuid, report.id).subscribe(results => {
-          this.analysisReport = results;
-          this.analysisReportUpdated.next(report.id);
+      this.analyzerService.getByID(this.helmReleaseHelper.endpointGuid, report.id).subscribe(results => {
+        this.analysisReport = results;
+        this.analysisReportUpdated.next(report.id);
       });
     }
   }
@@ -255,12 +251,6 @@ export class HelmReleaseSummaryTabComponent implements OnDestroy {
       map(e => e.name),
       first()
     );
-  }
-
-  public runAnalysis(id: string) {
-    this.helmReleaseHelper.release$.pipe(first()).subscribe(release => {
-      this.analyzerService.run(id, this.helmReleaseHelper.endpointGuid, release.namespace, release.name);
-    });
   }
 
   private applyAnalysis(resources, report) {
