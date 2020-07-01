@@ -1,5 +1,4 @@
 import { Injectable, NgZone } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
 import { Store } from '@ngrx/store';
 import { ITableColumn } from 'frontend/packages/core/src/shared/components/list/list-table/table.types';
 import {
@@ -96,7 +95,6 @@ export class AnalysisReportsListConfig implements IListConfig<AnalysisReport> {
   constructor(
     store: Store<AppState>,
     kubeEndpointService: KubernetesEndpointService,
-    private route: ActivatedRoute,
     private analysisService: KubernetesAnalysisService,
     ngZone: NgZone,
   ) {
