@@ -29,8 +29,8 @@ spec:
         app: "{{ .Release.Name }}"
     spec:
       containers:
-      - name: chartsync
-        image: {{.Values.kube.registry.hostname}}/{{.Values.kube.organization}}/{{ .Values.images.analyzers }}:{{.Values.consoleVersion}}
+      - name: analyzers
+        image: {{.Values.kube.registry.hostname}}/{{.Values.kube.organization}}/stratos-analyzers:{{.Values.consoleVersion}}
         imagePullPolicy: {{.Values.imagePullPolicy}}
         ports:
         - name: api
