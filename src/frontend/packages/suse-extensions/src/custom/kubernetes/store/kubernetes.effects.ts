@@ -19,12 +19,13 @@ import {
   WrapperRequestActionSuccess,
 } from '../../../../../store/src/types/request.types';
 import {
+  analysisReportEntityType,
   KUBERNETES_ENDPOINT_TYPE,
   kubernetesDashboardEntityType,
   kubernetesPodsEntityType,
-  analysisReportEntityType,
 } from '../kubernetes-entity-factory';
 import { KubernetesPodExpandedStatusHelper } from '../services/kubernetes-expanded-state';
+import { GET_ANALYSIS_REPORTS, GetAnalysisReports } from '../store/kubernetes.actions';
 import {
   BasicKubeAPIResource,
   KubernetesDeployment,
@@ -66,7 +67,6 @@ import {
   KubeAction,
   KubePaginationAction,
 } from './kubernetes.actions';
-import { GetAnalysisReports, GET_ANALYSIS_REPORTS } from '../store/kubernetes.actions';
 
 export interface KubeDashboardContainer {
   name: string;
@@ -109,7 +109,7 @@ export class KubernetesEffects {
       const requestArgs = {
         headers
       };
-      const url = `/pp/${this.proxyAPIVersion}/analysis/reports`;
+      const url = `/pp/${this.proxyAPIVersion}/analysis/reports/${action.endpointId}`;
       const entityConfig = entityCatalog.getEntity(KUBERNETES_ENDPOINT_TYPE, analysisReportEntityType);
       const entityKey = entityCatalog.getEntityKey(action);
       return this.http

@@ -1,9 +1,10 @@
-import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { Observable, of, Subject } from 'rxjs';
 import { catchError, map, startWith } from 'rxjs/operators';
-import { environment } from 'frontend/packages/core/src/environments/environment';
+
+import { KubernetesEndpointService } from '../../../services/kubernetes-endpoint.service';
+import { KubernetesAnalysisService } from '../../../services/kubernetes.analysis.service';
 
 @Component({
   selector: 'app-kubernetes-analysis-report',
@@ -17,31 +18,29 @@ export class KubernetesAnalysisReportComponent implements OnInit {
   errorMsg$ = this.errorMsg.pipe(startWith(''));
   isLoading$: Observable<boolean>;
 
+  endpointID: string;
   id: string;
 
-  constructor(public http: HttpClient, route: ActivatedRoute) {
-    const parts = route.snapshot.params;
-    this.id = parts.id;
+  constructor(
+    private analysisService: KubernetesAnalysisService,
+    route: ActivatedRoute,
+    private kubeEndpointService: KubernetesEndpointService
+  ) {
+    this.id = route.snapshot.params.id;
   }
 
   ngOnInit() {
-    const proxyAPIVersion = environment.proxyAPIVersion;
-
-    // Fetch the report
-    const url = `/pp/${proxyAPIVersion}/analysis/reports/${this.id}`;
-    const headers = new HttpHeaders({});
-    const requestArgs = {
-      headers
-    };
-
-    this.report$ = this.http.get(url, requestArgs).pipe(
+    this.report$ = this.analysisService.getByID(this.kubeEndpointService.baseKube.guid, this.id).pipe(
       map((response: any) => {
+        if (!response.type) {
+          this.error();
+          return false;
+        }
         this.errorMsg.next('');
         return response;
       }),
       catchError((e, c) => {
-        const msg = { firstLine: 'Failed to load Analysis Report'};
-        this.errorMsg.next(msg);
+        this.error();
         return of(false);
       })
     );
@@ -51,4 +50,11 @@ export class KubernetesAnalysisReportComponent implements OnInit {
       startWith(true)
     );
   }
+
+  error() {
+    const msg = { firstLine: 'Failed to load Analysis Report'};
+    this.errorMsg.next(msg);
+  }
 }
+
+

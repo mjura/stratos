@@ -249,9 +249,9 @@ export class KubernetesAnalysisService {
     }
   }
 
-  public getByID(id: string): Observable<any> {
+  public getByID(endpoint: string, id: string): Observable<any> {
     const proxyAPIVersion = environment.proxyAPIVersion;
-    const url = `/pp/${proxyAPIVersion}/analysis/reports/${id}`;
+    const url = `/pp/${proxyAPIVersion}/analysis/reports/${endpoint}/${id}`;
     const headers = new HttpHeaders({});
     const requestArgs = {
       headers,

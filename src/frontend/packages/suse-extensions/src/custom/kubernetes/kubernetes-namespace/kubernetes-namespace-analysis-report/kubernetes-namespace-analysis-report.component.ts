@@ -1,9 +1,10 @@
 import { Component } from '@angular/core';
 import { Subject } from 'rxjs';
-import { AnalysisReport } from '../../store/kube.types';
-import { KubernetesAnalysisService } from '../../services/kubernetes.analysis.service';
+
 import { KubernetesEndpointService } from '../../services/kubernetes-endpoint.service';
 import { KubernetesNamespaceService } from '../../services/kubernetes-namespace.service';
+import { KubernetesAnalysisService } from '../../services/kubernetes.analysis.service';
+import { AnalysisReport } from '../../store/kube.types';
 
 @Component({
   selector: 'app-kubernetes-namespace-analysis-report-tab',
@@ -38,7 +39,7 @@ export class KubernetesNamespaceAnalysisReportComponent {
   public analysisChanged(report) {
     if (report.id !== this.currentReport) {
       this.currentReport = report.id;
-      this.analyzerService.getByID(report.id).subscribe(r => this.report$.next(r));
+      this.analyzerService.getByID(this.endpointID, report.id).subscribe(r => this.report$.next(r));
     }
   }
 

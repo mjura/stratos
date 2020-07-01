@@ -10,7 +10,7 @@ import (
 )
 
 var (
-	listReports                = `SELECT id, endpoint_type, endpoint, user, name, path, type, format, created, acknowledged, status, duration, result FROM analysis WHERE user = $1`
+	listReports                = `SELECT id, endpoint_type, endpoint, user, name, path, type, format, created, acknowledged, status, duration, result FROM analysis WHERE user = $1 AND endpoint = $2`
 	listCompletedReportsByPath = `SELECT id, endpoint_type, endpoint, user, name, path, type, format, created, acknowledged, status, duration, result FROM analysis WHERE status = 'completed' AND user = $1 AND endpoint = $2 AND path = $3 ORDER BY created DESC`
 	getReport                  = `SELECT id, endpoint_type, endpoint, user, name, path, type, format, created, acknowledged, status, duration, result FROM analysis WHERE user = $1 AND id=$2`
 	deleteReport               = `DELETE FROM analysis WHERE user = $1 AND id = $2`
@@ -45,10 +45,10 @@ func NewAnalysisDBStore(dcp *sql.DB) (AnalysisStore, error) {
 	return &AnalysisDBStore{db: dcp}, nil
 }
 
-// List - Returns a list of all user Analysis Reports
-func (p *AnalysisDBStore) List(userGUID string) ([]*AnalysisRecord, error) {
+// List - Returns a list of all user Analysis Reports for the given endpoint
+func (p *AnalysisDBStore) List(userGUID, endpointID string) ([]*AnalysisRecord, error) {
 	log.Debug("List")
-	rows, err := p.db.Query(listReports, userGUID)
+	rows, err := p.db.Query(listReports, userGUID, endpointID)
 	if err != nil {
 		return nil, fmt.Errorf("Unable to retrieve Analysis Reports records: %v", err)
 	}

@@ -26,7 +26,7 @@ type AnalysisRecord struct {
 
 // AnalysisStore is the analysis repository
 type AnalysisStore interface {
-	List(userGUID string) ([]*AnalysisRecord, error)
+	List(userGUID, endpointID string) ([]*AnalysisRecord, error)
 	Get(userGUID, id string) (*AnalysisRecord, error)
 	GetLatestCompleted(userGUID, endpointID, path string) (*AnalysisRecord, error)
 	ListCompletedByPath(userGUID, endpointID, path string) ([]*AnalysisRecord, error)

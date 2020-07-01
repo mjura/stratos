@@ -30,7 +30,7 @@ export class HelmReleaseAnalysisTabComponent {
   public analysisChanged(report) {
     if (report.id !== this.currentReport) {
       this.currentReport = report.id;
-      this.analaysisService.getByID(report.id).subscribe(r => this.report$.next(r));
+      this.analaysisService.getByID(this.helmReleaseHelper.endpointGuid, report.id).subscribe(r => this.report$.next(r));
     }
   }
 

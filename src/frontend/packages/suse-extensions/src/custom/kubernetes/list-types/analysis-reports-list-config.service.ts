@@ -106,7 +106,6 @@ export class AnalysisReportsListConfig implements IListConfig<AnalysisReport> {
 
   private listActionDelete: IListAction<any> = {
     action: (item) => {
-      console.log(item);
       return this.analysisService.delete(item);
 
     },

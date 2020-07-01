@@ -26,6 +26,7 @@ func (c *Analysis) listReports(ec echo.Context) error {
 	// Need to get a config object for the target endpoint
 	// endpointGUID := ec.Param("endpoint")
 	userID := ec.Get("user_id").(string)
+	endpointID := ec.Param("endpoint")
 
 	// Create a record in the reports datastore
 	dbStore, err := store.NewAnalysisDBStore(p.GetDatabaseConnection())
@@ -33,7 +34,7 @@ func (c *Analysis) listReports(ec echo.Context) error {
 		return err
 	}
 
-	reports, err := dbStore.List(userID)
+	reports, err := dbStore.List(userID, endpointID)
 	if err != nil {
 		return err
 	}

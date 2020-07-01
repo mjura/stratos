@@ -183,7 +183,7 @@ export class HelmReleaseSummaryTabComponent implements OnDestroy {
       this.analysisReport = null;
       this.analysisReportUpdated.next('');
     } else {
-        this.analyzerService.getByID(report.id).subscribe(results => {
+        this.analyzerService.getByID(this.helmReleaseHelper.endpointGuid, report.id).subscribe(results => {
           this.analysisReport = results;
           this.analysisReportUpdated.next(report.id);
       });
