@@ -4,6 +4,7 @@ import {
 } from '../../../../store/src/entity-catalog/entity-catalog-entity/entity-catalog-entity';
 import { IFavoriteMetadata } from '../../../../store/src/types/user-favorites.types';
 import {
+  AnalysisReportsActionBuilders,
   KubeDashboardActionBuilders,
   KubeDeploymentActionBuilders,
   KubeNamespaceActionBuilders,
@@ -34,6 +35,7 @@ export class KubeEntityCatalog {
   public namespace: StratosCatalogEntity<IFavoriteMetadata, KubernetesNamespace, KubeNamespaceActionBuilders>;
   public service: StratosCatalogEntity<IFavoriteMetadata, KubeService, KubeServiceActionBuilders>
   public dashboard: StratosCatalogEntity<IFavoriteMetadata, any, KubeDashboardActionBuilders>;
+  public analysisReport: StratosCatalogEntity<undefined, any, AnalysisReportsActionBuilders>;
 }
 
 /**

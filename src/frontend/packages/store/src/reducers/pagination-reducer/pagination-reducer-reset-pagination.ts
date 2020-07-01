@@ -44,7 +44,7 @@ export function paginationResetPagination(state: PaginationState, action: ResetP
   }
   const { ids, pageRequests, pageCount, currentPage, totalResults } = getDefaultPaginationEntityState();
   const newState = { ...state };
-  const entityState = {
+  const entityState: PaginationEntityTypeState = {
     ...newState[entityKey],
     [action.paginationKey]: {
       ...newState[entityKey][action.paginationKey],
@@ -54,7 +54,7 @@ export function paginationResetPagination(state: PaginationState, action: ResetP
       currentPage,
       totalResults,
     }
-  } as PaginationEntityTypeState;
+  };
   return {
     ...newState,
     [entityKey]: entityState

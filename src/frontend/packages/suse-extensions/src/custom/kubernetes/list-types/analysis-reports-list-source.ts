@@ -1,15 +1,14 @@
 import { NgZone } from '@angular/core';
 import { Store } from '@ngrx/store';
+import { safeUnsubscribe } from 'frontend/packages/core/src/core/utils.service';
+import { ListDataSource } from 'frontend/packages/core/src/shared/components/list/data-sources-controllers/list-data-source';
+import { IListConfig } from 'frontend/packages/core/src/shared/components/list/list.component.types';
 import { interval } from 'rxjs';
 
 import { AppState } from '../../../../../store/src/app-state';
-import { analysisReportEntityType, kubernetesEntityFactory } from '../kubernetes-entity-factory';
+import { kubeEntityCatalog } from '../kubernetes-entity-catalog';
 import { KubernetesEndpointService } from '../services/kubernetes-endpoint.service';
 import { AnalysisReport } from '../store/kube.types';
-import { GetAnalysisReports } from '../store/kubernetes.actions';
-import { ListDataSource } from 'frontend/packages/core/src/shared/components/list/data-sources-controllers/list-data-source';
-import { IListConfig } from 'frontend/packages/core/src/shared/components/list/list.component.types';
-import { safeUnsubscribe } from 'frontend/packages/core/src/core/utils.service';
 
 export class AnalysisReportsDataSource extends ListDataSource<AnalysisReport> {
 
@@ -21,12 +20,12 @@ export class AnalysisReportsDataSource extends ListDataSource<AnalysisReport> {
     endpointService: KubernetesEndpointService,
     ngZone: NgZone,
   ) {
-    const action = new GetAnalysisReports(endpointService.baseKube.guid);
+    const action = kubeEntityCatalog.analysisReport.actions.getMultiple(endpointService.baseKube.guid);
     super({
       store,
       action,
-      schema: kubernetesEntityFactory(analysisReportEntityType),
-      getRowUniqueId: (entity: AnalysisReport) => entity.id,
+      schema: action.entity[0],
+      getRowUniqueId: (entity: AnalysisReport) => action.entity[0].getId(entity),
       paginationKey: action.paginationKey,
       isLocal: true,
       listConfig,

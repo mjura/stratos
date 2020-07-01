@@ -46,7 +46,7 @@ export class KubernetesResourceViewerComponent implements PreviewableComponent {
   public podRouterLink$: Observable<string[]>;
 
   private analysis;
-  private alerts;
+  public alerts;
 
   setProps(props: KubernetesResourceViewerConfig) {
     this.title = props.title;
@@ -58,7 +58,7 @@ export class KubernetesResourceViewerComponent implements PreviewableComponent {
 
         resource.raw = item;
         Object.keys(item || []).forEach(k => {
-          if (k !== 'endpointId' && k !== 'releaseTitle' && k !== 'expandedStatus' && k !== '_metadata' ) {
+          if (k !== 'endpointId' && k !== 'releaseTitle' && k !== 'expandedStatus' && k !== '_metadata') {
             newItem[k] = item[k];
           }
         });

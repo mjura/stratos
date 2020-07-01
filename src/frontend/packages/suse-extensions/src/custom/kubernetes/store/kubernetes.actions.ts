@@ -379,8 +379,8 @@ export class FetchKubernetesChartMetricsAction extends MetricsChartAction {
 
 // Get the analysis reports for the given endpoint ID
 export class GetAnalysisReports implements MonocularPaginationAction {
-  constructor(public endpointId: string) {
-    this.paginationKey = `k8s-${endpointId}`;
+  constructor(public kubeGuid: string) {
+    this.paginationKey = `k8s-${kubeGuid}`;
   }
   type = GET_ANALYSIS_REPORTS;
   endpointType = KUBERNETES_ENDPOINT_TYPE;

@@ -5,6 +5,7 @@ import { GetHelmReleasePods, GetHelmReleaseServices } from '../../workloads/stor
 import {
   CreateKubernetesNamespace,
   GeKubernetesDeployments,
+  GetAnalysisReports,
   GetKubernetesDashboard,
   GetKubernetesNamespace,
   GetKubernetesNamespaces,
@@ -144,4 +145,14 @@ export interface KubeDashboardActionBuilders extends OrchestratedActionBuilders 
 
 export const kubeDashboardActionBuilders: KubeDashboardActionBuilders = {
   get: (kubeGuid: string) => new GetKubernetesDashboard(kubeGuid)
+}
+
+export interface AnalysisReportsActionBuilders extends OrchestratedActionBuilders {
+  getMultiple: (
+    kubeGuid: string
+  ) => GetAnalysisReports;
+}
+
+export const analysisReportsActionBuilders: AnalysisReportsActionBuilders = {
+  getMultiple: (kubeGuid: string) => new GetAnalysisReports(kubeGuid)
 }

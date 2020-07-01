@@ -1,15 +1,15 @@
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { MatSnackBar } from '@angular/material/snack-bar';
 import { ActivatedRoute } from '@angular/router';
 import { Store } from '@ngrx/store';
 import { environment } from 'frontend/packages/core/src/environments/environment';
-import { ClearPaginationOfType } from 'frontend/packages/store/src/actions/pagination.actions';
+import { ResetPagination } from 'frontend/packages/store/src/actions/pagination.actions';
 import { combineLatest, Observable, of } from 'rxjs';
 import { catchError, filter, map, startWith } from 'rxjs/operators';
 
-import { RouterNav } from '../../../../../store/src/actions/router.actions';
+import { SnackBarService } from '../../../../../core/src/shared/services/snackbar.service';
 import { AppState } from '../../../../../store/src/app-state';
+import { kubeEntityCatalog } from '../kubernetes-entity-catalog';
 import { GetAnalysisReports } from '../store/kubernetes.actions';
 import { KubernetesEndpointService } from './kubernetes-endpoint.service';
 import { KubeScoreReportHelper } from './kubescore-report.helper';
@@ -33,12 +33,14 @@ export class KubernetesAnalysisService {
   public enabled$: Observable<boolean>;
   public hideAnalysis$: Observable<boolean>;
 
+  private action: GetAnalysisReports;
+
   constructor(
     public kubeEndpointService: KubernetesEndpointService,
     public activatedRoute: ActivatedRoute,
     public store: Store<AppState>,
     public http: HttpClient,
-    private snackBar: MatSnackBar,
+    private snackbarService: SnackBarService
   ) {
     this.kubeGuid = kubeEndpointService.kubeGuid;
 
@@ -99,9 +101,11 @@ export class KubernetesAnalysisService {
         return a.filter(v => v.namespaceAware);
       })
     );
+
+    this.action = kubeEntityCatalog.analysisReport.actions.getMultiple(this.kubeGuid)
   }
 
-    public delete(item) {
+  public delete(item) {
     if (!Array.isArray(item)) {
       item = [item];
     }
@@ -120,19 +124,14 @@ export class KubernetesAnalysisService {
     };
 
     const del = this.http.delete(url, requestArgs);
-    del.subscribe(d => {
-      const action = new GetAnalysisReports(this.kubeEndpointService.baseKube.guid);
-      this.store.dispatch(new ClearPaginationOfType(action));
-      this.store.dispatch(action);
-    });
+    del.subscribe(d => this.refresh());
 
     return del;
   }
 
   public refresh() {
-    const action = new GetAnalysisReports(this.kubeEndpointService.baseKube.guid);
-    this.store.dispatch(new ClearPaginationOfType(action));
-    this.store.dispatch(action);
+    this.store.dispatch(new ResetPagination(this.action, this.action.paginationKey));
+    this.store.dispatch(this.action);
   }
 
   public run(id: string, endpointID: string, namespace?: string, app?: string) {
@@ -156,7 +155,7 @@ export class KubernetesAnalysisService {
       catchError((e, c) => {
         console.log('Error occurred');
         console.log(e);
-        const msg = { firstLine: 'Failed to run Analysis Report'};
+        const msg = { firstLine: 'Failed to run Analysis Report' };
         return of(false);
       })
     );
@@ -171,10 +170,7 @@ export class KubernetesAnalysisService {
       } else {
         msg = `${type} analysis started for the Kubernetes cluster`;
       }
-      const ref = this.snackBar.open(msg, 'View', { duration: 5000 });
-      ref.onAction().subscribe(() => {
-        this.store.dispatch(new RouterNav({ path: ['kubernetes', endpointID, 'analysis'] }));
-      });
+      this.snackbarService.showReturn(msg, ['kubernetes', endpointID, 'analysis'], 'View', 5000);
       this.refresh();
     });
   }
@@ -194,7 +190,7 @@ export class KubernetesAnalysisService {
       catchError((e, c) => {
         console.log('Error occurred');
         console.log(e);
-        const msg = { firstLine: 'Failed to run Analysis Report'};
+        const msg = { firstLine: 'Failed to run Analysis Report' };
         return of(false);
       })
     );
@@ -221,7 +217,7 @@ export class KubernetesAnalysisService {
       catchError((e, c) => {
         console.log('Error occurred');
         console.log(e);
-        const msg = { firstLine: 'Failed to run Analysis Report'};
+        const msg = { firstLine: 'Failed to run Analysis Report' };
         return of(false);
       })
     );
@@ -267,7 +263,7 @@ export class KubernetesAnalysisService {
         console.log(e);
         // TODO: msg not used?
 
-        const msg = { firstLine: 'Failed to get Analysis Report'};
+        const msg = { firstLine: 'Failed to get Analysis Report' };
         return of(false);
       })
     );
@@ -286,7 +282,7 @@ export class KubernetesAnalysisService {
         console.log('Error occurred');
         console.log(e);
         // TODO: msg not used?
-        const msg = { firstLine: 'Failed to get Analysis Reports by path'};
+        const msg = { firstLine: 'Failed to get Analysis Reports by path' };
         return of(false);
       })
     );
@@ -306,7 +302,7 @@ export class KubernetesAnalysisService {
         console.log('Error occurred');
         console.log(e);
         // TODO: msg not used?
-        const msg = { firstLine: 'Failed to get Analysis Report'};
+        const msg = { firstLine: 'Failed to get Analysis Report' };
         return of(false);
       })
     );

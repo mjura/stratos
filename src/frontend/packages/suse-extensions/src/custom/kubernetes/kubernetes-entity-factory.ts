@@ -109,7 +109,7 @@ entityCache[kubernetesDashboardEntityType] = new KubernetesEntitySchema(
 entityCache[analysisReportEntityType] = new KubernetesEntitySchema(
   analysisReportEntityType,
   {},
-  { idAttribute: (entity) => entity.id }
+  { idAttribute: 'id' }
 );
 
 entityCache[metricEntityType] = new KubernetesEntitySchema(metricEntityType);

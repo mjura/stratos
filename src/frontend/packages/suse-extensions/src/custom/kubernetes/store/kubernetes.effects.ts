@@ -19,7 +19,6 @@ import {
   WrapperRequestActionSuccess,
 } from '../../../../../store/src/types/request.types';
 import {
-  analysisReportEntityType,
   KUBERNETES_ENDPOINT_TYPE,
   kubernetesDashboardEntityType,
   kubernetesPodsEntityType,
@@ -109,12 +108,10 @@ export class KubernetesEffects {
       const requestArgs = {
         headers
       };
-      const url = `/pp/${this.proxyAPIVersion}/analysis/reports/${action.endpointId}`;
-      const entityConfig = entityCatalog.getEntity(KUBERNETES_ENDPOINT_TYPE, analysisReportEntityType);
+      const url = `/pp/${this.proxyAPIVersion}/analysis/reports/${action.kubeGuid}`;
       const entityKey = entityCatalog.getEntityKey(action);
-      return this.http
-        .get(url, requestArgs)
-        .pipe(mergeMap(response => {
+      return this.http.get(url, requestArgs).pipe(
+        mergeMap(response => {
           const res = {
             entities: { [entityKey]: {} },
             result: []
@@ -126,7 +123,16 @@ export class KubernetesEffects {
             res.result.push(id);
           });
           return [new WrapperRequestActionSuccess(res, action)];
-        })
+        }),
+        catchError(error => [
+          new WrapperRequestActionFailed(error.message, action, 'fetch', {
+            endpointIds: [action.kubeGuid],
+            url: error.url || url,
+            eventCode: error.status ? error.status + '' : '500',
+            message: 'Kubernetes Analysis Report request error',
+            error
+          })
+        ])
       );
     })
   );
@@ -161,7 +167,7 @@ export class KubernetesEffects {
             endpointIds: [action.kubeGuid],
             url: error.url || url,
             eventCode: error.status ? error.status + '' : '500',
-            message: 'Kubernetes API request error',
+            message: 'Kubernetes Dashboard request error',
             error
           })
         ]));
