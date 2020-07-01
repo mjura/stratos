@@ -1,9 +1,9 @@
 import { Component } from '@angular/core';
-
-import { HelmReleaseHelperService } from '../helm-release-helper.service';
-import { KubernetesAnalysisService } from '../../../../services/kubernetes.analysis.service';
 import { Subject } from 'rxjs';
+
+import { KubernetesAnalysisService } from '../../../../services/kubernetes.analysis.service';
 import { AnalysisReport } from '../../../../store/kube.types';
+import { HelmReleaseHelperService } from '../helm-release-helper.service';
 
 @Component({
   selector: 'app-helm-release-analysis-tab',
@@ -18,6 +18,8 @@ export class HelmReleaseAnalysisTabComponent {
 
   currentReport = null;
 
+  noReportsAvailable = false;
+
   constructor(
     public analaysisService: KubernetesAnalysisService,
     public helmReleaseHelper: HelmReleaseHelperService
@@ -31,5 +33,10 @@ export class HelmReleaseAnalysisTabComponent {
       this.analaysisService.getByID(report.id).subscribe(r => this.report$.next(r));
     }
   }
+
+
+  public onReportCount(count: number) {
+    this.noReportsAvailable = count === 0;
+  }  
 
 }

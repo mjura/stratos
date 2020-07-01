@@ -124,8 +124,6 @@ export class HelmReleaseSummaryTabComponent implements OnDestroy {
       this.analysisReportUpdated$
     ).pipe(
       map(([graph, id]) => {
-        console.log(graph);
-        console.log(id);
         const resources = {};
         // Collect the resources
         Object.values(graph.nodes).forEach((node: any) => {
