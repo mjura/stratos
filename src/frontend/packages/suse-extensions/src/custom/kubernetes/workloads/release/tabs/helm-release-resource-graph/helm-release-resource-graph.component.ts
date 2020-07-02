@@ -48,11 +48,15 @@ export class HelmReleaseResourceGraphComponent implements OnInit, OnDestroy {
 
   private didInitialFit = false;
 
+  public path: string;
+
   constructor(
     private componentFactoryResolver: ComponentFactoryResolver,
     private helper: HelmReleaseHelperService,
     public analyzerService: KubernetesAnalysisService,
-    private previewPanel: SidePanelService) { }
+    private previewPanel: SidePanelService) {
+    this.path = `${this.helper.namespace}/${this.helper.releaseTitle}`;
+  }
 
   ngOnInit() {
 
@@ -160,6 +164,9 @@ export class HelmReleaseResourceGraphComponent implements OnInit, OnDestroy {
       map((r: any[]) => Object.values(r).find((res: any) => res.metadata.name === node.label && res.metadata.kind === node.kind)),
       first(),
     );
+  }
+
+  public analysisChanged(report) {
   }
 
 }
