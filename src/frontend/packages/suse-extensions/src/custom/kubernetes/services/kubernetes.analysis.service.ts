@@ -11,6 +11,7 @@ import { SnackBarService } from '../../../../../core/src/shared/services/snackba
 import { AppState } from '../../../../../store/src/app-state';
 import { kubeEntityCatalog } from '../kubernetes-entity-catalog';
 import { GetAnalysisReports } from '../store/kubernetes.actions';
+import { getHelmReleaseDetailsFromGuid } from '../workloads/store/workloads-entity-factory';
 import { KubernetesEndpointService } from './kubernetes-endpoint.service';
 import { KubeScoreReportHelper } from './kubescore-report.helper';
 import { PopeyeReportHelper } from './popeye-report.helper';
@@ -42,7 +43,7 @@ export class KubernetesAnalysisService {
     public http: HttpClient,
     private snackbarService: SnackBarService
   ) {
-    this.kubeGuid = kubeEndpointService.kubeGuid;
+    this.kubeGuid = kubeEndpointService.kubeGuid || getHelmReleaseDetailsFromGuid(activatedRoute.snapshot.params.guid).endpointId;
 
     // Is the backend plugin available?
     this.enabled$ = this.store.select('auth').pipe(

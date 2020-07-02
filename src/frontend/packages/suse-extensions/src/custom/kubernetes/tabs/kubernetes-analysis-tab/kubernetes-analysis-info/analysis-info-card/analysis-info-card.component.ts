@@ -1,7 +1,7 @@
-import { Observable, of } from 'rxjs';
+import { HttpClient } from '@angular/common/http';
 import { Component, Input } from '@angular/core';
 import * as markdown from 'marked';
-import { HttpClient } from '@angular/common/http';
+import { Observable, of } from 'rxjs';
 import { catchError, map } from 'rxjs/operators';
 
 @Component({
@@ -29,7 +29,7 @@ export class AnalysisInfoCardComponent {
   }
 
   constructor(private http: HttpClient) {
-    this.renderer.link = (href, title, text) => `<a target="_blank" title="${title}" href="${href}">${text}</a>`;
+    this.renderer.link = (href, title, text) => `<a target="_blank" title="${title || ''}" href="${href}">${text}</a>`;
     this.renderer.code = (text: string) => `<code>${text}</code>`;
   }
 

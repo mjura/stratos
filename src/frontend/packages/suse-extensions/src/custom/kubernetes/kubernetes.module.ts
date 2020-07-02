@@ -5,6 +5,9 @@ import { NgxChartsModule } from '@swimlane/ngx-charts';
 import { CoreModule } from '../../../../core/src/core/core.module';
 import { SharedModule } from '../../../../core/src/shared/shared.module';
 import {
+  AnalysisReportRunnerComponent,
+} from './analysis-report-viewer/analysis-report-runner/analysis-report-runner.component';
+import {
   AnalysisReportSelectorComponent,
 } from './analysis-report-viewer/analysis-report-selector/analysis-report-selector.component';
 import { AnalysisReportViewerComponent } from './analysis-report-viewer/analysis-report-viewer.component';
@@ -18,6 +21,7 @@ import {
 import {
   ResourceAlertViewComponent,
 } from './analysis-report-viewer/resource-alert-preview/resource-alert-view/resource-alert-view.component';
+import { KubeConsoleComponent } from './kube-terminal/kube-console.component';
 import {
   KubedashConfigurationComponent,
 } from './kubernetes-dashboard/kubedash-configuration/kubedash-configuration.component';
@@ -119,7 +123,6 @@ import { KubernetesNamespacesTabComponent } from './tabs/kubernetes-namespaces-t
 import { KubernetesNodesTabComponent } from './tabs/kubernetes-nodes-tab/kubernetes-nodes-tab.component';
 import { KubernetesPodsTabComponent } from './tabs/kubernetes-pods-tab/kubernetes-pods-tab.component';
 import { KubernetesSummaryTabComponent } from './tabs/kubernetes-summary-tab/kubernetes-summary.component';
-import { KubeConsoleComponent } from './kube-terminal/kube-console.component';
 
 /* tslint:disable:max-line-length */
 /* tslint:enable */
@@ -183,6 +186,7 @@ import { KubeConsoleComponent } from './kube-terminal/kube-console.component';
     AnalysisReportViewerComponent,
     PopeyeReportViewerComponent,
     AnalysisReportSelectorComponent,
+    AnalysisReportRunnerComponent,
     ResourceAlertPreviewComponent,
     ResourceAlertViewComponent,
     KubeScoreReportViewerComponent,
@@ -224,6 +228,7 @@ import { KubeConsoleComponent } from './kube-terminal/kube-console.component';
     PopeyeReportViewerComponent,
     KubeScoreReportViewerComponent,
     AnalysisReportSelectorComponent,
+    AnalysisReportRunnerComponent,
     ResourceAlertPreviewComponent,
     ResourceAlertViewComponent,
     AnalysisStatusCellComponent,

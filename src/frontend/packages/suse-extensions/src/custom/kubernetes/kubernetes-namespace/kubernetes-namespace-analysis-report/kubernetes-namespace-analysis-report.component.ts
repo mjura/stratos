@@ -34,7 +34,7 @@ export class KubernetesNamespaceAnalysisReportComponent {
     this.endpointID = this.endpointService.kubeGuid;
     this.path = `${this.kubeNamespaceService.namespaceName}`;
     this.report$.next(null);
-   }
+  }
 
   public analysisChanged(report) {
     if (report.id !== this.currentReport) {
@@ -47,7 +47,4 @@ export class KubernetesNamespaceAnalysisReportComponent {
     this.noReportsAvailable = count === 0;
   }
 
-  public runAnalysis(id: string) {
-    this.analyzerService.run(id, this.endpointID, this.kubeNamespaceService.namespaceName);
-  }
 }

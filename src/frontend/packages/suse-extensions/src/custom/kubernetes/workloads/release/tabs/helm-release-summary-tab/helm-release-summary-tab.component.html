@@ -4,22 +4,9 @@
     <span>Delete</span>
   </button>
 
-  <div *ngIf="analyzerService.namespaceAnalyzers$ | async as analyzers">
-    <!-- <button *ngFor="let analyzer of analyzerService.namespaceAnalyzers$ | async" name="{{ analyzer.id }}" (click)="deleteRelease()" matTooltip="Delete">
-      <mat-icon>delete</mat-icon>
-      <span>{{ analyzer.name }}</span>
-    </button> -->
-
-    <mat-menu #appMenu="matMenu">
-      <button (click)="runAnalysis(analyzer.id)" mat-menu-item
-        *ngFor="let analyzer of analyzerService.namespaceAnalyzers$ | async">{{ analyzer.name }}</button>
-    </mat-menu>
-
-    <button mat-button [matMenuTriggerFor]="appMenu" *ngIf="analyzers.length > 0">
-      <span>Run Analysis</span>
-      <mat-icon>arrow_drop_down</mat-icon>
-    </button>
-  </div>
+  <app-analysis-report-runner [kubeId]="helmReleaseHelper.endpointGuid" [namespace]="helmReleaseHelper.namespace"
+    [app]="helmReleaseHelper.releaseTitle">
+  </app-analysis-report-runner>
 
   <app-analysis-report-selector *ngIf="analyzerService.enabled$ | async" (selected)="analysisChanged($event)"
     [endpoint]="helmReleaseHelper.endpointGuid" [path]="path"></app-analysis-report-selector>
