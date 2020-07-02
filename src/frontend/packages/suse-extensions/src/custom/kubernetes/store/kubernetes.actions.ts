@@ -393,7 +393,7 @@ export class GetAnalysisReports implements MonocularPaginationAction {
   ];
   paginationKey: string;
   initialParams = {
-    'order-direction': 'desc',
-    'order-direction-field': 'name',
+    'order-direction': 'asc',
+    'order-direction-field': 'age',
   };
 }
