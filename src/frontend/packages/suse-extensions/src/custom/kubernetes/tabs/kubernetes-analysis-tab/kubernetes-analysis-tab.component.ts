@@ -2,6 +2,7 @@ import { Component } from '@angular/core';
 import { ListConfig } from 'frontend/packages/core/src/shared/components/list/list.component.types';
 
 import { AnalysisReportsListConfig } from '../../list-types/analysis-reports-list-config.service';
+import { KubernetesEndpointService } from '../../services/kubernetes-endpoint.service';
 import { KubernetesAnalysisService } from '../../services/kubernetes.analysis.service';
 
 @Component({
@@ -16,4 +17,8 @@ import { KubernetesAnalysisService } from '../../services/kubernetes.analysis.se
     }
   ]
 })
-export class KubernetesAnalysisTabComponent { }
+export class KubernetesAnalysisTabComponent {
+
+  constructor(public kubeEndpointService: KubernetesEndpointService) { }
+
+}

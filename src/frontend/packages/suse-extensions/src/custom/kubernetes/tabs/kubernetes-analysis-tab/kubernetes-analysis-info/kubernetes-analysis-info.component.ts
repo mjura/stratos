@@ -1,6 +1,9 @@
-
 import { Component } from '@angular/core';
+import { ActivatedRoute } from '@angular/router';
+
 import { KubernetesAnalysisService } from '../../../services/kubernetes.analysis.service';
+import { getParentURL } from '../../../services/route.helper';
+
 
 @Component({
   selector: 'app-kubernetes-analysis-info',
@@ -12,6 +15,15 @@ import { KubernetesAnalysisService } from '../../../services/kubernetes.analysis
 })
 export class KubernetesAnalysisInfoComponent {
 
-  constructor(public analysisService: KubernetesAnalysisService) { }
+  public breadcrumbs = [];
 
+  constructor(
+    route: ActivatedRoute,
+    public analysisService: KubernetesAnalysisService
+  ) {
+    this. breadcrumbs = [
+      { value: 'Analysis', routerLink: getParentURL(route) },
+      { value: 'Analyzer Info' },
+    ];    
+  }
 }

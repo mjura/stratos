@@ -1,10 +1,12 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { Observable, of, Subject } from 'rxjs';
-import { catchError, map, startWith } from 'rxjs/operators';
+import { IHeaderBreadcrumbLink } from 'frontend/packages/core/src/shared/components/page-header/page-header.types';
+import { BehaviorSubject, Observable, of, Subject } from 'rxjs';
+import { catchError, first, map, startWith } from 'rxjs/operators';
 
 import { KubernetesEndpointService } from '../../../services/kubernetes-endpoint.service';
 import { KubernetesAnalysisService } from '../../../services/kubernetes.analysis.service';
+import { getParentURL } from '../../../services/route.helper';
 
 @Component({
   selector: 'app-kubernetes-analysis-report',
@@ -21,12 +23,22 @@ export class KubernetesAnalysisReportComponent implements OnInit {
   endpointID: string;
   id: string;
 
+  private breadcrumbsSubject: BehaviorSubject<IHeaderBreadcrumbLink[]>;
+  public breadcrumbs$: Observable<IHeaderBreadcrumbLink[]>;
+
   constructor(
     private analysisService: KubernetesAnalysisService,
-    route: ActivatedRoute,
-    private kubeEndpointService: KubernetesEndpointService
+    private route: ActivatedRoute,
+    private kubeEndpointService: KubernetesEndpointService,
   ) {
     this.id = route.snapshot.params.id;
+
+    this.breadcrumbsSubject = new BehaviorSubject<IHeaderBreadcrumbLink[]>(undefined);
+    this.breadcrumbs$ = this.breadcrumbsSubject.asObservable();
+    this.breadcrumbsSubject.next([
+      { value: 'Analysis', routerLink: getParentURL(route, 2) },
+      { value: 'Report' },
+    ]);
   }
 
   ngOnInit() {
@@ -49,6 +61,16 @@ export class KubernetesAnalysisReportComponent implements OnInit {
       map(() => false),
       startWith(true)
     );
+
+    this.breadcrumbs$.subscribe(a => console.log(a));
+
+    // When the report has loaded, update the name in the breadcrumbs
+    this.report$.pipe(first()).subscribe(report => {
+      this.breadcrumbsSubject.next([
+        { value: 'Analysis', routerLink: getParentURL(this.route, 2) },
+        { value: report.name },
+      ]);
+    });
   }
 
   error() {
