@@ -33,6 +33,7 @@ type AnalysisStore interface {
 	ListCompletedByPath(userGUID, endpointID, path string) ([]*AnalysisRecord, error)
 	ListRunning() ([]*AnalysisRecord, error)
 	Delete(userGUID, id string) error
+	DeleteForEndpoint(endpointID string) error
 	Save(record AnalysisRecord) (*AnalysisRecord, error)
 	UpdateReport(userGUID string, report *AnalysisRecord) error
 }

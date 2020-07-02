@@ -105,6 +105,8 @@ func (a *Analyzer) registerRoutes(e *echo.Echo) {
 	api.GET("/v1/report/:user/:endpoint/:id/:file", a.report)
 	// Delete a report
 	api.DELETE("/v1/report/:user/:endpoint/:id", a.delete)
+	// Delete all reports for an endpoint
+	api.DELETE("/v1/report/:endpoint", a.deleteEndpoint)
 }
 
 func setSecureCacheContentMiddleware(h echo.HandlerFunc) echo.HandlerFunc {

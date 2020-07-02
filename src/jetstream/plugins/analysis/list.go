@@ -214,8 +214,7 @@ func (c *Analysis) getReportFile(userID, endpointID, ID, name string) ([]byte, e
 	rsp, err := client.Do(r)
 	if err != nil {
 		return nil, fmt.Errorf("Failed getting report from Analyzer service: %v", err)
-	}
-	if rsp.StatusCode != http.StatusOK {
+	} else if rsp.StatusCode != http.StatusOK {
 		return nil, fmt.Errorf("Failed getting report from Analyzer service: %d", rsp.StatusCode)
 	}
 

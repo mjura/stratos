@@ -2,6 +2,7 @@ package main
 
 import (
 	"errors"
+	"io/ioutil"
 	"os"
 	"path/filepath"
 	"strings"
@@ -50,4 +51,38 @@ func (a *Analyzer) delete(ec echo.Context) error {
 	}
 
 	return nil
+}
+
+// Delete all reports for a given endpoint
+func (a *Analyzer) deleteEndpoint(ec echo.Context) error {
+	log.Debug("delete reports for endpoint")
+
+	endpoint := ec.Param("endpoint")
+
+	// Iterate over all user folders
+	if items, err := ioutil.ReadDir(a.reportsDir); err == nil {
+		for _, item := range items {
+			if item.IsDir() {
+				// This is a user's folder - see if they have a folder for the endpoint
+				folder := filepath.Join(a.reportsDir, item.Name(), endpoint)
+				if folderExists(folder) {
+					if err := os.RemoveAll(folder); err != nil {
+						log.Warnf("Could not delete Analysis report endpoint folder: %s", folder)
+					}
+				}
+			}
+		}
+	} else {
+		return err
+	}
+
+	return nil
+}
+
+func folderExists(filename string) bool {
+	info, err := os.Stat(filename)
+	if os.IsNotExist(err) {
+		return false
+	}
+	return info.IsDir()
 }

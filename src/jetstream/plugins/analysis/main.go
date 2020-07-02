@@ -2,7 +2,11 @@ package analysis
 
 import (
 	"errors"
+	"fmt"
+	"io/ioutil"
+	"net/http"
 	"strconv"
+	"time"
 
 	"github.com/cloudfoundry-incubator/stratos/src/jetstream/plugins/analysis/store"
 	"github.com/cloudfoundry-incubator/stratos/src/jetstream/repository/interfaces"
@@ -99,4 +103,32 @@ func (analysis *Analysis) Init() error {
 	}
 
 	return errors.New("Analysis services API Server not configured")
+}
+
+// OnEndpointNotification called when for endpoint events
+func (analysis *Analysis) OnEndpointNotification(action interfaces.EndpointAction, endpoint *interfaces.CNSIRecord) {
+	if action == interfaces.EndpointUnregisterAction {
+		// An endpoint was unregistered, so remove all reports
+		dbStore, err := store.NewAnalysisDBStore(analysis.portalProxy.GetDatabaseConnection())
+		if err == nil {
+			dbStore.DeleteForEndpoint(endpoint.GUID)
+
+			// Now ask the analysis engine to to delete all files on disk
+			deleteURL := fmt.Sprintf("%s/api/v1/report/%s", analysis.analysisServer, endpoint.GUID)
+			r, _ := http.NewRequest(http.MethodDelete, deleteURL, nil)
+			client := &http.Client{Timeout: 30 * time.Second}
+			rsp, err := client.Do(r)
+			if err != nil {
+				log.Errorf("Failed deleting reports from Analyzer service: %v", err)
+			} else if rsp.StatusCode != http.StatusOK {
+				log.Errorf("Failed deleting reports from Analyzer service: %d", rsp.StatusCode)
+			}
+
+			defer rsp.Body.Close()
+			_, err = ioutil.ReadAll(rsp.Body)
+			if err != nil {
+				log.Errorf("Could not read response: %v", err)
+			}
+		}
+	}
 }

@@ -18,8 +18,7 @@ var (
 	updateReport               = `UPDATE analysis SET type = $1, format = $2, acknowledged = $3, status = $4, duration = $5, result = $6, name = $7, path = $8, result = $9 WHERE user = $10 AND id = $11`
 	getLatestReport            = `SELECT id, endpoint_type, endpoint, user, name, path, type, format, created, acknowledged, status, duration, result FROM analysis WHERE status = 'completed' AND user = $1 AND endpoint = $2 AND path = $3 ORDER BY created DESC`
 	listRunningReports         = `SELECT id, endpoint_type, endpoint, user, name, path, type, format, created, acknowledged, status, duration, result FROM analysis WHERE status = 'running' ORDER BY created DESC`
-
-	// TODO: Delete for endpoint when endpoint is removed?
+	deleteForEndpoint          = `DELETE FROM analysis WHERE endpoint = $1`
 )
 
 // InitRepositoryProvider - One time init for the given DB Provider
@@ -33,6 +32,7 @@ func InitRepositoryProvider(databaseProvider string) {
 	updateReport = datastore.ModifySQLStatement(updateReport, databaseProvider)
 	getLatestReport = datastore.ModifySQLStatement(getLatestReport, databaseProvider)
 	listRunningReports = datastore.ModifySQLStatement(listRunningReports, databaseProvider)
+	deleteForEndpoint = datastore.ModifySQLStatement(deleteForEndpoint, databaseProvider)
 }
 
 // AnalysisDBStore is a DB-backed Analysis Reports repository
@@ -155,10 +155,10 @@ func (p *AnalysisDBStore) Save(report AnalysisRecord) (*AnalysisRecord, error) {
 	return &report, nil
 }
 
-// DeleteFromEndpoint will remove all Analysis Reports for a given endpoint guid
-// func (p *AnalysisDBStore) DeleteFromEndpoint(endpointGUID string) error {
-// 	if _, err := p.db.Exec(deleteEndpointFavorite, endpointGUID); err != nil {
-// 		return fmt.Errorf("Unable to User Favorite record: %v", err)
-// 	}
-// 	return nil
-// }
+// DeleteForEndpoint will remove all Analysis Reports for a given endpoint guid
+func (p *AnalysisDBStore) DeleteForEndpoint(endpointID string) error {
+	if _, err := p.db.Exec(deleteForEndpoint, endpointID); err != nil {
+		return fmt.Errorf("Unable to delete reports for endpoint: %s %v", endpointID, err)
+	}
+	return nil
+}

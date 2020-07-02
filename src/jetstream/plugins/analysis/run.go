@@ -146,8 +146,7 @@ func (c *Analysis) doRunReport(ec echo.Context, analyzer, endpointID, userID str
 	rsp, err := client.Do(r)
 	if err != nil {
 		return errors.New("Analysis job failed - could not contact Analysis Server")
-	}
-	if rsp.StatusCode != http.StatusOK {
+	} else if rsp.StatusCode != http.StatusOK {
 		log.Debugf("Request failed with response code: %d", rsp.StatusCode)
 		return fmt.Errorf("Analysis job failed with response code: %d", rsp.StatusCode)
 	}
