@@ -1,8 +1,8 @@
-import { ResourceAlertMap, ResourceAlert, ResourceAlertLevel } from './analysis-report.types';
+import { ResourceAlert, ResourceAlertLevel, ResourceAlertMap } from './analysis-report.types';
 
 export class PopeyeReportHelper {
 
-  constructor(public report: any) {}
+  constructor(public report: any) { }
 
   // Map the report to the alert format
   public map() {

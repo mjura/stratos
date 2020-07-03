@@ -1,20 +1,18 @@
-import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { Store } from '@ngrx/store';
-import { environment } from 'frontend/packages/core/src/environments/environment';
-import { ResetPagination } from 'frontend/packages/store/src/actions/pagination.actions';
-import { combineLatest, Observable, of } from 'rxjs';
-import { catchError, filter, map, startWith } from 'rxjs/operators';
+import { combineLatest, Observable } from 'rxjs';
+import { filter, first, map, pairwise, startWith, tap } from 'rxjs/operators';
 
 import { SnackBarService } from '../../../../../core/src/shared/services/snackbar.service';
+import { ResetPaginationOfType } from '../../../../../store/src/actions/pagination.actions';
 import { AppState } from '../../../../../store/src/app-state';
+import { ListActionState, RequestInfoState } from '../../../../../store/src/reducers/api-request-reducer/types';
 import { kubeEntityCatalog } from '../kubernetes-entity-catalog';
-import { GetAnalysisReports } from '../store/kubernetes.actions';
+import { GetAnalysisReports } from '../store/anaylsis.actions';
+import { AnalysisReport } from '../store/kube.types';
 import { getHelmReleaseDetailsFromGuid } from '../workloads/store/workloads-entity-factory';
 import { KubernetesEndpointService } from './kubernetes-endpoint.service';
-import { KubeScoreReportHelper } from './kubescore-report.helper';
-import { PopeyeReportHelper } from './popeye-report.helper';
 
 export interface KubernetesAnalysisType {
   name: string;
@@ -40,7 +38,6 @@ export class KubernetesAnalysisService {
     public kubeEndpointService: KubernetesEndpointService,
     public activatedRoute: ActivatedRoute,
     public store: Store<AppState>,
-    public http: HttpClient,
     private snackbarService: SnackBarService
   ) {
     this.kubeGuid = kubeEndpointService.kubeGuid || getHelmReleaseDetailsFromGuid(activatedRoute.snapshot.params.guid).endpointId;
@@ -106,62 +103,22 @@ export class KubernetesAnalysisService {
     this.action = kubeEntityCatalog.analysisReport.actions.getMultiple(this.kubeGuid)
   }
 
-  public delete(item) {
-    if (!Array.isArray(item)) {
-      item = [item];
-    }
-
-    const ids = [];
-    item.forEach(i => ids.push(i.id));
-
-    const proxyAPIVersion = environment.proxyAPIVersion;
-
-    // Fetch the report
-    const url = `/pp/${proxyAPIVersion}/analysis/reports`;
-    const headers = new HttpHeaders({});
-    const requestArgs = {
-      headers,
-      body: ids
-    };
-
-    const del = this.http.delete(url, requestArgs);
-    del.subscribe(d => this.refresh());
-
-    return del;
+  public delete(endpointID: string, item: { id: string }) {
+    return kubeEntityCatalog.analysisReport.api.delete(endpointID, item.id);
   }
 
   public refresh() {
-    this.store.dispatch(new ResetPagination(this.action, this.action.paginationKey));
-    this.store.dispatch(this.action);
+    this.store.dispatch(new ResetPaginationOfType(this.action));
   }
 
-  public run(id: string, endpointID: string, namespace?: string, app?: string) {
-    const proxyAPIVersion = environment.proxyAPIVersion;
-    const body = {
-      namespace,
-      app,
-    };
-
-    // Start an Analysis
-    const url = `/pp/${proxyAPIVersion}/analysis/run/${id}/${endpointID}`;
-    const headers = new HttpHeaders({});
-    const requestArgs = {
-      headers,
-    };
-
-    const start = this.http.post(url, body, requestArgs).pipe(
-      map(response => {
-        return response;
-      }),
-      catchError((e, c) => {
-        console.log('Error occurred');
-        console.log(e);
-        const msg = { firstLine: 'Failed to run Analysis Report' };
-        return of(false);
-      })
-    );
-
-    start.subscribe(a => {
+  public run(id: string, endpointID: string, namespace?: string, app?: string): Observable<any> {
+    const obs$ = kubeEntityCatalog.analysisReport.api.run<RequestInfoState>(endpointID, id, namespace, app).pipe(
+      pairwise(),
+      filter(([oldE, newE]) => oldE.creating && !newE.creating),
+      map(([, newE]) => newE),
+      first()
+    )
+    obs$.subscribe(() => {
       const type = id.charAt(0).toUpperCase() + id.substring(1);
       let msg;
       if (app) {
@@ -174,138 +131,35 @@ export class KubernetesAnalysisService {
       this.snackbarService.showReturn(msg, ['kubernetes', endpointID, 'analysis'], 'View', 5000);
       this.refresh();
     });
+    return obs$;
   }
 
-  public getLatestCheck(endpointID: string, path: string): Observable<boolean> {
-    return this.getLatestObservable(endpointID, path, true).pipe(
-      map(response => response !== false),
-    );
-  }
-  public getLatest(endpointID: string, path: string): Observable<any> {
+  public getByID(endpoint: string, id: string, refresh = false): Observable<AnalysisReport> {
+    if (refresh) {
+      kubeEntityCatalog.analysisReport.api.getById<RequestInfoState>(endpoint, id)
+    }
 
-    const start = this.getLatestObservable(endpointID, path, false).pipe(
-      map(response => {
-        this.processReport(response);
-        return response;
+    const entityService = kubeEntityCatalog.analysisReport.store.getById.getEntityService(endpoint, id);
+    return entityService.waitForEntity$.pipe(
+      map(e => e.entity),
+      tap(entity => {
+        if (!refresh && !entity.report) {
+          kubeEntityCatalog.analysisReport.api.getById<RequestInfoState>(endpoint, id);
+          refresh = true;
+        }
       }),
-      catchError((e, c) => {
-        console.log('Error occurred');
-        console.log(e);
-        const msg = { firstLine: 'Failed to run Analysis Report' };
-        return of(false);
-      })
+      filter(entity => !!entity.report)
     );
-
-    return start;
   }
 
-  private getLatestObservable(endpointID: string, path: string, checkExists = false): Observable<any> {
-    const proxyAPIVersion = environment.proxyAPIVersion;
-    const url = `/pp/${proxyAPIVersion}/analysis/latest/${endpointID}/${path}`;
-    const headers = new HttpHeaders({});
-    const requestArgs = {
-      headers,
-    };
-
-    let req;
-    if (checkExists) {
-      req = this.http.head(url, requestArgs);
-    } else {
-      req = this.http.get(url, requestArgs);
+  public getByPath(endpointID: string, path: string, refresh = false): Observable<AnalysisReport[]> {
+    if (refresh) {
+      kubeEntityCatalog.analysisReport.api.getByPath<ListActionState>(endpointID, path)
     }
-
-    return req.pipe(
-      catchError((e, c) => {
-        console.log('Error occurred');
-        console.log(e);
-        const msg = { firstLine: 'Failed to run Analysis Report' };
-        return of(false);
-      })
-    );
-
-  }
-
-  private processReport(report: any) {
-    // Check the path of the report
-    if (report.path.split('/').length !== 2) {
-      return;
-    }
-
-    switch (report.format) {
-      case 'popeye':
-        const helper = new PopeyeReportHelper(report);
-        helper.map();
-        break;
-      case 'kubescore':
-        const kubeScoreHelper = new KubeScoreReportHelper(report);
-        kubeScoreHelper.map();
-        break;
-      default:
-        console.log('Do not know how to handle this report type');
-        break;
-    }
-  }
-
-  public getByID(endpoint: string, id: string): Observable<any> {
-    const proxyAPIVersion = environment.proxyAPIVersion;
-    const url = `/pp/${proxyAPIVersion}/analysis/reports/${endpoint}/${id}`;
-    const headers = new HttpHeaders({});
-    const requestArgs = {
-      headers,
-    };
-
-    return this.http.get(url, requestArgs).pipe(
-      map(response => {
-        this.processReport(response);
-        return response;
-      }),
-      catchError((e, c) => {
-        console.log('Error occurred');
-        console.log(e);
-        // TODO: msg not used?
-
-        const msg = { firstLine: 'Failed to get Analysis Report' };
-        return of(false);
-      })
+    return kubeEntityCatalog.analysisReport.store.getByPath.getPaginationService(endpointID, path).entities$.pipe(
+      tap(a => console.log('getByPath: ', a)),
+      filter(entities => !!entities)
     );
   }
 
-  public getByPath(endpointID: string, path: string): Observable<any> {
-    const proxyAPIVersion = environment.proxyAPIVersion;
-    const url = `/pp/${proxyAPIVersion}/analysis/completed/${endpointID}/${path}`;
-    const headers = new HttpHeaders({});
-    const requestArgs = {
-      headers,
-    };
-
-    return this.http.get(url, requestArgs).pipe(
-      catchError((e, c) => {
-        console.log('Error occurred');
-        console.log(e);
-        // TODO: msg not used?
-        const msg = { firstLine: 'Failed to get Analysis Reports by path' };
-        return of(false);
-      })
-    );
-  }
-
-
-  public getReportFile(id: string, file: string): Observable<any> {
-    const proxyAPIVersion = environment.proxyAPIVersion;
-    const url = `/pp/${proxyAPIVersion}/analysis/reports/${id}/${file}`;
-    const headers = new HttpHeaders({});
-    const requestArgs = {
-      headers,
-    };
-
-    return this.http.get(url, requestArgs).pipe(
-      catchError((e, c) => {
-        console.log('Error occurred');
-        console.log(e);
-        // TODO: msg not used?
-        const msg = { firstLine: 'Failed to get Analysis Report' };
-        return of(false);
-      })
-    );
-  }
 }

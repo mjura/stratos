@@ -18,8 +18,19 @@ export class PopeyeReportViewerComponent implements OnInit, IReportViewer {
 
   private apply(response) {
     if (response) {
+      // In order to supplement the sanitizers with extra properties need to create new obj (see spread below and `reduce`)
+      response = {
+        ...response,
+        report: {
+          ...response.report,
+          popeye: {
+            ...response.report.popeye
+          }
+        }
+      }
       // Make the response easier to render
-      response.report.popeye.sanitizers.forEach(s => {
+      response.report.popeye.sanitizers = response.report.popeye.sanitizers.reduce((ss, oldS) => {
+        const s = { ...oldS }
         const groups = [];
         let totalIssues = 0;
         if (s.issues) {
@@ -38,7 +49,9 @@ export class PopeyeReportViewerComponent implements OnInit, IReportViewer {
           s.hide = true;
         }
         s.groups = groups;
-      });
+        ss.push(s);
+        return ss;
+      }, []);
 
       return response.report;
     }

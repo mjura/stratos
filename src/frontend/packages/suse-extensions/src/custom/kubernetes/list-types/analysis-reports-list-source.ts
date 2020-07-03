@@ -10,8 +10,8 @@ import { AppState } from '../../../../../store/src/app-state';
 import { isFetchingPage } from '../../../../../store/src/reducers/pagination-reducer/pagination-reducer.helper';
 import { kubeEntityCatalog } from '../kubernetes-entity-catalog';
 import { KubernetesEndpointService } from '../services/kubernetes-endpoint.service';
+import { GetAnalysisReports } from '../store/anaylsis.actions';
 import { AnalysisReport } from '../store/kube.types';
-import { GetAnalysisReports } from '../store/kubernetes.actions';
 
 export class AnalysisReportsDataSource extends ListDataSource<AnalysisReport> {
 

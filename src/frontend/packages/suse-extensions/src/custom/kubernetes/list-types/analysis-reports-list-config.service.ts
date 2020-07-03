@@ -102,11 +102,8 @@ export class AnalysisReportsListConfig implements IListConfig<AnalysisReport> {
     this.AppsDataSource = new AnalysisReportsDataSource(store, this, kubeEndpointService, ngZone);
   }
 
-  private listActionDelete: IListAction<any> = {
-    action: (item) => {
-      return this.analysisService.delete(item);
-
-    },
+  private listActionDelete: IListAction<AnalysisReport> = {
+    action: (item) => this.analysisService.delete(item.endpoint, item),
     label: 'Delete',
     icon: 'delete',
     description: ``,

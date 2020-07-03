@@ -1,19 +1,22 @@
-import { Observable, Subject } from 'rxjs';
-import { Component, OnInit, Input, EventEmitter, Output } from '@angular/core';
-import { KubernetesAnalysisService } from '../../services/kubernetes.analysis.service';
-import { map, first } from 'rxjs/operators';
+import { Component, EventEmitter, Input, OnDestroy, OnInit, Output } from '@angular/core';
 import * as moment from 'moment';
+import { Observable, Subscription } from 'rxjs';
+import { map, tap } from 'rxjs/operators';
+
+import { safeUnsubscribe } from '../../../../../../core/src/core/utils.service';
+import { KubernetesAnalysisService } from '../../services/kubernetes.analysis.service';
+import { AnalysisReport } from '../../store/kube.types';
 
 @Component({
   selector: 'app-analysis-report-selector',
   templateUrl: './analysis-report-selector.component.html',
   styleUrls: ['./analysis-report-selector.component.scss']
 })
-export class AnalysisReportSelectorComponent implements OnInit {
+export class AnalysisReportSelectorComponent implements OnInit, OnDestroy {
 
   public selection = { title: 'None' };
 
-  public analyzers$ = new Subject<any>();
+  public analyzers$: Observable<AnalysisReport[]>;
 
   @Input() endpoint;
   @Input() path;
@@ -26,29 +29,21 @@ export class AnalysisReportSelectorComponent implements OnInit {
 
   autoSelected = false;
 
+  subs: Subscription[] = [];
+
   constructor(public analysisService: KubernetesAnalysisService) { }
 
   ngOnInit() {
-    this.analyzers$.pipe(first()).subscribe(reports => {
-      // Auto-select first report
-      if (!this.autoSelected && this.autoSelect && reports.length > 0) {
-        this.onSelected(reports[0]);
-      }
-    });
-
-    this.fetchReports();
-  }
-
-  private fetchReports() {
-    this.analysisService.getByPath(this.endpoint, this.path).pipe(
-      map(d => {
+    this.analyzers$ = this.analysisService.getByPath(this.endpoint, this.path).pipe(
+      map(reports => {
+        console.log('report selector: getByPath$: ', reports)
         const res = [];
         if (this.allowNone) {
-          res.push({title: 'None'});
+          res.push({ title: 'None' });
         }
-        if (d) {
-          d.forEach(r => {
-            const c = {... r};
+        if (reports) {
+          reports.forEach(r => {
+            const c = { ...r };
             const title = c.type.substr(0, 1).toUpperCase() + c.type.substr(1);
             const age = moment(c.created).fromNow(true);
             c.title = `${title} (${age})`;
@@ -57,11 +52,15 @@ export class AnalysisReportSelectorComponent implements OnInit {
         }
         this.reportCount.next(res.length);
         return res;
+      }),
+      tap(reports => {
+        if (!this.autoSelected && this.autoSelect && reports.length > 0) {
+          this.onSelected(reports[0]);
+        }
       })
-    ).subscribe(data => {
-      this.analyzers$.next(data);
-    });
+    )
   }
+
 
   // Selection changed
   public onSelected(d) {
@@ -74,10 +73,13 @@ export class AnalysisReportSelectorComponent implements OnInit {
   }
 
   public refreshReports($event: MouseEvent) {
-    this.analysisService.refresh();
-    this.fetchReports();
+    this.analysisService.getByPath(this.endpoint, this.path, true)
     $event.preventDefault();
     $event.cancelBubble = true;
+  }
+
+  ngOnDestroy() {
+    safeUnsubscribe(...this.subs)
   }
 
 }

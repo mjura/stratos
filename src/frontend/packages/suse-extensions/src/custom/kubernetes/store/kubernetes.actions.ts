@@ -6,9 +6,7 @@ import { MetricQueryConfig, MetricsAction, MetricsChartAction } from '../../../.
 import { getPaginationKey } from '../../../../../store/src/actions/pagination.actions';
 import { PaginatedAction, PaginationParam } from '../../../../../store/src/types/pagination.types';
 import { EntityRequestAction } from '../../../../../store/src/types/request.types';
-import { MonocularPaginationAction } from '../../helm/store/helm.actions';
 import {
-  analysisReportEntityType,
   KUBERNETES_ENDPOINT_TYPE,
   kubernetesDashboardEntityType,
   kubernetesDeploymentsEntityType,
@@ -82,10 +80,6 @@ export const GET_KUBE_DEPLOYMENT_FAILURE = '[KUBERNETES Endpoint] Get Deployment
 export const GET_KUBE_DASHBOARD = '[KUBERNETES Endpoint] Get K8S Dashboard Info';
 export const GET_KUBE_DASHBOARD_SUCCESS = '[KUBERNETES Endpoint] Get Dashboard Success';
 export const GET_KUBE_DASHBOARD_FAILURE = '[KUBERNETES Endpoint] Get Dashboard Failure';
-
-export const GET_ANALYSIS_REPORTS = '[ANALYSIS] Get Reports';
-export const GET_ANALYSIS_REPORTS_SUCCESS = '[ANALYSIS] Get Reports Success';
-export const GET_ANALYSIS_REPORTS_FAILURE = '[ANALYSIS] Get Reports Failure';
 
 const defaultSortParams = {
   'order-direction': 'desc' as SortDirection,
@@ -375,25 +369,4 @@ export class FetchKubernetesChartMetricsAction extends MetricsChartAction {
       KUBERNETES_ENDPOINT_TYPE
     );
   }
-}
-
-// Get the analysis reports for the given endpoint ID
-export class GetAnalysisReports implements MonocularPaginationAction {
-  constructor(public kubeGuid: string) {
-    this.paginationKey = `k8s-${kubeGuid}`;
-  }
-  type = GET_ANALYSIS_REPORTS;
-  endpointType = KUBERNETES_ENDPOINT_TYPE;
-  entityType = analysisReportEntityType;
-  entity = [kubernetesEntityFactory(analysisReportEntityType)];
-  actions = [
-    GET_ANALYSIS_REPORTS,
-    GET_ANALYSIS_REPORTS_SUCCESS,
-    GET_ANALYSIS_REPORTS_FAILURE
-  ];
-  paginationKey: string;
-  initialParams = {
-    'order-direction': 'asc',
-    'order-direction-field': 'age',
-  };
 }

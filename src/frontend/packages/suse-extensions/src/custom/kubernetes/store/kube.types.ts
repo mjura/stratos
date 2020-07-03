@@ -498,4 +498,6 @@ export interface AnalysisReport {
   read: boolean;
   status: string;
   duration: number;
+  report?: any;
+  title?: string;
 }

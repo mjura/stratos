@@ -24,7 +24,6 @@ import {
   kubernetesPodsEntityType,
 } from '../kubernetes-entity-factory';
 import { KubernetesPodExpandedStatusHelper } from '../services/kubernetes-expanded-state';
-import { GET_ANALYSIS_REPORTS, GetAnalysisReports } from '../store/kubernetes.actions';
 import {
   BasicKubeAPIResource,
   KubernetesDeployment,
@@ -97,45 +96,6 @@ export class KubernetesEffects {
   proxyAPIVersion = environment.proxyAPIVersion;
 
   constructor(private http: HttpClient, private actions$: Actions, private store: Store<AppState>) { }
-
-  // Analysis reports
-  @Effect()
-  fetchAnalysisReports$ = this.actions$.pipe(
-    ofType<GetAnalysisReports>(GET_ANALYSIS_REPORTS),
-    flatMap(action => {
-      this.store.dispatch(new StartRequestAction(action));
-      const headers = new HttpHeaders({});
-      const requestArgs = {
-        headers
-      };
-      const url = `/pp/${this.proxyAPIVersion}/analysis/reports/${action.kubeGuid}`;
-      const entityKey = entityCatalog.getEntityKey(action);
-      return this.http.get(url, requestArgs).pipe(
-        mergeMap(response => {
-          const res = {
-            entities: { [entityKey]: {} },
-            result: []
-          } as NormalizedResponse;
-          const items = response as Array<any>;
-          items.forEach(item => {
-            const id = item.id;
-            res.entities[entityKey][id] = item;
-            res.result.push(id);
-          });
-          return [new WrapperRequestActionSuccess(res, action)];
-        }),
-        catchError(error => [
-          new WrapperRequestActionFailed(error.message, action, 'fetch', {
-            endpointIds: [action.kubeGuid],
-            url: error.url || url,
-            eventCode: error.status ? error.status + '' : '500',
-            message: 'Kubernetes Analysis Report request error',
-            error
-          })
-        ])
-      );
-    })
-  );
 
   @Effect()
   fetchDashboardInfo$ = this.actions$.pipe(

@@ -14,6 +14,7 @@ import {
   KubeStatefulSetsActionBuilders,
 } from './store/action-builders/kube.action-builders';
 import {
+  AnalysisReport,
   KubernetesDeployment,
   KubernetesNamespace,
   KubernetesNode,
@@ -35,7 +36,7 @@ export class KubeEntityCatalog {
   public namespace: StratosCatalogEntity<IFavoriteMetadata, KubernetesNamespace, KubeNamespaceActionBuilders>;
   public service: StratosCatalogEntity<IFavoriteMetadata, KubeService, KubeServiceActionBuilders>
   public dashboard: StratosCatalogEntity<IFavoriteMetadata, any, KubeDashboardActionBuilders>;
-  public analysisReport: StratosCatalogEntity<undefined, any, AnalysisReportsActionBuilders>;
+  public analysisReport: StratosCatalogEntity<undefined, AnalysisReport, AnalysisReportsActionBuilders>;
 }
 
 /**
