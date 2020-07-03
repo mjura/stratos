@@ -9,7 +9,7 @@
     <mat-icon>arrow_drop_down</mat-icon>
   </button>
 
-  <button [routerLink]="'/kubernetes/' + kubeId + '/analysis/info'" mat-button *ngIf="analyzers.length > 0">
+  <button (click)="showAnalyzersInfo()" mat-button *ngIf="analyzers.length > 0">
     <mat-icon>help_outline</mat-icon>
     <span>Analyzer Info</span>
   </button>

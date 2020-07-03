@@ -33,6 +33,7 @@ $theme: map-get($stratos-theme, theme);
     .dark-theme {
       @include angular-material-theme($dark-theme);
       @include app-theme($dark-stratos-theme);
+      @include apply-theme($dark-stratos-theme);
     }
   }
 }
@@ -40,6 +41,7 @@ $theme: map-get($stratos-theme, theme);
 .default {
   @include angular-material-theme($theme);
   @include app-theme($stratos-theme);
+  @include apply-theme($stratos-theme);
 }
 
 // Import mat-core

@@ -1,8 +1,8 @@
 import { Component } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { PreviewableComponent } from 'frontend/packages/core/src/shared/previewable-component';
+import { Observable } from 'rxjs';
 
 import { KubernetesAnalysisService } from '../../../services/kubernetes.analysis.service';
-import { getParentURL } from '../../../services/route.helper';
 
 
 @Component({
@@ -13,17 +13,11 @@ import { getParentURL } from '../../../services/route.helper';
     KubernetesAnalysisService
   ]
 })
-export class KubernetesAnalysisInfoComponent {
+export class KubernetesAnalysisInfoComponent implements PreviewableComponent {
 
-  public breadcrumbs = [];
+  analyzers$: Observable<any>;
 
-  constructor(
-    route: ActivatedRoute,
-    public analysisService: KubernetesAnalysisService
-  ) {
-    this. breadcrumbs = [
-      { value: 'Analysis', routerLink: getParentURL(route) },
-      { value: 'Analyzer Info' },
-    ];    
+  setProps(props: { [key: string]: any; }) {
+    this.analyzers$ = props.analyzers$;
   }
 }

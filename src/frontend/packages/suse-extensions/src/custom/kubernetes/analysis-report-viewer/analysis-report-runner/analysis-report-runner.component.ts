@@ -1,7 +1,11 @@
 import { Component, Input, OnInit } from '@angular/core';
+import { SidePanelService } from 'frontend/packages/core/src/shared/services/side-panel.service';
 import { Observable } from 'rxjs';
 
 import { KubernetesAnalysisService, KubernetesAnalysisType } from '../../services/kubernetes.analysis.service';
+import {
+  KubernetesAnalysisInfoComponent,
+} from '../../tabs/kubernetes-analysis-tab/kubernetes-analysis-info/kubernetes-analysis-info.component';
 
 @Component({
   selector: 'app-analysis-report-runner',
@@ -17,6 +21,7 @@ export class AnalysisReportRunnerComponent implements OnInit {
 
   constructor(
     public analysisService: KubernetesAnalysisService,
+    private sidePanelService: SidePanelService,
   ) {
   }
 
@@ -30,6 +35,12 @@ export class AnalysisReportRunnerComponent implements OnInit {
     } else {
       this.analyzers$ = this.analysisService.analyzers$;
     }
+  }
+
+  showAnalyzersInfo() {
+    this.sidePanelService.showModal(KubernetesAnalysisInfoComponent, {
+      analyzers$: this.analysisService.analyzers$
+    });
   }
 
 }

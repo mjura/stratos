@@ -61,8 +61,8 @@ export class KubernetesAnalysisService {
         name: 'PopEye',
         id: 'popeye',
         namespaceAware: true,
-        iconUrl: '/core/assets/custom/popeye.png',
-        iconWidth: '80',
+        // iconUrl: '/core/assets/custom/popeye.png',
+        // iconWidth: '80',
         descriptionUrl: '/core/assets/custom/popeye.md'
       },
       'kube-score':
@@ -70,8 +70,8 @@ export class KubernetesAnalysisService {
         name: 'Kube Score',
         id: 'kube-score',
         namespaceAware: true,
-        iconUrl: '/core/assets/custom/kubescore.png',
-        iconWidth: '120',
+        // iconUrl: '/core/assets/custom/kubescore.png',
+        // iconWidth: '120',
         descriptionUrl: '/core/assets/custom/kubescore.md'
       }
       // {
