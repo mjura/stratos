@@ -62,8 +62,6 @@ export class KubernetesAnalysisReportComponent implements OnInit {
       startWith(true)
     );
 
-    this.breadcrumbs$.subscribe(a => console.log(a));
-
     // When the report has loaded, update the name in the breadcrumbs
     this.report$.pipe(first()).subscribe(report => {
       this.breadcrumbsSubject.next([
@@ -74,7 +72,7 @@ export class KubernetesAnalysisReportComponent implements OnInit {
   }
 
   error() {
-    const msg = { firstLine: 'Failed to load Analysis Report'};
+    const msg = { firstLine: 'Failed to load Analysis Report' };
     this.errorMsg.next(msg);
   }
 }

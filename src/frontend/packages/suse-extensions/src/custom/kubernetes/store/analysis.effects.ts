@@ -255,7 +255,7 @@ export class AnalysisEffects {
         kubeScoreHelper.map();
         break;
       default:
-        console.log('Do not know how to handle this report type');
+        console.warn('Do not know how to handle this report type: ', report.format);
         break;
     }
   }

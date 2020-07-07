@@ -157,7 +157,6 @@ export class KubernetesAnalysisService {
       kubeEntityCatalog.analysisReport.api.getByPath<ListActionState>(endpointID, path)
     }
     return kubeEntityCatalog.analysisReport.store.getByPath.getPaginationService(endpointID, path).entities$.pipe(
-      tap(a => console.log('getByPath: ', a)),
       filter(entities => !!entities)
     );
   }
