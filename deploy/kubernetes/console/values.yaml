@@ -109,6 +109,9 @@ console:
 
   # Node Selector for console Pod
   nodeSelector: {}
+
+  # Download link when installing the Kubernetes Dashboard in a targetted Kube Endpoint
+  kubeDashboardImage:
   
 images:
   console: stratos-console
