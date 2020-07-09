@@ -5,9 +5,15 @@ Stratos provides a mechanism for customization - the following customizations ar
 - Changing the theme colors
 - Changing certain image assets (favorite icon, login background and logo)
 - Overriding styles
-g- Chaging the4e've provided these instructions.
+- Adding new functionality
+- Changing the initial loading indicator
 
-1) Before updating to the latest code...ustomize-reset` to remove all previously created sym links.
+# Migrating to Stratos V4 Customization
+In V4 there are breaking customization changes. These changes allow a much improved approach to extensions by opening the door to npm style plugins.
+To aid in migrating we've provided these instructions.
+
+1) Before updating to the latest code...
+    1) Run `npm run customize-reset` to remove all previously created sym links.
     2) Read through the customization documentation below to get a better understanding of the new process.
 1) Update your codebase with the desired v4 code.
 1) Run `npm install` (only required first time, this will ensure you have the required version of Angular).
