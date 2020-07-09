@@ -116,6 +116,7 @@ The following table lists the configurable parameters of the Stratos Helm chart 
 |console.service.ingress.annotations|Annotations to be added to the ingress resource||
 |console.service.ingress.extraLabels|Additional labels to be added to the ingress resource||
 |console.nodeSelector|Node selectors to use for the console Pod||
+|console.kubeDashboardImage|Download link when installing the Kubernetes Dashboard in a targetted Kube Endpoint||
 |mariadb.nodeSelector|Node selectors to use for the database Pod||
 |configInit.nodeSelector|Node selectors to use for the configuration Pod||
 
@@ -310,7 +311,7 @@ helm install my-console stratos/console --namespace=console --set console.localA
 
 In some scenarios it is useful to be able to add custom annotations and/or labels to the Kubernetes resources that the Stratos Helm chart creates.
 
-The Stratos Helm chart exposes a number of Helm chart values that cabe specified in order to do this - they are:
+The Stratos Helm chart exposes a number of Helm chart values that can be specified in order to do this - they are:
 
 |Parameter|Description|Default|
 |----|---|---|

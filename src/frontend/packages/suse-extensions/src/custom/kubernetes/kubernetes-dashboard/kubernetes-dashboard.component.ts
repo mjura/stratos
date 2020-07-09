@@ -50,7 +50,7 @@ export class KubernetesDashboardTabComponent implements OnInit {
   href = '';
   isLoading$ = new BehaviorSubject<boolean>(true);
   hasError$ = new BehaviorSubject<boolean>(false);
-  expanded = false;
+  expanded = true;
 
   private loadCheckTries = 0;
   private haveSetupEventLister = false;

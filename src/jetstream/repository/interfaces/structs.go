@@ -373,6 +373,7 @@ type PortalConfig struct {
 	// This depends on the deployment mechanism and the database config
 	// e.g. if running in Cloud Foundry with a shared DB, then only the 0-index application instance
 	// can perform migrations
+	KubeDashboardImage string `configName:"STRATOS_KUBERNETES_DASHBOARD_IMAGE"`
 }
 
 // SetCanPerformMigrations updates the state that records if we can perform Database migrations
