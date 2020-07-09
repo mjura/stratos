@@ -1,10 +1,11 @@
 {
-  "name": "@suse/theme",
-  "version": "0.0.1",
+  "name": "@susestratos/theme",
+  "version": "0.0.0",
   "stratos": {
     "assets": {
       "assets/core": "core/assets",
-      "assets/favicon.ico": "favicon.ico"
+      "assets/favicon.ico": "favicon.ico",
+      "assets/fonts": "suse/fonts"
     },
     "theme": {
       "loadingCss": "loader/loading.css",
