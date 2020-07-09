@@ -116,7 +116,6 @@ The following table lists the configurable parameters of the Stratos Helm chart 
 |console.service.ingress.annotations|Annotations to be added to the ingress resource||
 |console.service.ingress.extraLabels|Additional labels to be added to the ingress resource||
 |console.nodeSelector|Node selectors to use for the console Pod||
-|console.kubeDashboardImage|Download link when installing the Kubernetes Dashboard in a targetted Kube Endpoint||
 |mariadb.nodeSelector|Node selectors to use for the database Pod||
 |configInit.nodeSelector|Node selectors to use for the configuration Pod||
 

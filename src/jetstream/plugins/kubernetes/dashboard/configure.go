@@ -147,7 +147,7 @@ func addErrorMessage(msg, prefix string, response *interfaces.CNSIRequest, err e
 // InstallDashboard will install the dashboard into a Kubernetes cluster
 func InstallDashboard(p interfaces.PortalProxy, endpointGUID, userGUID string) error {
 	// Download the Yaml for the dashboard
-	kubeDashboardImage := p.GetConfig().KubeDashboardImage
+	kubeDashboardImage := p.Env().String("STRATOS_KUBERNETES_DASHBOARD_IMAGE", "")
 	if len(kubeDashboardImage) == 0 {
 		kubeDashboardImage = dashboardInstallYAMLDownloadURL
 	}
