@@ -126,7 +126,7 @@ export class KubernetesDashboardTabComponent implements OnInit {
 
     if (hasLoaded) {
       this.isLoading$.next(false);
-      this.toggle(false);
+      this.toggle(true);
     }
 
   }
