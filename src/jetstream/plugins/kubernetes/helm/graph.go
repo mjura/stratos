@@ -27,8 +27,12 @@ type ReleaseNode struct {
 	ID    string `json:"id"`
 	Label string `json:"label"`
 	Data  struct {
-		Kind   string     `json:"kind"`
-		Status NodeStatus `json:"status"`
+		Kind     string     `json:"kind"`
+		Status   NodeStatus `json:"status"`
+		Metadata struct {
+			Name      string `yaml:"name" json:"name"`
+			Namespace string `yaml:"namespace" json:"namespace"`
+		} `yaml:"metadata" json:"metadata"`
 	} `json:"data"`
 }
 
@@ -67,9 +71,9 @@ func (r *HelmReleaseGraph) ParseManifest(release *HelmRelease) {
 		}
 
 		node.Data.Kind = item.Kind
+		node.Data.Metadata = item.Metadata
+		log.Errorf("!!!!! %+v: ", item.Metadata.Namespace) // TODO: RC Check
 		node.Data.Status = "unknown"
-
-		//log.Debugf("%s %s", item.Kind, item.APIVersion)
 
 		switch o := item.Resource.(type) {
 		case *appsv1.Deployment:

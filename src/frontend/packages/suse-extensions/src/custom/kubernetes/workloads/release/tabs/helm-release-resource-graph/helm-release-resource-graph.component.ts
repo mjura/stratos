@@ -1,12 +1,13 @@
 import { Component, ComponentFactoryResolver, OnDestroy, OnInit } from '@angular/core';
 import { Edge, Node } from '@swimlane/ngx-graph';
 import { SidePanelService } from 'frontend/packages/core/src/shared/services/side-panel.service';
-import { BehaviorSubject, Observable, Subscription } from 'rxjs';
-import { filter, first, map } from 'rxjs/operators';
+import { BehaviorSubject, combineLatest, Observable, Subject, Subscription } from 'rxjs';
+import { distinctUntilChanged, filter, first, map, startWith } from 'rxjs/operators';
 
 import {
   KubernetesResourceViewerComponent,
 } from '../../../../kubernetes-resource-viewer/kubernetes-resource-viewer.component';
+import { ResourceAlert } from '../../../../services/analysis-report.types';
 import { KubernetesAnalysisService } from '../../../../services/kubernetes.analysis.service';
 import { KubeAPIResource } from '../../../../store/kube.types';
 import { getIcon } from '../../icon-helper';
@@ -50,6 +51,9 @@ export class HelmReleaseResourceGraphComponent implements OnInit, OnDestroy {
 
   public path: string;
 
+  private analysisReportUpdated = new Subject<any>();
+  private analysisReportUpdated$ = this.analysisReportUpdated.pipe(startWith(null), distinctUntilChanged());
+
   constructor(
     private componentFactoryResolver: ComponentFactoryResolver,
     private helper: HelmReleaseHelperService,
@@ -61,14 +65,17 @@ export class HelmReleaseResourceGraphComponent implements OnInit, OnDestroy {
   ngOnInit() {
 
     // Listen for the graph
-    this.graph = this.helper.fetchReleaseGraph().subscribe(g => {
+    this.graph = combineLatest(
+      this.helper.fetchReleaseGraph(),
+      this.analysisReportUpdated$
+    ).subscribe(([g, report]) => {
       const newNodes = [];
       Object.values(g.nodes).forEach((node: any) => {
         const colors = this.getColor(node.data.status);
         const icon = getIcon(node.data.kind);
         const missing = node.data.status === 'missing';
 
-        newNodes.push({
+        const newNode = {
           id: node.id,
           label: node.label,
           data: {
@@ -77,9 +84,16 @@ export class HelmReleaseResourceGraphComponent implements OnInit, OnDestroy {
             dash: missing ? 6 : 0,
             fill: colors.bg,
             text: colors.fg,
-            icon: icon
+            icon: icon,
+            alerts: null,
+            alertSummary: {}
           },
-        });
+        };
+
+        // Does this node have any alerts?
+        this.applyAlertToNote(newNode, report)
+
+        newNodes.push(newNode);
       });
       this.nodes = newNodes;
 
@@ -100,6 +114,31 @@ export class HelmReleaseResourceGraphComponent implements OnInit, OnDestroy {
         setTimeout(() => this.fitGraph(), 10);
       }
     });
+  }
+
+  private applyAlertToNote(newNode, report) {
+    if (report && report.alerts) {
+      console.log(newNode.data.metadata.namespace);
+      Object.values(report.alerts).forEach((group: ResourceAlert[]) => {
+        group.forEach(alert => {
+          if (
+            newNode.data.kind.toLowerCase() === alert.kind &&
+            newNode.data.metadata.name === alert.name
+            // && newNode.data.metadata.namespace === alert.namespace // TODO: RC CHECK! Is this needed given analysis should only contain
+            // resources from this release?
+          ) {
+            console.log(newNode, alert);
+            newNode.data.alerts = newNode.data.alerts || [];
+            newNode.data.alerts.push(alert);
+            newNode.data.alertSummary = newNode.data.alertSummary || {};
+            if (newNode) {
+              // TODO: RC retain the most critical colour, colourise appropriately
+              newNode.data.alertSummary.color = 'red';
+            }
+          }
+        });
+      });
+    }
   }
 
   ngOnDestroy() {
@@ -167,6 +206,14 @@ export class HelmReleaseResourceGraphComponent implements OnInit, OnDestroy {
   }
 
   public analysisChanged(report) {
+    if (report === null) {
+      this.analysisReportUpdated.next(null);
+    } else {
+      // TODO: RC Is this needed?
+      this.analyzerService.getByID(this.helper.endpointGuid, report.id).subscribe(results => {
+        this.analysisReportUpdated.next(results);
+      });
+    }
   }
 
 }
